@@ -2,35 +2,37 @@ from typing import List
 import heapq
 
 
+# class Solution():
+#     def findKthLargest(self, nums: List[int], k: int) -> int:
+#         return sorted(nums, reverse=True)[k - 1]
+#
+#
+# class Solution():
+#     def findKthLargest(self, nums: List[int], k: int) -> int:
+#         return heapq.nlargest(k, nums)[-1]
+
+
 class Solution():
 
-    def quicksort(self, nums, left, right):
-        if left == right:
-            return nums[left]
-        pivot = self.partition(nums, left, right)
-        if pivot == self._k:
-            return nums[pivot]
-        elif pivot < self._k:
-            return self.quicksort(nums, pivot + 1, right)
-        else:
-            return self.quicksort(nums, left, pivot - 1)
-
-    def partition(self, nums, left, right):
-        pivot = nums[left]
-        while left < right:
-            while nums[right] >= pivot:
-                right -= 1
-            if left < right:
-                nums[left] = nums[right]
-                left += 1
-
-    #    todo 未完成
-
-    # def findKthLargest(self, nums: List[int], k: int) -> int:
-    #     return sorted(nums, reverse=True)[k - 1]
-
-    # def findKthLargest(self, nums: List[int], k: int) -> int:
-    #     return heapq.nlargest(k, nums)[-1]
+    # def quicksort(self, nums, left, right):
+    #     if left == right:
+    #         return nums[left]
+    #     pivot = self.partition(nums, left, right)
+    #     if pivot == self._k:
+    #         return nums[pivot]
+    #     elif pivot < self._k:
+    #         return self.quicksort(nums, pivot + 1, right)
+    #     else:
+    #         return self.quicksort(nums, left, pivot - 1)
+    #
+    # def partition(self, nums, left, right):
+    #     pivot = nums[left]
+    #     while left < right:
+    #         while nums[right] >= pivot:
+    #             right -= 1
+    #         if left < right:
+    #             nums[left] = nums[right]
+    #             left += 1
 
     # 自己实现的快速排序
     def findKthLargest(self, nums: List[int], k: int) -> int:
@@ -39,13 +41,14 @@ class Solution():
             pivot_index = left
             left += 1
             while right >= left:
-                #                 两个指针相遇，跳出循环
+                #  两个指针相遇，跳出循环
                 if nums[right] <= pivot:
-                    right -= 1;
+                    right -= 1
                     continue
                 if nums[left] >= pivot:
-                    left += 1;
+                    left += 1
                     continue
+                # 右边小于哨兵，且左边大于哨兵，就左右交换位置
                 nums[right], nums[left] = nums[left], nums[right]
                 left += 1
                 right -= 1

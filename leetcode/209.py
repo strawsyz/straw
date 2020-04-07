@@ -6,6 +6,8 @@ from typing import *
 # 使用滑动窗口
 class Solution:
     def minSubArrayLen(self, s: int, nums: List[int]) -> int:
+        if not nums:
+            return 0
         left = right = 0
         length = len(nums) - 1
         min_len = 0
