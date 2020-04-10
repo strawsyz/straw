@@ -2,12 +2,12 @@
 # Every integer represented in the 2D-array will be between 1 and N, where N is the size of the input array.
 
 # 使用了查并集算法
-# 任何一条边的两个点，如果在某个位置连载一起说明，应为这条边，而产生了环
+# 任何一条边的两个点，如果在某个位置连载一起说明，这条边是附加边，而产生了环
 
 # 找到有相同根的两个节点
 class Solution:
     def findRedundantConnection(self, edges: List[List[int]]) -> List[int]:
-        # temp的y位置上的数值表示连接到y的点 【0,0,1,1】表示从1出发，连接到点2和3,第一个0是摆饰，node从1开始
+        # temp的y位置上的数值表示连接到y的点 【0,0,1,1】表示从1出发，连接到点2和3,第一个0是摆饰，node从1开始计算
         temp = [0] * 1001
         # 用查并集
         for edge in edges:
