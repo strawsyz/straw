@@ -1,0 +1,147 @@
+﻿<!DOCTYPE HTML>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title></title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+    <meta name="generator" content=""/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+    <link href="/static/css/haiersoft.css" rel="stylesheet" type="text/css" media="screen,print"/>
+    <link href="/static/css/print.css" rel="stylesheet" type="text/css" media="print"/>
+    <script src="/static/js/jquery-1.10.1.min.js"></script>
+    <script src="/static/js/side.js" type="text/javascript"></script>
+
+    <!--[if lt IE 9]>
+{#<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>#}
+{#<script src="http://css3-mediaqueries-js.googlecode.com/svn/trunk/css3-mediaqueries.js"></script>#}
+<![endif]-->
+</head>
+
+<body>
+<form id="form" method="get" action="/left/illuster_list/">
+    <!-- Popup -->
+    <div id="Popup">
+
+        <!-- SubPopup -->
+        <div id="SubPopup">
+            <script type="text/javascript">
+                $(function () {
+                    $(".select").each(function () {
+                        var s = $(this);
+                        var z = parseInt(s.css("z-index"));
+                        var dt = $(this).children("dt");
+                        var dd = $(this).children("dd");
+                        var _show = function () {
+                            dd.slideDown(200);
+                            dt.addClass("cur");
+                            s.css("z-index", z + 1);
+                        };
+                        var _hide = function () {
+                            dd.slideUp(200);
+                            dt.removeClass("cur");
+                            s.css("z-index", z);
+                        };
+                        dt.click(function () {
+                            dd.is(":hidden") ? _show() : _hide();
+                        });
+                        dd.find("a").click(function () {
+                            dt($(this)());
+                            _hide();
+                        });
+                        $("body").click(function (i) {
+                            !$(i.target).parents(".select").first().is(s) ? _hide() : "";
+                        });
+                    })
+                })
+            </script>
+            <div class="form_boxC">
+                <table cellpadding="0" cellspacing="0">
+                    {% csrf_token %}
+                    <tr>
+                        <th width="100">画师姓名</th>
+                        <td>
+                            <div class="txtbox floatL" style="width:100px;"><input name="name" type="text" size="5"
+                                                                                   value=""></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>画师id</th>
+                        <td>
+                            <div class="txtbox floatL" style="width:100px;"><input name="illuster_id" type="text"
+                                                                                   size="5" value=""></div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <!-- SubPopup -->
+
+        <div id="BtmBtn">
+            <div class="btn_boxB floatR mag_l20"><input name="" type="reset" value="取消"
+                                                        onmousemove="this.className='input_move'"
+                                                        onmouseout="this.className='input_out'"></div>
+            <div class="btn_box floatR"><input name="" type="submit" value="查询"
+                                               onmousemove="this.className='input_move'"
+                                               onmouseout="this.className='input_out'"></div>
+        </div>
+    </div>
+</form>
+<!-- /Popup -->
+<div id="MainForm">
+    <div class="form_boxA">
+        <h2>画师信息</h2>
+        <table cellpadding="0" cellspacing="0">
+            <tr>
+                <th>画师名</th>
+                <th>画师id</th>
+                <th>头像</th>
+                <th>更新日期</th>
+                <th>操作</th>
+            </tr>
+            {% for illuster in illuster_list %}
+                <tr>
+                    <td><a href="/illuster_info?id={{ illuster.illuster_id }}">{{ illuster.name }}</a>></td>
+                    <td>{{ illuster.illuster_id }}</td>
+                    <td>{{ illuster.image_url }}</td>
+{#                                        <td><img src="http://192.168.31.145:81/files/pixiv/5496634/67918160_p17.png"></td>#}
+                    <td>{{ illuster.modify_time|date:"Y-m-d H:i:s" }}</td>
+                    <td><a href="/left/yT?d={{ illuster.illuster_id }}">删除</a> | <a
+                            href="/left/yT?u={{ illuster.illuster_id }}">修改</a></td>
+                    {#            <a  href="/kc?d={{ blog.title }}">删除我</a>#}
+                    {#            <a href="/blog_update?u={{ blog.title }}">更新我</a>#}
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+{# 这里使用 bootstrap 渲染页面 #}
+<div id="pages" class="text-center">
+    <nav>
+        <ul class="pagination">
+            <li class="step-links">
+                {% if illuster_list.has_previous %}
+                    <a  href="?page={{ illuster_list.previous_page_number }}">上一页</a>
+                {% endif %}
+                {% for pg in illuster_list.paginator.page_range %}
+                    {% if illuster_list.number == pg %}
+                        <span class="current">
+                    {{ illuster_list.number }} </span>
+
+                    {% else %}
+{#                        <span>#}
+{#                   {{ illuster_list.paginator.num_pages }}</span>#}
+                        <a class='active' href="?page={{ pg}}">{{ pg}}</a>
+                    {% endif %}
+                {% endfor %}
+
+                {% if illuster_list.has_next %}
+                    <a  href="?page={{ illuster_list.next_page_number }}">下一页</a>
+                {% endif %}
+            </li>
+        </ul>
+    </nav>
+</div>
+</body>
+</html>

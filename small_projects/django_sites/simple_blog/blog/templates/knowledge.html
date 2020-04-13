@@ -1,0 +1,72 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>顾少个人博客网站</title>
+
+<link href="/static/css/base.css" rel="stylesheet">
+<link href="/static/css/learn.css" rel="stylesheet">
+<!--[if lt IE 9]>
+<script src="/static/js/modernizr.js"></script>
+<![endif]-->
+</head>
+<body>
+<header>
+  <div id="logo"><a href="/"></a></div>
+    <nav class="topnav" id="topnav">
+            <a href="/blog"><span>首页</span><span class="en">Protal</span></a>
+            <a href="/about"><span>关于我</span><span class="en">About</span></a>
+            <a href="/newlist"><span>慢生活</span><span class="en">Life</span></a>
+            <a href="/moodlist"><span>碎言碎语</span><span class="en">Doing</span></a>
+            <!-- <a href="share"><span>模板分享</span><span class="en">Share</span></a> -->
+            <a href="/knowledge">  	<span>学无止境</span><span class="en">Learn</span>  </a>
+            <!-- <a href="book"><span>留言版</span><span class="en">Gustbook</span></a> -->
+        </nav>
+</header>
+<article class="blogs">
+<h1 class="t_nav"><span>我们长路漫漫，只因学无止境。 </span><a href="/" class="n1">网站首页</a><a href="/" class="n2">学无止境</a></h1>
+<div class="newblog left">
+    {% for blog in blog_list %}
+   <h2>{{ blog.title }}</h2>
+   <p class="dateview"><span>发布时间：{{ blog.timestamp }}</span><span>作者：{{ blog.author }}</span><span>分类：[<a href="/knowledge">{{ blog.type }}</a>]</span></p>
+    <figure><img src="/static/images/01.jpg"></figure>
+    <ul class="nlist">
+      <p>{{ blog.body }}</p>
+      <a title="/" href="/new?id={{ blog.id }}" target="_blank" class="readmore">详细信息>></a>
+    </ul>
+    <div class="line"></div>
+    {% endfor %}
+    <div class="blank"></div>
+    
+ <!--    <div class="page"><a title="Total record"><b></b></a>
+      <b>1</b>
+      <a href="/news/s/index_2">2</a>
+      <a href="/news/s/index_2">&gt;</a>
+      <a href="/news/s/index_2">&gt;&gt;</a>
+    </div> -->
+</div>
+<aside class="right">
+   <div class="rnav">
+      <h2>栏目导航</h2>
+      <ul>
+       <li><a href="http://www.w3school.com.cn/html5/index.asp" target="_blank">CSS3|Html5</a></li>
+       <li><a href="/knowledge/" target="_blank">心得笔记</a></li>
+<li><a href="http://www.w3school.com.cn/js/index.asp" target="_blank">JS经典实例</a></li>
+<li><a href="/newsfree/" target="_blank">网站建设</a></li>
+     </ul>      
+    </div>
+
+     <!-- Baidu Button BEGIN -->
+    <div id="bdshare" class="bdshare_t bds_tools_32 get-codes-bdshare"><a class="bds_tsina"></a><a class="bds_qzone"></a><a class="bds_tqq"></a><a class="bds_renren"></a><span class="bds_more"></span><a class="shareCount"></a></div>
+    <script type="text/javascript" id="bdshare_js" data="type=tools&amp;uid=6574585" ></script> 
+    <script type="text/javascript" id="bdshell_js"></script> 
+    <script type="text/javascript">
+document.getElementById("bdshell_js").src = "http://bdimg.share.baidu.com/static/js/shell_v2.js?cdnversion=" + Math.ceil(new Date()/3600000)
+</script> 
+    <!-- Baidu Button END -->   
+</aside>
+</article>
+
+<script src="/static/js/silder.js"></script>
+</body>
+</html>
