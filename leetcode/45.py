@@ -23,7 +23,7 @@ class Solution:
             max_range = max
         return step
 
-
-s = Solution()
-res = s.jump([2, 3, 1, 1, 4])
-print(res)
+if __name__ == '__main__':
+    s = Solution()
+    res = s.jump([2, 3, 1, 1, 4])
+    print(res)
