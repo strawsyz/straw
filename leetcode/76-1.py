@@ -9,14 +9,14 @@ class Solution:
         need, have = {}, {}
         result = ""
         min_result_len = len(s) + 1
-        for x in t:
-            need[x] = need.get(x, 0) + 1
-        tset = set(t)
+        for c in t:
+            need[c] = need.get(c, 0) + 1
+        t_set = set(t)
         # 需要匹配的字符数量
-        need_match = len(tset)
+        need_match = len(t_set)
         while right < len(s):
             # 如果右指针所指的字符在需要的字符类型之内
-            if s[right] in tset:
+            if s[right] in t_set:
                 # 将相应的字符的已经拥有的数量加一
                 have[s[right]] = have.get(s[right], 0) + 1
                 # 如果字符拥有的数量等于需要的数量
@@ -35,7 +35,7 @@ class Solution:
                     # 更新最小子串长度
                     min_result_len = len(result)
                 # 如果左指针所指的字符是需要的字符类型
-                if s[left] in tset:
+                if s[left] in t_set:
                     # 在拥有的字符中，减去相应的字符个数
                     have[s[left]] = have.get(s[left], 0) - 1
                     # 如果拥有的字符个数小于需要的字符个数。就减少一个match的值

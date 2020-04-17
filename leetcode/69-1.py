@@ -1,3 +1,4 @@
+# 采用二分法
 class Solution:
     def mySqrt(self, x: int) -> int:
         # if x < 4:
@@ -13,8 +14,6 @@ class Solution:
             else:
                 return mid
         return left - 1
-
-
 
 
 if __name__ == '__main__':
