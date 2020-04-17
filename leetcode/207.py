@@ -1,5 +1,5 @@
-
 # DFS
+
 class Solution:
     def canFinish(self, numCourses: int, prerequisites: List[List[int]]) -> bool:
         # 存储每种课的依赖的所有课程
@@ -10,7 +10,7 @@ class Solution:
         # 存储每个课程的调查状态
         # 0表示还没有调查，初始状态
         # 1表示不清楚调查结果
-        # 2表示没有构成环
+        # 2表示没有构成环，遇到没有构成环的点，就不需要在继续探索了
         status = [0] * numCourses
         for i in range(numCourses):
             if self.exist_cycle(status, graphic, i):
@@ -29,7 +29,7 @@ class Solution:
         # 遍历学习该课程前需要学习的课程
         for next_node in graphic[cur_node]:
             if self.exist_cycle(status, graphic, next_node):
-                # 如果发现有一个环，说明，当前这个图有环
+                # 如果发现有一个环，说明当前这个图有环
                 return True
         # 走出循环，说明已经遍历了所有预备课程，没有形成环
         status[cur_node] = 2
