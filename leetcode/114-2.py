@@ -7,6 +7,8 @@
 #         self.left = None
 #         self.right = None
 
+# 代码更加简洁
+
 class Solution:
     def flatten(self, root: TreeNode) -> None:
         """
@@ -18,39 +20,15 @@ class Solution:
                 # 就遍历右节点
                 root = root.right
             else:
+                # 如果有左节点
                 pre = root.left
+                # 移动到左子树的最右边
                 while pre.right:
                     pre = pre.right
-                #  将右子树放到左子树的最右边上
+                # 将右子树放到左子树的最右边上
                 pre.right = root.right
                 #  将左子树放到右子树上
                 root.right = root.left
-                # let left tree is None
+                # 让左子树为空
                 root.left = None
                 root = root.right
-
-
-
-class Solution:
-    def flatten(self, root: TreeNode) -> None:
-        """
-        modify root in-place instead.
-        """
-        if root is None:
-            return root
-        left = right = None
-        if root.left is not None:
-            left = self.flatten(root.left)
-        if root.right is not None:
-            right = self.flatten(root.right)
-        if left:
-            root.right = left
-            while left.right:
-                left = left.right
-            if right:
-                left.right = right
-        else:
-            if right:
-                root.right = right
-        root.left = None
-        return root

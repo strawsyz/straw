@@ -3,7 +3,6 @@
 class Solution:
     def deleteDuplication(self, pHead):
         # write code here
-
         last = pHead
         now = pHead.next
         flag = False
@@ -43,9 +42,9 @@ class Solution:
                     last = last.next
                     last_last = last_last.next
                     now = now.next
-            # last_last = last_last.next
+                    # last_last = last_last.next
 
-            # now = now.next
+                    # now = now.next
         if head_flag:
             pHead = pHead.next
         return pHead

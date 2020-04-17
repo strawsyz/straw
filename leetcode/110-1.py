@@ -16,7 +16,6 @@ class Solution:
             return True
         left_depth = self.depth(root.left)
         right_depth = self.depth(root.right)
-        # 使用内置函数abs快了4ms
         if abs(left_depth - right_depth) > 1:
             return False
         else:

@@ -4,13 +4,9 @@
 
 class Solution:
     def majorityElement(self, nums: List[int]) -> int:
-        length = len(nums) // 2
-        dict = {}
+        map = {}
+        target = len(nums) // 2
         for num in nums:
-            if num in dict:
-                dict[num] += 1
-            else:
-                dict[num] = 1
-        for k, v in dict.items():
-            if v > length:
-                return k
+            map[num] = map.get(num, 0) + 1
+            if map[num] > target:
+                return num

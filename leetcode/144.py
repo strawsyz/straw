@@ -5,10 +5,11 @@
 #         self.left = None
 #         self.right = None
 
+# 使用栈结构来先序遍历二叉树
 class Solution:
     def preorderTraversal(self, root: TreeNode) -> List[int]:
-        res = []
-        if not root: return []
+        if not root:
+            return []
         stack = [root]
         result = []
         while stack:
