@@ -1,40 +1,49 @@
+# -*- coding:utf-8 -*-
+
+# 逻辑和之前的版本基本一样
 class Solution:
-    def movingCount(self, m: int, n: int, k: int) -> int:
-        if k < 0:
+    def movingCount(self, threshold, rows, cols):
+        # 题目要求threshold小于0的时候返回0
+        if threshold <= 0:
             return 0
-        moves = [[1, 0], [-1, 0], [0, 1], [0, -1]]
-        visited = [[0] * n for _ in range(m)]
+        # write code here
+        moves = [[1, 0], [0, 1], [-1, 0], [0, -1]]
+        counter = 0
+        visited = [[0 for _ in range(cols)] for _ in range(rows)]
 
-        def validate_boundary(x, y, xMax, yMax):
-            if x < 0 or x >= xMax:
+        def is_ok(row, col, n_row, n_col, k=threshold):
+            if row < 0 or row >= n_row:
                 return False
-            if y < 0 or y >= yMax:
+            if col < 0 or col >= n_col:
                 return False
-            return True
+            sum = 0
+            while row > 0:
+                sum += row % 10
+                row = row // 10
+            while col > 0:
+                sum += col % 10
+                col = col // 10
+            return sum <= k
 
-        def validate_k(x, y, k):
-            res = 0
-            while x > 0:
-                res += x % 10
-                x = x // 10
-            while y > 0:
-                res += y % 10
-                y = y // 10
-            return res > k
+        start = [0, 0]
+        counter += 1
+        visited[0][0] = 1
 
-        def dfs(m, n, x, y, k):
-            count = 1
-            visited[x][y] = 1
-            for i in range(len(moves)):
-                newX = x + moves[i][0]
-                newY = y + moves[i][1]
-                if not validate_boundary(newX, newY, m, n):
-                    continue
-                if visited[newX][newY] == 1:
-                    continue
-                if validate_k(newX, newY, k):
-                    continue
-                count += dfs(m, n, newX, newY, k)
-            return count
+        def dfs(now, n_row, n_col):
+            counter = 0
+            for move in moves:
+                next_step = [now[0] + move[0], now[1] + move[1]]
+                if is_ok(next_step[0], next_step[1], n_row, n_col):
+                    if visited[next_step[0]][next_step[1]] == 0:
+                        visited[next_step[0]][next_step[1]] = 1
+                        counter += 1
+                        counter += dfs(next_step, n_row, n_col)
+            return counter
 
-        return dfs(m, n, 0, 0, k)
+        return dfs(start, rows, cols) + 1
+
+
+if __name__ == '__main__':
+    s = Solution()
+    res = s.movingCount(2, 6, 2)
+    print(res)
