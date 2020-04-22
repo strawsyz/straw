@@ -7,7 +7,6 @@ class Node:
 
 
 class Trie:
-
     def __init__(self):
         """
         Initialize your data structure here.
@@ -50,11 +49,12 @@ class Trie:
         return True
 
 
-# Your Trie object will be instantiated and called as such:
-obj = Trie()
-word = 'asd'
-obj.insert(word)
-param_2 = obj.search(word)
-param_3 = obj.startsWith(word)
-print(param_2)
-print(param_3)
+if __name__ == '__main__':
+    # Your Trie object will be instantiated and called as such:
+    obj = Trie()
+    word = 'asd'
+    obj.insert(word)
+    param_2 = obj.search(word)
+    param_3 = obj.startsWith(word)
+    print(param_2)
+    print(param_3)

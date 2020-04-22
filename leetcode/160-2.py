@@ -17,19 +17,3 @@ class Solution:
             p = p.next if p else headB
             q = q.next if q else headA
         return q
-
-
-class Solution:
-    def getIntersectionNode(self, headA: ListNode, headB: ListNode) -> ListNode:
-
-        p = headA
-        hashmap = {}
-        while p:
-            hashmap[p] = 0
-            p = p.next
-        q = headB
-        while q:
-            res = hashmap.get(q)
-            if res is not None:
-                return q
-            q = q.next
