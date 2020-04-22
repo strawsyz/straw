@@ -47,17 +47,17 @@ class Solution:
             right += 1
             res.append(right)
 
-    elif right == length - 1:
-        for _ in range(k - count - 1):
-            left -= 1
-            res.append(left)
+        elif right == length - 1:
+            for _ in range(k - count - 1):
+                left -= 1
+                res.append(left)
 
 
-result = []
-for i in res:
-    result.append(arr[i])
+        result = []
+        for i in res:
+            result.append(arr[i])
 
-return result
+        return result
 
 if __name__ == '__main__':
     s = Solution()
