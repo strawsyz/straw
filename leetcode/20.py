@@ -32,11 +32,13 @@ class Solution:
             elif c in right_part:
                 # 如果没有目标值。但是有着右边部分，说明有问题
                 return False
-        if have_left_parts==[]:
+        if have_left_parts == []:
             # 如果没有需要补全的部分了，说明结束了
             return True
         else:
             return False
+
+
 if __name__ == '__main__':
     s = Solution()
     res = s.isValid("([])]")
