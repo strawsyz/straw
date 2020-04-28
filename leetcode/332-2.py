@@ -14,6 +14,8 @@ import collections
 
 # 虽然题目写了一定有合理路径。但我还是写了判断是否合理路径
 # 明明添加了一堆无用的判断代码，不知道为什么结果速度要快很多
+
+
 class Solution:
     def findItinerary(self, tickets: List[List[str]]) -> List[str]:
         def temp():
@@ -32,6 +34,7 @@ class Solution:
                 # 设置入度和出度
                 in_out_map[from_][1] += 1
                 in_out_map[to][0] += 1
+
         # 默认从JFK出发
         start = 'JFK'
         in_more_than_out = 0

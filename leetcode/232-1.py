@@ -6,8 +6,8 @@
 # empty() -- Return whether the queue is empty.
 
 # 其实做错了，因为没有使用栈来实现队列
-class MyQueue:
 
+class MyQueue:
     def __init__(self):
         """
         Initialize your data structure here.
@@ -43,6 +43,7 @@ class MyQueue:
         Returns whether the queue is empty.
         """
         return len(self.nums) == 0
+
 # Your MyQueue object will be instantiated and called as such:
 # obj = MyQueue()
 # obj.push(x)

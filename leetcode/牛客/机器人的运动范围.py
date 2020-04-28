@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 
-# 逻辑和之前的版本基本一样
+# 深度遍历
 class Solution:
     def movingCount(self, threshold, rows, cols):
         # 题目要求threshold小于0的时候返回0
