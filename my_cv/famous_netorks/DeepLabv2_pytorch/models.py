@@ -1,3 +1,7 @@
+import torch
+from torch import nn
+import torch.nn.functional as F
+
 # 参考https://zhuanlan.zhihu.com/p/68531147的实现
 
 class ASPP(nn.Module):
@@ -51,7 +55,6 @@ class ConvBnReLU(nn.Sequential):
                  dilation, relu=True):
         super(ConvBnReLU, self).__init__()
         # 添加卷积层
-        # todo 不懂为什么bias是False
         self.add_module("Conv",
                         nn.Conv2d(in_n, out_n, kernel_size,
                                   stride, padding, dilation, bias=False))
