@@ -127,5 +127,6 @@ class LinkNet(nn.Module):
         out = self.conv_tp_block_2(out)
         return out
 
-# if __name__ == '__main__':
-#     LinkNet()
+
+if __name__ == '__main__':
+    LinkNet()
