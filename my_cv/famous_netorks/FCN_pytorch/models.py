@@ -20,7 +20,11 @@ class Deconv(nn.Module):
 
 
 class FCN(nn.Module):
-    def __init__(self):
+    def __init__(self, n_out=4):
+        """
+        网络初始化，特点输出结果的图像大小和输入图像的是一样的
+        :param n_out: 输出结果的频道数。
+        """
         super(FCN, self).__init__()
         # 在VGG的基础上建立，使用VGG的结构
         vgg = vgg16_bn(pretrained=False)
@@ -35,7 +39,7 @@ class FCN(nn.Module):
         self.decoder_2 = Deconv(512, 256)
         self.decoder_3 = Deconv(256, 128)
         self.decoder_4 = Deconv(128, 64)
-        self.decoder_5 = Deconv(64, 12)
+        self.decoder_5 = Deconv(64, n_out)
 
     def forward(self, x):
         # 编码器部分
@@ -59,4 +63,4 @@ if __name__ == '__main__':
     x = torch.randn(1, 3, 224, 224)
     net = FCN()
     out = net(x)
-    print(x.shape)
+    print(out.shape)
