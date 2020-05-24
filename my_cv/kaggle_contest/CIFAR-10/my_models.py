@@ -2,6 +2,14 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+import torchvision.models as models
+
+def network():
+    """方便外面调用"""
+    resnet50 = models.resnet101(pretrained=True)
+    resnet50.fc = nn.Linear(2048, 10)
+    return resnet50
+
 
 class Conv(nn.Sequential):
     def __init__(self, in_n, out_n, kernel_size=3, stride=1, padding=1, groups=1, **kwargs):
@@ -40,85 +48,6 @@ class DepthPointConv(nn.Module):
             return F.relu(self.conv_bn(out), inplace=True)
         else:
             return self.conv_bn(out)
-
-
-class MobileNetV2(nn.Module):
-    def __init__(self, num_classes, bottle=BaseMobileResNet, layers=[1, 2, 3, 4, 3, 3, 1], ratio=[1, 6, 6, 6, 6, 6, 6],
-                 strides=[1, 2, 2, 2, 1, 2, 1]):
-        self.layers = layers
-        self.bottle = bottle
-        super(MobileNetV2, self).__init__()
-        self.conv_bn = self._conv_bn(3, 32, 2)
-        self.layer1 = self._make_layer(32, 16, layers[0], ratio[0], strides[0])
-        self.layer2 = self._make_layer(16, 24, layers[1], ratio[1], strides[1])
-        self.layer3 = self._make_layer(24, 32, layers[2], ratio[2], strides[2])
-        self.layer4 = self._make_layer(32, 64, layers[3], ratio[3], strides[3])
-        self.layer5 = self._make_layer(64, 96, layers[4], ratio[4], strides[4])
-        self.layer6 = self._make_layer(96, 160, layers[5], ratio[5], strides[5])
-        self.layer7 = self._make_layer(160, 320, layers[6], ratio[6], strides[6])
-        self.bottom = self._conv1x1(320, 1280)
-        self.avgpool = nn.AvgPool2d(7)
-        self.fc = nn.Sequential(
-            nn.Dropout(p=0.8),
-            nn.Linear(1280, num_classes),
-        )
-        for m in self.modules():
-            if isinstance(m, nn.Conv2d):
-                n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
-                m.weight.data.normal_(0, (2. / n) ** .5)
-            elif isinstance(m, nn.BatchNorm2d):
-                m.weight.data.fill_(1)
-                m.bias.data.zero_()
-            elif isinstance(m, nn.Linear):
-                n = m.weight.size(1)
-                m.weight.data.normal_(0, 0.01)
-                m.bias.data.zero_()
-
-    def forward(self, x):
-        x = self.conv_bn(x)
-        x = self.layer1(x)
-        x = self.layer2(x)
-        x = self.layer3(x)
-        x = self.layer4(x)
-        x = self.layer5(x)
-        x = self.layer6(x)
-        x = self.layer7(x)
-        x = self.bottom(x)
-        x = self.avgpool(x)
-        x = x.view(x.size(0), -1)
-        x = self.fc(x)
-        # pro = F.softmax(x)
-        # return x, pro
-        return x
-
-    def _make_layer(self, in_channel, out_channel, layer, ratio, stride):
-        cnn = []
-
-        if layer > 1:
-            for i in range(layer):
-                out_channel = int(out_channel * 1)
-                if i == 0:
-                    cnn.append(self.bottle(in_channel, out_channel, stride, ratio))
-                else:
-                    cnn.append(self.bottle(in_channel, out_channel, 1, ratio))
-                in_channel = out_channel
-        elif layer == 1:
-            cnn.append(self.bottle(in_channel, int(out_channel * 1), 1, ratio))
-        return nn.Sequential(*cnn)
-
-    def _conv_bn(self, in_channel, out_channel, stride):
-        return nn.Sequential(
-            nn.Conv2d(in_channel, out_channel, kernel_size=3, stride=stride, padding=1, bias=False),
-            nn.BatchNorm2d(out_channel),
-            nn.ReLU6(inplace=True),
-        )
-
-    def _conv1x1(self, in_channel, out_channel, stride=1):
-        return nn.Sequential(
-            nn.Conv2d(in_channel, out_channel, 1, 1, 0, bias=False),
-            nn.BatchNorm2d(out_channel),
-            nn.ReLU6(inplace=True),
-        )
 
 class MobileNetV1(nn.Module):
     # [(conv num_channels, stirde),(conv planes, stirde)，(conv planes, stirde)....]
@@ -484,23 +413,3 @@ class MobileNetV3(nn.Module):
         out = self.classifier(out)
         return out.view(out.size(0), -1)
 
-
-
-if __name__ == '__main__':
-    # 经测试可以跑通
-    model = MobileNetV1()
-    x = torch.randn(8, 3, 32, 32)
-    y = model(x)
-    print(y.size())
-
-    # 懒得改代码了，就使用relu代替MobileNet的ReLU6了
-    model = MobileNetV2()
-    x = torch.randn(8, 3, 32, 32)
-    y = model(x)
-    print(y.size())
-
-    model = MobileNetV3(type='small')
-    # print(model)
-    input = torch.randn(8, 3, 224, 224)
-    y = model(input)
-    print(y.shape)

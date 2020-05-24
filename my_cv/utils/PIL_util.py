@@ -5,6 +5,10 @@ def show(path):
     Image.open(path).show()
 
 
+def show_numpy_image(np_array):
+    Image.fromarray(np_array).show()
+
+
 def thumbnail(img, size):
     return img.thumbnail(size)
 

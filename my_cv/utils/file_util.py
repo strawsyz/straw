@@ -1,4 +1,5 @@
 import os
+
 import zipfile36 as zipfile
 from PIL import Image
 
@@ -122,8 +123,14 @@ def img2thumbnail(file_path, dest_path, size, is_cover=False):
     except OSError:
         print('{} 文件有问题'.format(file_path))
 
+
 def get_cur_dir(py_file):
     return os.path.dirname(os.path.abspath(py_file))  # 当前py文件所在的路径
+
+
+def get_filename_ext(path):
+    file_name, ext = os.path.splitext(os.path.basename(path))
+    return file_name, ext
 
 
 if __name__ == '__main__':
