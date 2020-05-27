@@ -1,18 +1,17 @@
-import os
+import time
 
 import pandas as pd
 import torch
+from my_models import network
 from torch.autograd import Variable
 from torchvision import transforms
 
 import dataset
-from my_models import network
 
-MODEL_PATH = '/home/straw/Downloads/models/kaggle/cifar10/generator_param_resnet101.pkl'
-RESULT_PATH = "/home/straw/Downloads/dataset/kaggle/cifar10/sub.csv"
+MODEL_PATH = '/home/straw/Downloads/models/kaggle/cifar10/res101_ep19_2020-05-25.pkl'
+RESULT_PATH = "/home/straw/Downloads/dataset/kaggle/cifar10/sub{}.csv".format(int(time.time()))
 # 标签列表
 LABEL_NAMES = ['airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck']
-
 
 
 def get_label_name(index):
@@ -23,7 +22,7 @@ def test():
     # 创建网络
     net = network()
     # 加载之前保存的参数
-    net.load_state_dict(torch.load())
+    net.load_state_dict(torch.load(MODEL_PATH))
     net.cuda()
     net.eval()
     result_labels = []
@@ -58,6 +57,7 @@ if __name__ == '__main__':
     # 准备数据
     test_data = dataset.Cifar10TestDataset(transform=test_transforms)
     testloader = torch.utils.data.DataLoader(test_data, batch_size=256, shuffle=False, num_workers=2)
-
+    # 测试数据
     result_labels = test()
+    # 保存数据
     save(result_labels)

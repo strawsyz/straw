@@ -1,11 +1,43 @@
 # -*- coding: utf-8 -*-
 
 import os
-import torch
-from torch.utils.data import Dataset
+
 import cv2
+import torch
 import torchvision
 from PIL import Image
+from torch.utils.data import Dataset
+
+
+class PolypDataset(Dataset):
+
+    def __init__(self, image_path, mask_path, image_transforms=None, mask_transforms=None):
+        super(PolypDataset, self).__init__()
+        self.image_paths = []
+        self.mask_paths = []
+        self.transforms = image_transforms
+        self.mask_transforms = mask_transforms
+        for file_name in os.listdir(image_path):
+            self.image_paths.append(os.path.join(image_path, file_name))
+            self.mask_paths.append(os.path.join(mask_path, file_name))
+
+    def __len__(self):
+        return len(self.image_paths)
+
+    def __getitem__(self, index):
+        image = Image.open(self.image_paths[index])
+        mask = Image.open(self.mask_paths[index])
+        # 对图像进行处理
+        if self.transforms is not None:
+            image = self.transforms(image)
+        if self.mask_transforms is not None:
+            # todo 存在一些不是0也不是1的数字，非常小，对结果应该没有太大影响，但姑且记录一下
+            mask = self.mask_transforms(mask)
+            # 要对数据二值化
+            # 应该不需要对mask图像做处理
+            # label = self.transforms(label)
+        # sample = self.transform(image, label)
+        return image, mask
 
 
 class NYU(Dataset):

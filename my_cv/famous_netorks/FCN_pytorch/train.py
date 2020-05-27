@@ -21,9 +21,9 @@ VAL_LABEL_PATH = ""
 
 # 创建数据加载器
 train_data = DataLoader(NYU(TRAIN_DATA_PATH, TRAIN_LABEL_PATH), batch_size=BATCH_SIZE,
-                        shuffle=True, num_works=4, phase_train=True)
+                        shuffle=True, num_workers=4, phase_train=True)
 val_data = DataLoader(NYU(VAL_DATA_PATH, VAL_LABEL_PATH), batch_size=BATCH_SIZE,
-                      shuffle=True, num_works=4, phase_train=False)
+                      shuffle=True, num_workers=4, phase_train=False)
 
 net = FCN().cuda()
 optimizer = optim.Adam(net.parameters(), lr=lr)

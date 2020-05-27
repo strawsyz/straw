@@ -3,12 +3,12 @@ import time
 
 import torch
 import torch.optim as optim
+from my_models import network
 from torch import nn
 from torch.autograd import Variable
 from torchvision import transforms
 
 import dataset
-from my_models import network
 
 # 准备数据
 DATA_PATH = '/home/straw/Downloads/dataset/kaggle/cifar10/'
@@ -26,7 +26,7 @@ MODEL_PATH = '/home/straw/Downloads/models/kaggle/cifar10/'
 PRETRAIN_MODEL_PATH = os.path.join(MODEL_PATH, 'generator_param_resnet101.pkl')
 DATASETS_PATH = "/home/straw/Downloads/dataset/"
 # k折交叉验证的计算方法
-K = 10
+K = 5
 # ===========================数据集准备==================================
 # 数据增强的方法
 train_transforms = transforms.Compose([
@@ -91,11 +91,11 @@ def accuracy(output, labels):
 
 # k-fold cross validation（k-折叠交叉验证）
 # 将n份数据分为n_folds份，以次将第i份作为测试集，其余部分作为训练集
-def KFold(num=200, n_folds=10):
+def KFold(num, n_folds=5):
     """
     k折叠交叉验证算法,如果份数不能整除数据的数量
     会尽量分成相近的数量
-    :param num: 总共的数量
+    :param num: 所有数据的数量
     :param n_folds: k，分成k份
     :return:
     """
@@ -150,7 +150,7 @@ def train(epoch):
             total += len(y_)
             if num_iter % 200 == 0:
                 print(
-                    "Epoch:{}\t iter:{}\t K:{}\t loss:{:6}\t accuracy:{:5}".format(epoch, num_iter, k_index,
+                    "Epoch:{}\t iter:{}\t K:{}\t loss:{:6}\t accuracy:{:6}".format(epoch, num_iter, k_index,
                                                                                    train_loss.data,
                                                                                    (predict == y_).sum().float() / len(
                                                                                        y_)))
@@ -173,17 +173,20 @@ def train(epoch):
             valid_accu /= total
             valid_loss /= total
             # 必须使用loss的data属性，不能直接print cuda上的数据
-            print("Epoch{}:\t K{}:\t valid_loss:{:.6f}\t valid_accu:{}".format(epoch, k_index, valid_loss, valid_accu))
+            print("Epoch{}:\t K{}:\t valid_loss:{:.6f}\t valid_accu:{:.6f}".format(epoch, k_index, valid_loss,
+                                                                                   valid_accu))
 
         k_index += 1
 
     per_epoch_time = time.time() - epoch_start_time
-    print('[{}/{}] - use {:.2f} minutes\t loss: {:.6f}\t accu: {.6f}\t'.format(
-        (epoch + 1), EPOCH, per_epoch_time / 60, torch.mean(torch.FloatTensor(loss)), train_accu))
+    print('[{}/{}] - use {:.2f} minutes\t loss: {:.6f}\t accu: {:.6f}\t'.format(
+        (epoch + 1), EPOCH, per_epoch_time / 60, torch.mean(torch.FloatTensor(loss)),
+        torch.mean(torch.FloatTensor(train_accu))))
     # k折训练结束之后保存模型
     train_hist['per_epoch_ptimes'].append(per_epoch_time)
     print('EPOCH {} is over! ... save training results'.format(epoch))
-    torch.save(net.state_dict(), os.path.join(MODEL_PATH, 'generator_param_resnet101.pkl'))
+    import time_util
+    torch.save(net.state_dict(), os.path.join(MODEL_PATH, 'res101_ep{}_{}.pkl'.format(epoch, time_util.get_date())))
 
 
 # 训练数据
