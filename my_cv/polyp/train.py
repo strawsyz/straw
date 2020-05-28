@@ -79,7 +79,7 @@ for epoch in range(EPOCH):
     last_mask = None
     last_image = None
     # 开始每个批次
-    for image, label in train_data:
+    for image, mask in train_data:
         # 检查输入的图像是否有问题
         # from PIL import Image
         #
@@ -91,12 +91,11 @@ for epoch in range(EPOCH):
         num_iter += 1
         if is_use_gpu:
             # 将数据放入GPU
-            image = Variable(image.cuda())
-            label = Variable(label.cuda())
+            image, mask = Variable(image.cuda()), Variable(mask.cuda())
+            # label = Variable(label.cuda())
             # label = Variable(label.long().cuda())
         else:
-            image = Variable(image)
-            label = Variable(label)
+            image, mask = Variable(image), Variable(mask)
             # label = Variable(label.long())
 
         optimizer.zero_grad()
@@ -116,7 +115,7 @@ for epoch in range(EPOCH):
         #     print("mask")
         # if last_image is not None and torch.equal(image, last_image):
         #     print("image")
-        loss = loss_fucntion(out, label)
+        loss = loss_fucntion(out, mask)
         # print(loss.data.size())
         # 返回数据
         loss.backward()
@@ -134,7 +133,8 @@ for epoch in range(EPOCH):
 
     print("==============saving model data===============")
 
-    torch.save(net.state_dict(), os.path.join(MODEL_PATH, 'FCN_NLL_ep{}_{}_second.pkl'.format(epoch, time_util.get_date())))
+    torch.save(net.state_dict(),
+               os.path.join(MODEL_PATH, 'FCN_NLL_ep{}_{}_second.pkl'.format(epoch, time_util.get_date())))
     print("==============saving is over===============")
 
 print("================training is over=================")

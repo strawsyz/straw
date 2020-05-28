@@ -10,8 +10,7 @@ from torch.utils.data import Dataset
 
 
 class PolypDataset(Dataset):
-
-    def __init__(self, image_path, mask_path, image_transforms=None, mask_transforms=None):
+    def __init__(self, image_path, mask_path, image_transforms=None, mask_transforms=None, test=False):
         super(PolypDataset, self).__init__()
         self.image_paths = []
         self.mask_paths = []
@@ -20,6 +19,7 @@ class PolypDataset(Dataset):
         for file_name in os.listdir(image_path):
             self.image_paths.append(os.path.join(image_path, file_name))
             self.mask_paths.append(os.path.join(mask_path, file_name))
+        self.test = test
 
     def __len__(self):
         return len(self.image_paths)
@@ -37,7 +37,10 @@ class PolypDataset(Dataset):
             # 应该不需要对mask图像做处理
             # label = self.transforms(label)
         # sample = self.transform(image, label)
-        return image, mask
+        if self.test:
+            return image, mask, os.path.basename(self.image_paths[index])
+        else:
+            return image, mask
 
 
 class NYU(Dataset):
