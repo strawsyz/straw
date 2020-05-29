@@ -19,7 +19,7 @@ class PolypDataset(Dataset):
         self.transforms = image_transforms
         self.mask_transforms = mask_transforms
 
-        for file_name in os.listdir(image_path):
+        for file_name in sorted(os.listdir(image_path)):
             self.IMAGE_PATHS.append(os.path.join(image_path, file_name))
             self.MASK_PATHS.append(os.path.join(mask_path, file_name))
             self.image_paths.append(os.path.join(image_path, file_name))
@@ -43,6 +43,7 @@ class PolypDataset(Dataset):
             # label = self.transforms(label)
         # sample = self.transform(image, label)
         if self.test:
+            # 如果是测试模型，就会返回图像的名字
             return image, mask, os.path.basename(self.image_paths[index])
         else:
             return image, mask
