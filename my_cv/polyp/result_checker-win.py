@@ -3,7 +3,7 @@ import os
 import numpy as np
 from PIL import Image
 
-
+# 经测试当前版本可以在win上正常运行
 def read_img(file_name):
     # 特殊情况下需要转换，为了速度暂时不转换为RGB
     # img = img.convert('RGB')
@@ -55,37 +55,29 @@ def on_key_release(event):
             index[0] -= 1
             show_images(file_names[index[0]])
         else:
-            print("It's the first image")
+            print("It 's the first image")
 
 
 def show_images(file_name):
-
-    fig = plt.figure('checker result')
-
-    # fig.canvas.mpl_connect("button_release_event", on_mouse_release)
-    fig.canvas.mpl_connect("key_release_event", on_key_release)
-    fig.canvas.mpl_disconnect(fig.canvas.manager.key_press_handler_id)  # 取消默认快捷键的注册
-
     image_path = os.path.join(IMAGE_PATH, file_name)
     mask_path = os.path.join(MASK_PATH, file_name)
     result_path = os.path.join(RESLUT_PATH, file_name)
-    ax = fig.add_subplot(131)
+    ax = plt.subplot(131)
     ax.set_title(file_name)
     ax.imshow(read_img(image_path))
     plt.axis("off")
 
-    ax = fig.add_subplot(132)
+    ax = plt.subplot(132)
     ax.imshow(read_img(mask_path))
     ax.set_title("mask")
     plt.axis("off")
 
-    ax = fig.add_subplot(133)
+    ax = plt.subplot(133)
     ax.imshow(read_img(result_path))
     ax.set_title("result")
     plt.axis("off")
 
-    # ubuntu上调用两次的plt.show()的话会报错，要用下面的函数
-    fig.canvas.draw()
+    plt.show()
 
 
 if __name__ == '__main__':
@@ -109,7 +101,7 @@ if __name__ == '__main__':
     # 查询已经注册的响应函数
     # fig.canvas.callbacks.callbacks
 
-    fig = plt.figure('checker result')
+    fig = plt.figure('')
 
     # fig.canvas.mpl_connect("button_release_event", on_mouse_release)
     fig.canvas.mpl_connect("key_release_event", on_key_release)
@@ -119,4 +111,4 @@ if __name__ == '__main__':
     index = [0]
     show_images(file_names[index[0]])
 
-    plt.show()
+    # plt.show()

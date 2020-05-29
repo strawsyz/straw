@@ -115,7 +115,6 @@ def get_net(ctx):
 
 
 # 读取数据集
-
 train_ds = gdata.vision.ImageFolderDataset(
     os.path.join(data_dir, input_dir, 'train'), flag=1)
 valid_ds = gdata.vision.ImageFolderDataset(

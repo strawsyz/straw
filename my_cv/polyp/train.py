@@ -25,6 +25,8 @@ MODEL_PATH = "/home/straw/Downloads/models/polyp/"
 PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/FCN_NLL_ep413_2020-05-25.pkl"
 is_pretrain = True
 
+# 正式开始测试，将数据分为训练集，测试机和验证机
+
 file_util.make_directory(MODEL_PATH)
 image_transforms = transforms.Compose([
     # 随机调整亮度，对比度，饱和度，色相
@@ -123,11 +125,6 @@ for epoch in range(EPOCH):
         # 计算累计的损失
         train_loss = loss.data + train_loss
         print(train_loss)
-        # last_out = out
-        # last_mask = label
-        # last_image = image
-        # print(out)
-        # print(label)
     train_loss = train_loss / num_iter
     print("EPOCH:{} train_loss:{}".format(epoch, train_loss))
 

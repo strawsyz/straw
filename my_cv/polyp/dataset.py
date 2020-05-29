@@ -14,9 +14,14 @@ class PolypDataset(Dataset):
         super(PolypDataset, self).__init__()
         self.image_paths = []
         self.mask_paths = []
+        self.IMAGE_PATHS = []
+        self.MASK_PATHS = []
         self.transforms = image_transforms
         self.mask_transforms = mask_transforms
+
         for file_name in os.listdir(image_path):
+            self.IMAGE_PATHS.append(os.path.join(image_path, file_name))
+            self.MASK_PATHS.append(os.path.join(mask_path, file_name))
             self.image_paths.append(os.path.join(image_path, file_name))
             self.mask_paths.append(os.path.join(mask_path, file_name))
         self.test = test
@@ -41,6 +46,10 @@ class PolypDataset(Dataset):
             return image, mask, os.path.basename(self.image_paths[index])
         else:
             return image, mask
+
+    def set_data_num(self, num):
+        # 设置数据集的大小
+        self.image_paths, self.mask_paths = self.IMAGE_PATHS[:num], self.MASK_PATHS[:num]
 
 
 class NYU(Dataset):
