@@ -8,21 +8,55 @@ from torch.utils.data import DataLoader
 from torchvision import transforms
 
 import file_util
+import time_util
 from dataset import PolypDataset as dataset
 from models import FCN
+
+# 实验记录
+# E 500
+# lr0.0003
+
+# E 500
+# lr0.0002
+
+# E 500
+# lr0.0002
+
+# E 500
+# lr0.0001
+
+# E 500
+# lr0.00008
+
+# E 500
+# lr0.0.003
+
+# E 500
+# lr0.0.003
 
 # 设置训练参数
 # 由于最后处理的时候要将去掉通道数1的通道，所以不能设置为1
 BATCH_SIZE = 1
 EPOCH = 500
 # 学习率
-lr = 0.0003
+lr = 0.003
 is_use_gpu = True
 DATA_PATH = "/home/straw/Downloads/dataset/polyp/data/"
 MASK_PATH = "/home/straw/Downloads/dataset/polyp/mask/"
 MODEL_PATH = "/home/straw/Downloads/models/polyp/"
-PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/FCN_NLL_ep413_2020-05-25.pkl"
+MODEL_PATH = os.path.join(MODEL_PATH, time_util.get_date())
+file_util.make_directory(MODEL_PATH)
+PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/2020-05-29/FCN_NLL_ep499_01-56-07.pkl"
+PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/2020-06-01/FCN_NLL_ep499_23-56-50.pkl"
+PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/2020-06-02/FCN_NLL_ep499_09-38-52.pkl"
+PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/2020-06-02/FCN_NLL_ep499_12-17-27.pkl"
+PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/2020-06-03/FCN_NLL_ep499_16-52-43.pkl"
+PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/2020-06-04/FCN_NLL_ep499_14-25-49.pkl"
+PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/2020-06-05/FCN_NLL_ep91_15-27-52.pkl"
+PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/2020-06-07/FCN_NLL_ep499_20-55-59.pkl"
+# PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/FCN"
 is_pretrain = True
+
 # 用于训练和验证的所有数据集
 N_TRAIN = 120
 # 训练集数据总共的训练集数据中的百分比
@@ -33,10 +67,8 @@ VALID_RATE = 0.2
 # 120用于训练
 # 30张数据用于验证
 # 36用于测试
-import time_util
 
-MODEL_PATH = os.path.join(MODEL_PATH, time_util.get_date())
-file_util.make_directory(MODEL_PATH)
+
 image_transforms = transforms.Compose([
     # 随机调整亮度，对比度，饱和度，色相
     transforms.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1, hue=0.1),
@@ -56,8 +88,18 @@ mask_transforms = transforms.Compose([
 
 
 def prepare_data():
+    # 为了使结果可以复现，确性随机分的数据是什么
+    torch.manual_seed(7)  # cpu
+    torch.cuda.manual_seed(7)  # gpu
+    import numpy as np
+    import random
+    np.random.seed(7)  # numpy
+    random.seed(7)  # random and transforms
+    torch.backends.cudnn.deterministic = True  # cudnn
+
     # 准备数据
     train_data = dataset(DATA_PATH, MASK_PATH, image_transforms, mask_transforms)
+    # 设置全部训练数据集的大小
     train_data.set_data_num(N_TRAIN)
     # train_data = DataLoader(train_data, batch_size=BATCH_SIZE, shuffle=True)
     # train_data = np.array(train_data)
@@ -77,6 +119,7 @@ def prepare_net():
         net = net.cuda()
         loss_function = loss_function.cuda()
     if is_pretrain:
+        print("load the model from {}".format(PRETRAIN_PATH))
         net.load_state_dict(torch.load(PRETRAIN_PATH))
     optimizer = optim.SGD(net.parameters(), lr=lr)
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=15, gamma=0.8)  # 设置学习率下降策略
@@ -129,7 +172,7 @@ def train(epoch):
         optimizer.step()
         # 计算累计的损失
         train_loss = loss.data + train_loss
-        print(train_loss)
+        # print(train_loss)
     train_loss = train_loss / n_total
     print("EPOCH:{} train_loss:{:.6f}".format(epoch, train_loss))
 

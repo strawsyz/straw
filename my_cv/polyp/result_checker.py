@@ -95,9 +95,9 @@ if __name__ == '__main__':
     # IMAGE_PATH = "/home/straw/.straw's back/image"
     IMAGE_PATH = '/home/straw/Downloads/dataset/polyp/data/'
     MASK_PATH = '/home/straw/Downloads/dataset/polyp/mask/'
-    RESLUT_PATH = '/home/straw/Downloads/dataset/polyp/result/2020-05-28'
+    RESLUT_PATH = '/home/straw/Downloads/dataset/polyp/result/2020-06-07/'
 
-    for file_name in os.listdir(IMAGE_PATH):
+    for file_name in os.listdir(RESLUT_PATH):
         file_names.append(file_name)
 
     from matplotlib import pyplot as plt

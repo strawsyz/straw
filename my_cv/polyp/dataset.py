@@ -49,8 +49,13 @@ class PolypDataset(Dataset):
             return image, mask
 
     def set_data_num(self, num):
-        # 设置数据集的大小
-        self.image_paths, self.mask_paths = self.IMAGE_PATHS[:num], self.MASK_PATHS[:num]
+        if self.test:
+            # 如果是训练模式，就从图像的后面往前选取num个图像
+            self.image_paths, self.mask_paths = self.IMAGE_PATHS[-num:], self.MASK_PATHS[-num:]
+            pass
+        else:
+            # 设置数据集的大小
+            self.image_paths, self.mask_paths = self.IMAGE_PATHS[:num], self.MASK_PATHS[:num]
 
 
 class NYU(Dataset):
