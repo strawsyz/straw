@@ -1,7 +1,8 @@
-from imgaug import augmenters as iaa
-import imgaug as ia
-import cv2
 import os
+
+import cv2
+import imgaug as ia
+from imgaug import augmenters as iaa
 
 
 def handle_function():

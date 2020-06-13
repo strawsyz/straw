@@ -34,7 +34,8 @@ from models import FCN
 # E 500
 # lr0.0.003
 
-# 设置训练参数
+# 最终结果0.69loss
+#  设置训练参数
 # 由于最后处理的时候要将去掉通道数1的通道，所以不能设置为1
 BATCH_SIZE = 1
 EPOCH = 500

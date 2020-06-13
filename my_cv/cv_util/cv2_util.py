@@ -1,5 +1,6 @@
-import numpy as np
 import cv2
+import numpy as np
+from PIL import Image
 
 
 def draw_approx_polyDP(cnt, epsilon=0.01, closed=True):
@@ -115,7 +116,6 @@ def array2img_gray(arr, height, width):
 
 
 if __name__ == '__main__':
-    from PIL import Image
 
     img = cv2.imread('sphere.png')
     cv2.imshow('win', img)

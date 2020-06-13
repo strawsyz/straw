@@ -1,6 +1,6 @@
 import cv2
-from scipy import ndimage
 import numpy as np
+from scipy import ndimage
 
 
 def detect_face_eye():
@@ -119,3 +119,4 @@ def canny_gray(img, threshold1=200, threshold2=300):
     # todo 还需要理解
     # 使用canny边缘检测算法
     return cv2.Canny(img, threshold1, threshold2)
+

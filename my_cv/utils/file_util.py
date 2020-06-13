@@ -133,6 +133,9 @@ def get_filename_ext(path):
     return file_name, ext
 
 
+def get_filename(path):
+    return get_filename_ext(path)[0]
+
 if __name__ == '__main__':
     batch_img2thumbnail('D:\Temp\收藏', (300, 400))
     print("ok")
