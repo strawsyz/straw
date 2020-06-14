@@ -149,8 +149,8 @@ def create_patch(source_path, target_path, width, height, n_width, n_height):
             label += 1
 
 
-flag = True
-# flag = False
+# flag = True
+flag = False
 # 将图像切成平均的切成4份
 if flag:
     SOURCE_IMAGE_PATH = "/home/straw/Downloads/dataset/polyp/TMP/03/data/"
@@ -163,6 +163,40 @@ if flag:
     height = 800
     create_patch(SOURCE_IMAGE_PATH, TARGET_IMAGE_PATH, width, height, 2, 2)
     create_patch(SOURCE_MASK_PATH, TARGET_MASK_PATH, width, height, 2, 2)
+
+
+def convert_imgs(source_path, target_path):
+    for file_name in os.listdir(source_path):
+        file_path = os.path.join(source_path, file_name)
+        img = Image.open(file_path)
+        img.convert("L")
+        save_path = os.path.join(target_path, file_name)
+        img.save(save_path)
+        # 理论上来讲经过之前的处理之后，所有的文件都被保存为png格式了。
+        # 但为了保险，还是重新处理一遍后缀名
+        # target_path = os.path.join(target_path, "{}.png".format(file_util.get_filename(file_path)))
+
+
+def copy_images(source_path, target_path):
+    """复制所有的文件"""
+    for file_name in os.listdir(source_path):
+        file_path = os.path.join(source_path, file_name)
+        img = Image.open(file_path)
+        save_path = os.path.join(target_path, file_name)
+        img.save(save_path)
+
+
+# 由于mask图像的通道数有的是3通道，有的是1通道
+# 所以将mask图像全部都统一为1通道
+flag = True
+# flag=False
+if flag:
+    SOURCE_IMAGE_PATH = "/home/straw/Downloads/dataset/polyp/TMP/04/data/"
+    SOURCE_MASK_PATH = "/home/straw/Downloads/dataset/polyp/TMP/04/mask/"
+    TARGET_IMAGE_PATH = "/home/straw/Downloads/dataset/polyp/TMP/05/data/"
+    TARGET_MASK_PATH = "/home/straw/Downloads/dataset/polyp/TMP/05/mask/"
+    convert_imgs(SOURCE_MASK_PATH, TARGET_MASK_PATH)
+    copy_images(SOURCE_MASK_PATH, TARGET_MASK_PATH)
 
 if __name__ == '__main__':
     # win上的测试
