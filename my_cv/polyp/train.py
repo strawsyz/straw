@@ -63,7 +63,7 @@ PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/2020-06-08/FCN_NLL_ep412_20-
 is_pretrain = False
 
 # 用于训练和验证的所有数据集
-N_TRAIN = 480
+N_TRAIN = 600
 # 训练集数据总共的训练集数据中的百分比
 VALID_RATE = 0.2
 

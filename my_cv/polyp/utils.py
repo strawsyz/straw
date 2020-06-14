@@ -112,6 +112,7 @@ def create_support_image(image_path, target_dir):
 def check_same(dir1, dir2):
     file_list1 = os.listdir(dir1)
     file_list2 = os.listdir(dir2)
+
     file_set1 = set(file_list1)
     # 2有，但是1没有的文件
     lack = []
@@ -137,6 +138,6 @@ if __name__ == '__main__':
     # split(depth_path)
     # split(label_path)
 
-    dir1 = "D:\Download"
-    dir2 = "D:\(lab\cv"
+    dir1 = "/home/straw/Downloads/dataset/polyp/raw/data"
+    dir2 = "/home/straw/Downloads/dataset/polyp/raw/mask"
     check_same(dir1, dir2)

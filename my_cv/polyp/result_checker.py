@@ -6,9 +6,11 @@ from PIL import Image
 
 def read_img(file_name):
     # 特殊情况下需要转换，为了速度暂时不转换为RGB
-    # img = img.convert('RGB')
-    img_array = np.array(Image.open(file_name))
-    return img_array
+    # img_array = np.array(Image.open(file_name))
+    img = Image.open(file_name)
+    # 防止一个通道的图像无法正常显示
+    img = img.convert('RGB')
+    return img
 
 
 # todo 点击某个按钮进入编辑模式，然后编辑图像
