@@ -108,12 +108,35 @@ def create_support_image(image_path, target_dir):
     :return:
     """
 
+
+def check_same(dir1, dir2):
+    file_list1 = os.listdir(dir1)
+    file_list2 = os.listdir(dir2)
+    file_set1 = set(file_list1)
+    # 2有，但是1没有的文件
+    lack = []
+    for file in file_list2:
+        if file in file_set1:
+            file_set1.remove(file)
+        else:
+            lack.append(file)
+    over = list(file_set1)
+    if lack != []:
+        print("dir1 lack files:{}".format(lack))
+    if over != []:
+        print("dir2 lack files:{}".format(over))
+
+
 if __name__ == '__main__':
     # 图像预处理
-    data_preprocess()
-    image_path = '/home/straw/下载/dataset/NYU/images/'
-    depth_path = '/home/straw/下载/dataset/NYU/depths/'
-    label_path = '/home/straw/下载/dataset/NYU/labels/'
-    split(image_path)
-    split(depth_path)
-    split(label_path)
+    # data_preprocess()
+    # image_path = '/home/straw/下载/dataset/NYU/images/'
+    # depth_path = '/home/straw/下载/dataset/NYU/depths/'
+    # label_path = '/home/straw/下载/dataset/NYU/labels/'
+    # split(image_path)
+    # split(depth_path)
+    # split(label_path)
+
+    dir1 = "D:\Download"
+    dir2 = "D:\(lab\cv"
+    check_same(dir1, dir2)
