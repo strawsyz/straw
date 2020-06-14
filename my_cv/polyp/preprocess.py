@@ -142,8 +142,8 @@ def create_patch(source_path, target_path, width, height, n_width, n_height):
     patch_width = width // n_width
     patch_height = height // n_height
     label = 0
-    for start_x in range(0, width - patch_width, patch_width):
-        for start_y in range(0, height - patch_height, patch_height):
+    for start_x in range(0, width - patch_width + 1, patch_width):
+        for start_y in range(0, height - patch_height + 1, patch_height):
             get_needed_data(source_path, target_path,
                             needed_part=(start_x, start_y, start_x + patch_width, start_y + patch_height), ext=label)
             label += 1
