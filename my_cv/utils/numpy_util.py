@@ -10,6 +10,7 @@ def reverse_color(img):
 
 
 def standard(img, min, max):
+    """标准化"""
     return (max - min) * img / 255 + min
 
 

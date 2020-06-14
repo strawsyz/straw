@@ -107,7 +107,7 @@ def create_support_image(image_path, target_dir):
     :param target_dir:
     :return:
     """
-
+    pass
 
 def check_same(dir1, dir2):
     file_list1 = os.listdir(dir1)

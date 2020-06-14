@@ -12,7 +12,7 @@ from models import FCN
 # 设置训练参数
 # 由于最后处理的时候要将去掉通道数1的通道，所以不能设置为1
 BATCH_SIZE = 16  # 设置为32 ，内存就炸了
-N_TEST = 36
+N_TEST = 140
 is_use_gpu = True
 DATA_PATH = "/home/straw/Downloads/dataset/polyp/data/"
 MASK_PATH = "/home/straw/Downloads/dataset/polyp/mask/"
