@@ -116,7 +116,37 @@ def low_pass_filter(img, ksize=(11, 11), sigmaX=0):
 
 
 def canny_gray(img, threshold1=200, threshold2=300):
+    """貌似只能处理灰度图"""
     # todo 还需要理解
     # 使用canny边缘检测算法
-    return cv2.Canny(img, threshold1, threshold2)
+    return cv2.Canny(img, threshold1=threshold1, threshold2=threshold2)
 
+
+def canny_threshold(low_threshold):
+    detected_edges = cv2.GaussianBlur(gray, (3, 3), 0)
+    detected_edges = cv2.Canny(detected_edges, low_threshold, low_threshold * ratio, apertureSize=kernel_size)
+    dst = cv2.bitwise_and(img, img, mask=detected_edges)  # just add some colours to edges from original image.
+    cv2.imshow('canny demo', dst)
+
+
+if __name__ == '__main__':
+
+    lowThreshold = 0
+    max_lowThreshold = 100
+    ratio = 3
+    kernel_size = 3
+    path = "C:\\Users\Administrator\PycharmProjects\straw\my_cv\polyp\source\Proc201506160021_1_1.png"
+    # path = "C:\\Users\Administrator\PycharmProjects\straw\my_cv\polyp\source\\06.jpg"
+    img = cv2.imread(path)
+    img = cv2.resize(img, (224, 224))
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    cv2.namedWindow('canny')
+
+    cv2.createTrackbar('Min threshold', 'canny', lowThreshold, max_lowThreshold, canny_threshold)
+
+    canny_threshold(0)  # initialization
+    if cv2.waitKey(0) == 27:
+        cv2.destroyAllWindows()
+        # edges = cv2.Canny(np.array([[0, 1234], [1234, 2345]], dtype=np.uint16), 50, 100)
+        # canny_gray("source/Proc201506020034_1_2.png")

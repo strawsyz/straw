@@ -1,4 +1,3 @@
-import os
 import torch
 import torch.nn as nn
 from PIL import Image
@@ -51,18 +50,11 @@ def prepare_data():
     return test_loader
 
 
-test_loader = prepare_data()
 
-
-# 清空cuda的缓存
-# torch.cuda.empty_cache()
 
 # polpy_dataset = dataset(DATA_PATH, MASK_PATH, image_transforms, mask_transforms, test=True)
 # polpy_dataset.set_data_num(4)
 
-# 准备数据
-# test_data = DataLoader(polpy_dataset, batch_size=BATCH_SIZE)
-# 设置输出通道为1
 def prepare_net():
     net = FCN(n_out=1)
     if is_use_gpu:
@@ -82,6 +74,8 @@ def prepare_net():
     return net, loss_fucntion
 
 
+test_loader = prepare_data()
+
 net, loss_function = prepare_net()
 
 # 变成验证模式
@@ -89,7 +83,6 @@ net.eval()
 import os
 import time_util
 
-# tensor(0.6106, device='cuda:0', grad_fn=<BinaryCrossEntropyWithLogitsBackward>)
 # 当前的设置当时会按照天数来保存文件
 # todo 有必要改进
 RESULT_SAVE_PATH = os.path.join(RESULT_SAVE_PATH, time_util.get_date())
@@ -108,18 +101,6 @@ for i, (image, mask, image_name) in enumerate(test_loader):
     # 计算损失
     loss = loss_function(out, mask)
     print(loss)
-    # tensor(0.6373, device='cuda:0', grad_fn= < BinaryCrossEntropyWithLogitsBackward >)
-    # tensor(0.6714, device='cuda:0', grad_fn= < BinaryCrossEntropyWithLogitsBackward >)
-    # tensor(0.6618, device='cuda:0', grad_fn= < BinaryCrossEntropyWithLogitsBackward >)
-    # tensor(0.6791, device='cuda:0', grad_fn= < BinaryCrossEntropyWithLogitsBackward >)
-    # tensor(0.6326, device='cuda:0', grad_fn= < BinaryCrossEntropyWithLogitsBackward >)
-    # tensor(0.6640, device='cuda:0', grad_fn= < BinaryCrossEntropyWithLogitsBackward >)
-    # tensor(0.6631, device='cuda:0', grad_fn= < BinaryCrossEntropyWithLogitsBackward >)
-    # tensor(0.6163, device='cuda:0', grad_fn= < BinaryCrossEntropyWithLogitsBackward >)
-    # tensor(0.6370, device='cuda:0', grad_fn= < BinaryCrossEntropyWithLogitsBackward >)
-    # tensor(0.6335, device='cuda:0', grad_fn= < BinaryCrossEntropyWithLogitsBackward >)
-    # tensor(0.6410, device='cuda:0', grad_fn= < BinaryCrossEntropyWithLogitsBackward >)
-    # tensor(0.6246, device='cuda:0', grad_fn= < BinaryCrossEntropyWithLogitsBackward >)
 
     predict = out.squeeze().cpu().data.numpy()
     # 画出图像

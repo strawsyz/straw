@@ -1,4 +1,5 @@
 import os
+
 import h5py
 import numpy as np
 from PIL import Image
@@ -98,6 +99,14 @@ def split(data_path, train_rate=0.7):
         os.rename(path,
                   os.path.join(test_data_path, path.split("/")[-1]))
 
+
+def create_support_image(image_path, target_dir):
+    """
+    创建原图像的边缘图像
+    :param image_path:
+    :param target_dir:
+    :return:
+    """
 
 if __name__ == '__main__':
     # 图像预处理

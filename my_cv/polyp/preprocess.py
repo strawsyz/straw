@@ -132,8 +132,8 @@ if flag:
     TARGET_MASK_PATH = "/home/straw/Downloads/dataset/polyp/TMP/03/mask/"
     file_util.make_directory(TARGET_IMAGE_PATH)
     file_util.make_directory(TARGET_MASK_PATH)
-    get_needed_data(SOURCE_IMAGE_PATH, TARGET_IMAGE_PATH, needed_part=(294, 35, 1454, 1040))
-    get_needed_data(SOURCE_MASK_PATH, TARGET_MASK_PATH, needed_part=(294, 35, 1454, 1040))
+    get_needed_data(SOURCE_IMAGE_PATH, TARGET_IMAGE_PATH, needed_part=(100, 100, 1100, 900))
+    get_needed_data(SOURCE_MASK_PATH, TARGET_MASK_PATH, needed_part=(100, 100, 1100, 900))
 
 
 # 将图片切成小块增加图像数量

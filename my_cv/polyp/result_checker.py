@@ -64,7 +64,8 @@ def show_images(file_name):
 
     # fig.canvas.mpl_connect("button_release_event", on_mouse_release)
     fig.canvas.mpl_connect("key_release_event", on_key_release)
-    fig.canvas.mpl_disconnect(fig.canvas.manager.key_press_handler_id)  # 取消默认快捷键的注册
+    # 取消默认快捷键的注册
+    fig.canvas.mpl_disconnect(fig.canvas.manager.key_press_handler_id)
 
     image_path = os.path.join(IMAGE_PATH, file_name)
     mask_path = os.path.join(MASK_PATH, file_name)
