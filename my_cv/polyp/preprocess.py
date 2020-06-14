@@ -149,8 +149,8 @@ def create_patch(source_path, target_path, width, height, n_width, n_height):
             label += 1
 
 
-# flag = True
-flag = False
+flag = True
+# flag = False
 # 将图像切成平均的切成4份
 if flag:
     SOURCE_IMAGE_PATH = "/home/straw/Downloads/dataset/polyp/TMP/03/data/"
@@ -166,7 +166,8 @@ if flag:
 
 if __name__ == '__main__':
     # win上的测试
-    SOURCE_IMAGE_PATH = "sample_data/"
-    TARGET_IMAGE_PATH = "source/"
+    # SOURCE_IMAGE_PATH = "sample_data/"
+    # TARGET_IMAGE_PATH = "source/"
     # 1000*800
-    get_needed_data(SOURCE_IMAGE_PATH, TARGET_IMAGE_PATH, needed_part=(100, 100, 1100, 900))
+    # get_needed_data(SOURCE_IMAGE_PATH, TARGET_IMAGE_PATH, needed_part=(100, 100, 1100, 900))
+    pass

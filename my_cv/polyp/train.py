@@ -32,15 +32,17 @@ from models import FCN
 # lr0.0.003
 
 # E 500
-# lr0.0.003
+# lr0.0.001
 
-# 最终结果0.69loss
-#  设置训练参数
+# E 500
+# lr0.0.0003
+
+# 设置训练参数
 # 由于最后处理的时候要将去掉通道数1的通道，所以不能设置为1
 BATCH_SIZE = 1
 EPOCH = 500
 # 学习率
-lr = 0.003
+lr = 0.002
 is_use_gpu = True
 DATA_PATH = "/home/straw/Downloads/dataset/polyp/data/"
 MASK_PATH = "/home/straw/Downloads/dataset/polyp/mask/"
@@ -55,6 +57,8 @@ PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/2020-06-03/FCN_NLL_ep499_16-
 PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/2020-06-04/FCN_NLL_ep499_14-25-49.pkl"
 PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/2020-06-05/FCN_NLL_ep91_15-27-52.pkl"
 PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/2020-06-07/FCN_NLL_ep499_20-55-59.pkl"
+PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/2020-06-08/FCN_NLL_ep468_13-19-38.pkl"
+PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/2020-06-08/FCN_NLL_ep412_20-20-26.pkl"
 # PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/FCN"
 is_pretrain = True
 
