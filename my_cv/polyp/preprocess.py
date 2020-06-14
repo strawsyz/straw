@@ -169,7 +169,7 @@ def convert_imgs(source_path, target_path):
     for file_name in os.listdir(source_path):
         file_path = os.path.join(source_path, file_name)
         img = Image.open(file_path)
-        img.convert("L")
+        img = img.convert("L")
         save_path = os.path.join(target_path, file_name)
         img.save(save_path)
         # 理论上来讲经过之前的处理之后，所有的文件都被保存为png格式了。
@@ -195,8 +195,10 @@ if flag:
     SOURCE_MASK_PATH = "/home/straw/Downloads/dataset/polyp/TMP/04/mask/"
     TARGET_IMAGE_PATH = "/home/straw/Downloads/dataset/polyp/TMP/05/data/"
     TARGET_MASK_PATH = "/home/straw/Downloads/dataset/polyp/TMP/05/mask/"
+    file_util.make_directory(TARGET_IMAGE_PATH)
+    file_util.make_directory(TARGET_MASK_PATH)
+    copy_images(SOURCE_IMAGE_PATH, TARGET_IMAGE_PATH)
     convert_imgs(SOURCE_MASK_PATH, TARGET_MASK_PATH)
-    copy_images(SOURCE_MASK_PATH, TARGET_MASK_PATH)
 
 if __name__ == '__main__':
     # win上的测试
