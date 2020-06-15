@@ -22,6 +22,7 @@ def paste(img, region, point):
 
 
 def transpose(img, method=Image.ROTATE_90):
+    """旋转图片"""
     # Image.ROTATE_90
     # Image.FLIP_TOP_BOTTOM
     # Image.FLIP_LEFT_RIGHT

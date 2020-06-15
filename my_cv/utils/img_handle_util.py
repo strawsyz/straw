@@ -122,31 +122,50 @@ def canny_gray(img, threshold1=200, threshold2=300):
     return cv2.Canny(img, threshold1=threshold1, threshold2=threshold2)
 
 
-def canny_threshold(low_threshold):
-    detected_edges = cv2.GaussianBlur(gray, (3, 3), 0)
-    detected_edges = cv2.Canny(detected_edges, low_threshold, low_threshold * ratio, apertureSize=kernel_size)
-    dst = cv2.bitwise_and(img, img, mask=detected_edges)  # just add some colours to edges from original image.
-    cv2.imshow('canny demo', dst)
+def canny(path):
+    """
+    检测在图像上使用Canny检测边缘的效果
+    :param path:
+    :return:
+    """
+    threshold1 = 0
+    threshold2 = 0
 
+    # todo完成最大阈值和最小阈值的设定
+    def update_lowthreshold(threshlod):
+        nonlocal threshold1
+        threshold1 = threshlod
+        show()
 
-if __name__ == '__main__':
+    def update_maxthreshold(threshlod):
+        nonlocal threshold2
+        threshold2 = threshlod
+        show()
 
-    lowThreshold = 0
-    max_lowThreshold = 100
-    ratio = 3
+    def show():
+        nonlocal threshold2
+        nonlocal threshold1
+        detected_edges = cv2.GaussianBlur(gray, (3, 3), 0)
+        detected_edges = cv2.Canny(detected_edges, threshold1, threshold2, apertureSize=kernel_size)
+        dst = cv2.bitwise_and(img, img, mask=detected_edges)  # just add some colours to edges from original image.
+        cv2.imshow('canny demo', dst)
+
+    min_Threshold = 0
+    max_Threshold = 300
     kernel_size = 3
-    path = "C:\\Users\Administrator\PycharmProjects\straw\my_cv\polyp\source\Proc201506160021_1_1.png"
     # path = "C:\\Users\Administrator\PycharmProjects\straw\my_cv\polyp\source\\06.jpg"
     img = cv2.imread(path)
     img = cv2.resize(img, (224, 224))
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
     cv2.namedWindow('canny')
+    cv2.createTrackbar('threshold1', 'canny', min_Threshold, max_Threshold, update_lowthreshold)
+    cv2.createTrackbar('threshold2', 'canny', min_Threshold, max_Threshold, update_maxthreshold)
 
-    cv2.createTrackbar('Min threshold', 'canny', lowThreshold, max_lowThreshold, canny_threshold)
-
-    canny_threshold(0)  # initialization
+    show()
     if cv2.waitKey(0) == 27:
         cv2.destroyAllWindows()
-        # edges = cv2.Canny(np.array([[0, 1234], [1234, 2345]], dtype=np.uint16), 50, 100)
-        # canny_gray("source/Proc201506020034_1_2.png")
+
+
+if __name__ == '__main__':
+    path = "C:\\Users\Administrator\PycharmProjects\straw\my_cv\polyp\source\Proc201506160021_1_1.png"
+    canny(path)

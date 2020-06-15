@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import random
 
 import cv2
 import torch
@@ -18,8 +19,11 @@ class PolypDataset(Dataset):
         self.MASK_PATHS = []
         self.transforms = image_transforms
         self.mask_transforms = mask_transforms
-
-        for file_name in sorted(os.listdir(image_path)):
+        # 随机排序
+        random.seed(7)
+        image_paths = sorted(os.listdir(image_path))
+        random.shuffle(image_paths)
+        for file_name in image_paths:
             self.IMAGE_PATHS.append(os.path.join(image_path, file_name))
             self.MASK_PATHS.append(os.path.join(mask_path, file_name))
             self.image_paths.append(os.path.join(image_path, file_name))

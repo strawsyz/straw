@@ -1,4 +1,3 @@
-import os
 import torch
 import torch.nn as nn
 from PIL import Image
@@ -12,16 +11,16 @@ from models import FCN
 
 # 设置训练参数
 # 由于最后处理的时候要将去掉通道数1的通道，所以不能设置为1
-BATCH_SIZE = 8  # 设置为32 ，内存就炸了
-N_TEST = 36
+BATCH_SIZE = 16  # 设置为32 ，内存就炸了
+N_TEST = 140
 is_use_gpu = True
-DATA_PATH = "/home/straw/Downloads/dataset/polyp/TMP/05/data"
-MASK_PATH = "/home/straw/Downloads/dataset/polyp/TMP/05/mask"
+DATA_PATH = "/home/straw/Downloads/dataset/polyp/data/"
+MASK_PATH = "/home/straw/Downloads/dataset/polyp/mask/"
 
 # 使用的预训练模型的路径
-# PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/2020-06-04/FCN_NLL_ep156_12-39-27.pkl"
-PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/2020-06-14/FCN_NLL_ep256_14-30-31.pkl"
-PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/2020-06-14/FCN_NLL_ep498_20-17-54.pkl"
+PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/2020-06-04/FCN_NLL_ep156_12-39-27.pkl"
+PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/2020-06-05/FCN_NLL_ep91_15-27-52.pkl"
+
 RESULT_SAVE_PATH = "/home/straw/Downloads/dataset/polyp/result/"
 
 image_transforms = transforms.Compose([
