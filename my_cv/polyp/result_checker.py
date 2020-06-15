@@ -96,9 +96,9 @@ if __name__ == '__main__':
     file_names = []
     # IMAGE_PATH = '/home/straw/下载/dataset/gray2color/train/color/'
     # IMAGE_PATH = "/home/straw/.straw's back/image"
-    IMAGE_PATH = '/home/straw/Downloads/dataset/polyp/data/'
-    MASK_PATH = '/home/straw/Downloads/dataset/polyp/mask/'
-    RESLUT_PATH = '/home/straw/Downloads/dataset/polyp/result/2020-06-07/'
+    IMAGE_PATH = "/home/straw/Downloads/dataset/polyp/TMP/05/data"
+    MASK_PATH = "/home/straw/Downloads/dataset/polyp/TMP/05/mask"
+    RESLUT_PATH = '/home/straw/Downloads/dataset/polyp/result/2020-06-15/'
 
     for file_name in os.listdir(RESLUT_PATH):
         file_names.append(file_name)

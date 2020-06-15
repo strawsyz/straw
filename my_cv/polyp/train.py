@@ -42,7 +42,7 @@ from models import FCN
 BATCH_SIZE = 2
 EPOCH = 500
 # 学习率
-lr = 0.002
+lr = 0.0003
 is_use_gpu = True
 DATA_PATH = "/home/straw/Downloads/dataset/polyp/TMP/05/data"
 MASK_PATH = "/home/straw/Downloads/dataset/polyp/TMP/05/mask"
@@ -59,7 +59,21 @@ PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/2020-06-05/FCN_NLL_ep91_15-2
 PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/2020-06-07/FCN_NLL_ep499_20-55-59.pkl"
 PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/2020-06-08/FCN_NLL_ep468_13-19-38.pkl"
 PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/2020-06-08/FCN_NLL_ep412_20-20-26.pkl"
+
+
+# 第二波BATCH_SIZE = 2
+# EPOCH = 279
+# # 学习率
+# lr = 0.002
+BATCH_SIZE = 2
+EPOCH = 500
+# 学习率
+lr = 0.002
+PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/2020-06-14/FCN_NLL_ep279_14-38-27.pkl"
+PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/2020-06-14/FCN_NLL_ep477_17-24-07.pkl"
+# 增加旋转的做法
 # PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/FCN"
+# is_pretrain = True
 is_pretrain = False
 
 # 用于训练和验证的所有数据集
@@ -79,6 +93,9 @@ image_transforms = transforms.Compose([
     transforms.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1, hue=0.1),
     # 随机水平翻转
     # transforms.RandomHorizontalFlip(),
+    # transforms.RandomVerticalFlip(),
+    # transforms.RandomRotation(100),
+
     transforms.Resize((224, 224)),
     transforms.ToTensor(),
     # transforms.Normalize(mean=[0.482, 0.456, 0.406],
