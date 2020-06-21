@@ -155,11 +155,6 @@ def prepare_net():
     return net, optimizer, loss_function, scheduler
 
 
-train_loader, val_loader = prepare_data()
-
-net, optimizer, loss_function, scheduler = prepare_net()
-eval_miou = []
-best = [0]
 
 
 def train(epoch):
@@ -188,13 +183,11 @@ def train(epoch):
         # 计算Loss
         # todo 损失函数需要改进
         loss = loss_function(out, mask)
-        # print(loss.data.size())
         # 返回数据
         loss.backward()
         optimizer.step()
         # 计算累计的损失
         train_loss = loss.data + train_loss
-        # print(train_loss)
     train_loss = train_loss / n_total
     print("EPOCH:{} train_loss:{:.6f}".format(epoch, train_loss))
 
@@ -203,7 +196,6 @@ def train(epoch):
         valid_loss = 0
         total = 0
         # 使用验证集数据
-
         for image, mask in val_loader:
             image, mask = Variable(image.cuda()), Variable(mask.cuda())
             net.zero_grad()
@@ -224,6 +216,12 @@ def train(epoch):
 
 
 if __name__ == '__main__':
+    train_loader, val_loader = prepare_data()
+
+    net, optimizer, loss_function, scheduler = prepare_net()
+    eval_miou = []
+    best = [0]
+
     print("================training start=================")
     for epoch in range(EPOCH):
         train(epoch)

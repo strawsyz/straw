@@ -3,6 +3,7 @@ import os
 import h5py
 import numpy as np
 from PIL import Image
+from matplotlib import pyplot as plt
 
 
 def data_preprocess():
@@ -109,6 +110,7 @@ def create_support_image(image_path, target_dir):
     """
     pass
 
+
 def check_same(dir1, dir2):
     file_list1 = os.listdir(dir1)
     file_list2 = os.listdir(dir2)
@@ -128,16 +130,84 @@ def check_same(dir1, dir2):
         print("dir2 lack files:{}".format(over))
 
 
-if __name__ == '__main__':
-    # 图像预处理
-    # data_preprocess()
-    # image_path = '/home/straw/下载/dataset/NYU/images/'
-    # depth_path = '/home/straw/下载/dataset/NYU/depths/'
-    # label_path = '/home/straw/下载/dataset/NYU/labels/'
-    # split(image_path)
-    # split(depth_path)
-    # split(label_path)
+def hist_equal(img, z_max=200):
+    """
+    直方图均衡化，将暗的地方变量，亮的地方变暗
+    :param img:
+    :param z_max:
+    :return:
+    """
+    if len(img.shape) == 2:
+        height, width = img.shape
+        n_chan = 1
+    elif len(img.shape) == 3:
+        height, width, n_chan = img.shape
+        print(img[:, :, 0].shape)
+    # H, W = img.shape
+    # S is the total of pixels
+    n_pixle = height * width
+    out = img.copy()
+    sum_h = 0.
+    if n_chan == 1:
+        for i in range(1, 255):
+            ind = np.where(img == i)
+            sum_h += len(img[ind])
+            z_prime = z_max / n_pixle * sum_h
+            out[ind] = z_prime
+    else:
+        for c in range(n_chan):
+            tmp_img = img[:, :, c]
+            tmp_out = tmp_img.copy()
+            for i in range(1, 255):
+                ind = np.where(tmp_img == i)
+                sum_h += len(tmp_img[ind])
+                z_prime = z_max / n_pixle * sum_h
+                tmp_out[ind] = z_prime
+            out[:, :, c] = tmp_out
+    out = out.astype(np.uint8)
 
-    dir1 = "/home/straw/Downloads/dataset/polyp/raw/data"
-    dir2 = "/home/straw/Downloads/dataset/polyp/raw/mask"
-    check_same(dir1, dir2)
+    return out
+
+
+def read_img_as_np(path, convert=None):
+    if convert is None:
+        return np.asarray(Image.open(path))
+    else:
+        return np.asarray(Image.open(path).convert(convert))
+
+
+def img_hist(path):
+    img = read_img_as_np(path)
+    plt.hist(img.ravel(), bins=255, rwidth=0.8, range=(0, 255))
+    plt.show()
+
+
+if __name__ == '__main__':
+    path = "sample_data/Proc201506160021_1_1.png"
+    raw_img = Image.open(path)
+    # raw_img = raw_img.convert("L")
+    # img = read_img_as_np(path, "L")
+    img = np.asarray(raw_img)
+    res = hist_equal(img)
+    res_img = Image.fromarray(res)
+
+    fig = plt.figure("result checking")
+    ax = fig.add_subplot(221)
+    ax.set_title("raw img")
+    ax.imshow(raw_img, cmap='gray')
+    ax.axis("off")
+    # ax.hist(img.ravel(), bins=255, rwidth=0.8, range=(0, 255))
+
+    ax = fig.add_subplot(222)
+    ax.set_title("raw hist")
+    ax.hist(img.ravel(), bins=255, rwidth=0.8, range=(0, 255))
+
+    ax = fig.add_subplot(223)
+    ax.set_title("res img")
+    ax.imshow(res_img, cmap='gray')
+    ax.axis("off")
+
+    ax = fig.add_subplot(224)
+    ax.set_title("result hist")
+    ax.hist(res.ravel(), bins=255, rwidth=0.8, range=(0, 255))
+    plt.show()

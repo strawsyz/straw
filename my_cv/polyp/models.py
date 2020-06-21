@@ -14,9 +14,24 @@ class Deconv(nn.Module):
             nn.BatchNorm2d(out_n),
             nn.ReLU(inplace=True),
         )
+        # 初始化网络的参数
+        self.init_weight()
 
     def forward(self, x):
         return self.model(x)
+
+    def init_weight(self):
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
+                if m.bias is not None:
+                    nn.init.constant_(m.bias, 0)
+            elif isinstance(m, (nn.BatchNorm2d, nn.GroupNorm)):
+                nn.init.constant_(m.weight, 1)
+                nn.init.constant_(m.bias, 0)
+            elif isinstance(m, nn.Linear):
+                nn.init.normal_(m.weight, 0, 0.01)
+                nn.init.constant_(m.bias, 0)
 
 
 class FCN(nn.Module):
@@ -27,7 +42,8 @@ class FCN(nn.Module):
         """
         super(FCN, self).__init__()
         # 在VGG的基础上建立，使用VGG的结构
-        vgg = vgg16_bn(pretrained=False)
+        vgg = vgg16_bn(pretrained=True)
+
         # 编码器
         self.encoder_1 = vgg.features[:7]
         self.encoder_2 = vgg.features[7:14]
@@ -53,9 +69,10 @@ class FCN(nn.Module):
         decoder_1 = self.decoder_1(out_5)
         decoder_2 = self.decoder_2(decoder_1 + out_4)
         decoder_3 = self.decoder_3(decoder_2 + out_3)
+        # 输出中间结果，对中间结果也进行优化
         decoder_4 = self.decoder_4(decoder_3 + out_2)
         out = self.decoder_5(decoder_4 + out_1)
-        return out
+        return out, decoder_4
 
 
 def network():

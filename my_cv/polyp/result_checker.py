@@ -1,6 +1,5 @@
 import os
 
-import numpy as np
 from PIL import Image
 
 
@@ -9,7 +8,7 @@ def read_img(file_name):
     # img_array = np.array(Image.open(file_name))
     img = Image.open(file_name)
     # 防止一个通道的图像无法正常显示
-    img = img.convert('RGB')
+    # img = img.convert('RGB')
     return img
 
 
@@ -78,12 +77,12 @@ def show_images(file_name):
     plt.axis("off")
 
     ax = fig.add_subplot(132)
-    ax.imshow(read_img(mask_path))
+    ax.imshow(read_img(mask_path), cmap='gray')
     ax.set_title("mask")
     plt.axis("off")
 
     ax = fig.add_subplot(133)
-    ax.imshow(read_img(result_path))
+    ax.imshow(read_img(result_path), cmap='gray')
     ax.set_title("result")
     plt.axis("off")
 
