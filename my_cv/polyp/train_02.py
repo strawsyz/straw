@@ -12,12 +12,9 @@ import time_util
 from dataset import PolypDataset as dataset
 from models import FCN
 
-# 将vgg改为ResNet
+# 初始化模型的权重，
+# 优化器从SGD改为Adam，效果好了不少
 
-# EPOCH:1989 train_loss:0.287866
-# Epoch1989:	 valid_loss:0.328060
-# ==============saving model data===============
-# ==============saving at /home/straw/Downloads/models/polyp/2020-06-26/FCN_NLL_ep1989_04-57-10.pkl===============
 
 # 设置训练参数
 # 由于最后处理的时候要将去掉通道数1的通道，所以不能设置为1
@@ -31,6 +28,26 @@ MASK_PATH = "/home/straw/Downloads/dataset/polyp/TMP/05/mask"
 MODEL_PATH = "/home/straw/Downloads/models/polyp/"
 MODEL_PATH = os.path.join(MODEL_PATH, time_util.get_date())
 file_util.make_directory(MODEL_PATH)
+PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/2020-05-29/FCN_NLL_ep499_01-56-07.pkl"
+PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/2020-06-01/FCN_NLL_ep499_23-56-50.pkl"
+PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/2020-06-02/FCN_NLL_ep499_09-38-52.pkl"
+PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/2020-06-02/FCN_NLL_ep499_12-17-27.pkl"
+PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/2020-06-03/FCN_NLL_ep499_16-52-43.pkl"
+PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/2020-06-04/FCN_NLL_ep499_14-25-49.pkl"
+PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/2020-06-05/FCN_NLL_ep91_15-27-52.pkl"
+PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/2020-06-07/FCN_NLL_ep499_20-55-59.pkl"
+PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/2020-06-08/FCN_NLL_ep468_13-19-38.pkl"
+PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/2020-06-08/FCN_NLL_ep412_20-20-26.pkl"
+
+# E 500
+# lr0.002
+
+# E 500
+# lr0.002
+
+# E 500
+# lr0.0003
+
 # 第二波BATCH_SIZE = 2
 # EPOCH = 279
 # # 学习率
@@ -38,10 +55,27 @@ file_util.make_directory(MODEL_PATH)
 BATCH_SIZE = 2
 EPOCH = 2000
 # 学习率
-lr = 0.002
+lr = 0.0003
+PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/2020-06-14/FCaN_NLL_ep279_14-38-27.pkl"
+PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/2020-06-22/FCN_NLL_ep244_10-56-25.pkl"
+PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/2020-06-22/FCN_NLL_ep371_15-04-48.pkl"
+PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/2020-06-22/FCN_NLL_ep237_18-18-37.pkl"
+PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/2020-06-23/FCN_NLL_ep371_19-40-30.pkl"
+# 增加旋转的做法
+# PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/FCN"
+# EPOCH:371 train_loss:0.259196
+# Epoch371:	 valid_loss:0.315917
+# ==============saving model data===============
+# ==============saving at /home/straw/Downloads/models/polyp/2020-06-23/FCN_NLL_ep371_19-40-30.pkl===============
+# EPOCH:1989 train_loss:0.256775
+# Epoch1989:	 valid_loss:0.321297
+# ==============saving model data===============
+# ==============saving at /home/straw/Downloads/models/polyp/2020-06-25/FCN_NLL_ep1989_03-24-03.pkl===============
+is_pretrain = True
+# is_pretrain = False
 
-# is_pretrain = True
-is_pretrain = False
+# EPOCH:244 train_loss:0.319330
+# Epoch244:	 valid_loss:0.347137
 
 # 用于训练和验证的所有数据集
 N_TRAIN = 600
@@ -65,7 +99,6 @@ image_transforms = transforms.Compose([
 
     transforms.Resize((224, 224)),
     transforms.ToTensor(),
-    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     # transforms.Normalize(mean=[0.482, 0.456, 0.406],
     #                      std=[0.229, 0.224, 0.225])
 ])
