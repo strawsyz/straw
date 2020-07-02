@@ -1,11 +1,11 @@
-import dgl
 import dgl.function as fn
+import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from dgl import DGLGraph
 
-# it can't run in charm by can run in the terminal
+# it can't run in charm but can run in the terminal
 
 # define the message and reduce function
 gcn_msg = fn.copy_src(src='h', out='m')
@@ -43,9 +43,9 @@ class GCN(nn.Module):
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
-        self.gcn1 = GCN(1433, 512, F.sigmoid)
-        self.gcn2 = GCN(512, 128, F.sigmoid)
-        self.gcn3 = GCN(128, 16, F.sigmoid)
+        self.gcn1 = GCN(1433, 512, torch.sigmoid)
+        self.gcn2 = GCN(512, 128, torch.sigmoid)
+        self.gcn3 = GCN(128, 16, torch.sigmoid)
         self.gcn4 = GCN(16, 7, None)
 
     def forward(self, g, features):
@@ -128,9 +128,6 @@ for epoch in range(start_EPOCH, EPOCH):
         epoch_hist.append(epoch)
         print("Epoch {:05d} | Loss {:.4f} | Test Acc {:.4f} | Time(s) {:.4f}".format(
             epoch, loss.item(), acc, np.mean(dur)))
-
-# draw the result
-import matplotlib.pyplot as plt
 
 plt.figure()
 plt.plot(epoch_hist, loss_hist, label='loss')

@@ -112,6 +112,13 @@ def create_support_image(image_path, target_dir):
 
 
 def check_same(dir1, dir2):
+    """
+    判断两个文件夹中的文件是否一样
+    如果不一样分别显示两个文件夹中缺少了哪些文件
+    :param dir1:
+    :param dir2:
+    :return:
+    """
     file_list1 = os.listdir(dir1)
     file_list2 = os.listdir(dir2)
 
@@ -130,11 +137,61 @@ def check_same(dir1, dir2):
         print("dir2 lack files:{}".format(over))
 
 
-def hist_equal(img, z_max=200):
+def hist_equal_one_chan(img, height, width):
+    n_pixle = height * width
+    out = img.copy()
+    sum_h = 0
+    n_dark_pixle = len(img[np.where(img < 128)])
+    n_bright_pixle = n_pixle - n_dark_pixle
+    # 128
+    for i in range(128):
+        ind = np.where(img == i)
+        sum_h += len(img[ind])
+        z_prime = 127 / n_dark_pixle * sum_h
+        out[ind] = z_prime
+    sum_h = 0
+    for i in range(255, 127, -1):
+        ind = np.where(img == i)
+        sum_h += len(img[ind])
+        z_prime = 255 - (127 / n_bright_pixle * sum_h)
+        out[ind] = z_prime
+    return out
+
+
+def hist_equal_one_chan2(img, height, width):
+    n_pixle = height * width
+    out = img.copy()
+    sum_h = 0
+    n_dark_pixle = len(img[np.where(img < 128)])
+    n_bright_pixle = n_pixle - n_dark_pixle
+    print(len(img[np.where(img == 0)]))
+    print(len(img[np.where(img == 254)]))
+    # 128
+    for i in range(127, -1, -1):
+        ind = np.where(img == i)
+        sum_h += len(img[ind])
+        z_prime = 128 - (128 / n_dark_pixle * sum_h)
+        out[ind] = z_prime
+    sum_h = 0
+    for i in range(128, 256):
+        ind = np.where(img == i)
+        sum_h += len(img[ind])
+        z_prime = 127 + (128 / n_bright_pixle * sum_h)
+        out[ind] = z_prime
+    pixels = [0, 1, 2, 3, 4, 250, 251, 252, 253, 254, 255]
+    for pixel in pixels:
+        print("pixel is : {}".format(pixel))
+        print("raw:", len(img[np.where(img == pixel)]))
+        print("result:", len(out[np.where(out == pixel)]))
+    # print(len(img[np.where(out == 254)]))
+    return out
+
+
+def hist_equal(img, z_max=255):
     """
     直方图均衡化，将暗的地方变量，亮的地方变暗
     :param img:
-    :param z_max:
+    :param z_max: 原图像最亮的地方减去最暗的地方的值
     :return:
     """
     if len(img.shape) == 2:
@@ -182,32 +239,137 @@ def img_hist(path):
     plt.show()
 
 
+def convert_imgs(source_path, target_path):
+    for file_name in os.listdir(source_path):
+        file_path = os.path.join(source_path, file_name)
+        img = Image.open(file_path)
+        img = img.convert("L")
+        save_path = os.path.join(target_path, file_name)
+        img.save(save_path)
+        # 理论上来讲经过之前的处理之后，所有的文件都被保存为png格式了。
+        # 但为了保险，还是重新处理一遍后缀名
+        # target_path = os.path.join(target_path, "{}.png".format(file_util.get_filename(file_path)))
+
+
+def copy_images(source_path, target_path):
+    """复制所有的文件"""
+    for file_name in os.listdir(source_path):
+        file_path = os.path.join(source_path, file_name)
+        img = Image.open(file_path)
+        save_path = os.path.join(target_path, file_name)
+        img.save(save_path)
+
+
+def convert2PNG(source_path, target_path, mask=False):
+    img = Image.open(source_path)
+    target_path = os.path.join(target_path, "{}.png".format(file_util.get_filename(source_path)))
+    if mask:
+        # 如果是处理mask图像,把文件名中M去掉
+        target_path = target_path.replace("M.png", ".png")
+    img.save(target_path)
+    print(target_path)
+
+
+def get_needed_data(source_path, target_path, needed_part, ext=None):
+    """
+    将需要的部分图像从原图像切下来，然后保存到目标目录中
+    :param source_path:
+    :param target_path:
+    :param needed_part: 下标是从0开始[top, left, bottom,right]
+    :param ext: 防止图片重名，用于标注
+    :return:
+    """
+    for file_name in os.listdir(source_path):
+        file_path = os.path.join(source_path, file_name)
+        img = Image.open(file_path)
+        cropped = img.crop(needed_part)
+        # 理论上来讲经过之前的处理之后，所有的文件都被保存为png格式了。
+        # 但为了保险，还是重新处理一遍后缀名
+        # target_path = os.path.join(target_path, "{}.png".format(file_util.get_filename(file_path)))
+        if ext is None:
+            cropped.save(os.path.join(target_path, "{}.png".format(file_util.get_filename(file_path))))
+        else:
+            cropped.save(os.path.join(target_path, "{}_{}.png".format(file_util.get_filename(file_path), ext)))
+
+
+# 将图片切成小块增加图像数量
+# 原本的图像大小1000width  800height
+def create_patch(source_path, target_path, width, height, n_width, n_height):
+    """
+    将图像切成小块
+    :param source_path:原图像的路径
+    :param target_path:目标图像的保存路径
+    :param width:
+    :param height:
+    :param n_width:在宽度上切成一定的份数
+    :param n_height:在高度上切成一定的份数
+    :return:
+    """
+    patch_width = width // n_width
+    patch_height = height // n_height
+    label = 0
+    for start_x in range(0, width - patch_width + 1, patch_width):
+        for start_y in range(0, height - patch_height + 1, patch_height):
+            get_needed_data(source_path, target_path,
+                            needed_part=(start_x, start_y, start_x + patch_width, start_y + patch_height), ext=label)
+            label += 1
+
+
+def analy_image(path):
+    image = Image.open(path)
+    print("format : {}".format(image.format))
+    print("indo : {}".format(image.info))
+    print("mode : {}".format(image.mode))
+    print("size : {}".format(image.size))
+    print("num_channel : {}".format(len(image.split())))
+    return image
+
+
 if __name__ == '__main__':
     path = "sample_data/Proc201506160021_1_1.png"
     raw_img = Image.open(path)
-    # raw_img = raw_img.convert("L")
-    # img = read_img_as_np(path, "L")
+    raw_img = raw_img.convert("L")
     img = np.asarray(raw_img)
-    res = hist_equal(img)
+
+    height, width = img.shape
+    res = hist_equal_one_chan2(img, height, width)
     res_img = Image.fromarray(res)
+    # 使用标准的算法
+    res1 = hist_equal(img)
+    res_img1 = Image.fromarray(res1)
 
     fig = plt.figure("result checking")
-    ax = fig.add_subplot(221)
+    ax = fig.add_subplot(321)
     ax.set_title("raw img")
     ax.imshow(raw_img, cmap='gray')
     ax.axis("off")
     # ax.hist(img.ravel(), bins=255, rwidth=0.8, range=(0, 255))
 
-    ax = fig.add_subplot(222)
+    ax = fig.add_subplot(322)
     ax.set_title("raw hist")
     ax.hist(img.ravel(), bins=255, rwidth=0.8, range=(0, 255))
 
-    ax = fig.add_subplot(223)
+    ax = fig.add_subplot(323)
     ax.set_title("res img")
     ax.imshow(res_img, cmap='gray')
     ax.axis("off")
 
-    ax = fig.add_subplot(224)
+    ax = fig.add_subplot(324)
     ax.set_title("result hist")
     ax.hist(res.ravel(), bins=255, rwidth=0.8, range=(0, 255))
+
+    ax = fig.add_subplot(325)
+    ax.set_title("res1 img")
+    ax.imshow(res_img1, cmap='gray')
+    ax.axis("off")
+
+    ax = fig.add_subplot(326)
+    ax.set_title("result1 hist")
+    ax.hist(res1.ravel(), bins=255, rwidth=0.8, range=(0, 255))
+
     plt.show()
+
+    # 保存图像数据
+    raw_img.save("sample_data/raw.jpg")
+    res_img.save("sample_data/res_img.jpg")
+    res_img1.save("sample_data/res_img1.jpg")

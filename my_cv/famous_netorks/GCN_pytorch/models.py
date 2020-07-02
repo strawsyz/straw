@@ -22,7 +22,7 @@ class GCN(nn.Module):
         self.dropout_rate = dropout_rate
 
     def forward(self, x, adj):
-        # todo 不知道adj的意义
+        # adj是邻接矩阵
         out = F.relu(self.graph1(x, adj), inplace=True)
         if self.dropout_rate is not None:
             return F.dropout(out, self.dropout_rate, training=self.training)
@@ -34,7 +34,6 @@ class GraphConvolution(nn.Module):
     """
     使用pytorch实现的图卷积层
     """
-
     def __init__(self, n_in, n_out, bias=True):
         super(GraphConvolution, self).__init__()
         self.in_features = n_in

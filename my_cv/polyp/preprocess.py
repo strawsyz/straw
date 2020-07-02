@@ -1,4 +1,4 @@
-import os
+from utils import *
 
 """
 预处理数据
@@ -50,40 +50,6 @@ def check_image_mask(image_path, mask_path):
 
 
 import file_util
-from PIL import Image
-
-
-def convert2PNG(source_path, target_path, mask=False):
-    img = Image.open(source_path)
-    target_path = os.path.join(target_path, "{}.png".format(file_util.get_filename(source_path)))
-    if mask:
-        # 如果是处理mask图像,把文件名中M去掉
-        target_path = target_path.replace("M.png", ".png")
-    img.save(target_path)
-    print(target_path)
-
-
-def get_needed_data(source_path, target_path, needed_part, ext=None):
-    """
-    将需要的部分图像从原图像切下来，然后保存到目标目录中
-    :param source_path:
-    :param target_path:
-    :param needed_part: 下标是从0开始[top, left, bottom,right]
-    :param ext: 防止图片重名，用于标注
-    :return:
-    """
-    for file_name in os.listdir(source_path):
-        file_path = os.path.join(source_path, file_name)
-        img = Image.open(file_path)
-        cropped = img.crop(needed_part)
-        # 理论上来讲经过之前的处理之后，所有的文件都被保存为png格式了。
-        # 但为了保险，还是重新处理一遍后缀名
-        # target_path = os.path.join(target_path, "{}.png".format(file_util.get_filename(file_path)))
-        if ext is None:
-            cropped.save(os.path.join(target_path, "{}.png".format(file_util.get_filename(file_path))))
-        else:
-            cropped.save(os.path.join(target_path, "{}_{}.png".format(file_util.get_filename(file_path), ext)))
-
 
 # 将bmp和jpg类型的原图像转化为png图像保存到tmp文件夹中
 TMP_PATH = "/home/straw/Downloads/dataset/polyp/TMP/01/data/"
@@ -135,20 +101,6 @@ if flag:
     get_needed_data(SOURCE_IMAGE_PATH, TARGET_IMAGE_PATH, needed_part=(100, 100, 1100, 900))
     get_needed_data(SOURCE_MASK_PATH, TARGET_MASK_PATH, needed_part=(100, 100, 1100, 900))
 
-
-# 将图片切成小块增加图像数量
-# 原本的图像大小1000width  800height
-def create_patch(source_path, target_path, width, height, n_width, n_height):
-    patch_width = width // n_width
-    patch_height = height // n_height
-    label = 0
-    for start_x in range(0, width - patch_width + 1, patch_width):
-        for start_y in range(0, height - patch_height + 1, patch_height):
-            get_needed_data(source_path, target_path,
-                            needed_part=(start_x, start_y, start_x + patch_width, start_y + patch_height), ext=label)
-            label += 1
-
-
 # flag = True
 flag = False
 # 将图像切成平均的切成4份
@@ -164,32 +116,10 @@ if flag:
     create_patch(SOURCE_IMAGE_PATH, TARGET_IMAGE_PATH, width, height, 2, 2)
     create_patch(SOURCE_MASK_PATH, TARGET_MASK_PATH, width, height, 2, 2)
 
-
-def convert_imgs(source_path, target_path):
-    for file_name in os.listdir(source_path):
-        file_path = os.path.join(source_path, file_name)
-        img = Image.open(file_path)
-        img = img.convert("L")
-        save_path = os.path.join(target_path, file_name)
-        img.save(save_path)
-        # 理论上来讲经过之前的处理之后，所有的文件都被保存为png格式了。
-        # 但为了保险，还是重新处理一遍后缀名
-        # target_path = os.path.join(target_path, "{}.png".format(file_util.get_filename(file_path)))
-
-
-def copy_images(source_path, target_path):
-    """复制所有的文件"""
-    for file_name in os.listdir(source_path):
-        file_path = os.path.join(source_path, file_name)
-        img = Image.open(file_path)
-        save_path = os.path.join(target_path, file_name)
-        img.save(save_path)
-
-
 # 由于mask图像的通道数有的是3通道，有的是1通道
 # 所以将mask图像全部都统一为1通道
-flag = True
-# flag=False
+# flag = True
+flag = False
 if flag:
     SOURCE_IMAGE_PATH = "/home/straw/Downloads/dataset/polyp/TMP/04/data/"
     SOURCE_MASK_PATH = "/home/straw/Downloads/dataset/polyp/TMP/04/mask/"
@@ -199,6 +129,14 @@ if flag:
     file_util.make_directory(TARGET_MASK_PATH)
     copy_images(SOURCE_IMAGE_PATH, TARGET_IMAGE_PATH)
     convert_imgs(SOURCE_MASK_PATH, TARGET_MASK_PATH)
+
+# 生成轮廓图
+# 轮廓图和mask图像重叠的部分作为正确的图
+# 输入原图像，从图像检测出轮廓，获得轮廓图
+# 输出是一个轮廓图。真值是轮廓图和mask图像重叠的部分
+# 简介：检测polyp的轮廓的网络
+# 需要的数据：轮廓图。轮廓和mask图像重叠的部分
+
 
 if __name__ == '__main__':
     # win上的测试

@@ -2,7 +2,6 @@ import os
 
 import torch
 import torch.nn as nn
-from torch import optim
 from torch.autograd import Variable
 from torch.utils.data import DataLoader
 from torchvision import transforms
@@ -21,39 +20,6 @@ from models import FCN
 
 # 设置训练参数
 # 由于最后处理的时候要将去掉通道数1的通道，所以不能设置为1
-BATCH_SIZE = 2
-EPOCH = 500
-# 学习率
-# lr = 0.0003
-is_use_gpu = True
-DATA_PATH = "/home/straw/Downloads/dataset/polyp/TMP/05/data"
-MASK_PATH = "/home/straw/Downloads/dataset/polyp/TMP/05/mask"
-MODEL_PATH = "/home/straw/Downloads/models/polyp/"
-MODEL_PATH = os.path.join(MODEL_PATH, time_util.get_date())
-file_util.make_directory(MODEL_PATH)
-# 第二波BATCH_SIZE = 2
-# EPOCH = 279
-# # 学习率
-# lr = 0.002
-BATCH_SIZE = 2
-EPOCH = 2000
-# 学习率
-lr = 0.002
-
-# is_pretrain = True
-is_pretrain = False
-
-# 用于训练和验证的所有数据集
-N_TRAIN = 600
-# 训练集数据总共的训练集数据中的百分比
-VALID_RATE = 0.2
-
-# 正式开始测试，将数据分为训练集，测试机和验证机
-# 186
-# 120用于训练
-# 30张数据用于验证
-# 36用于测试
-
 
 image_transforms = transforms.Compose([
     # 随机调整亮度，对比度，饱和度，色相
@@ -100,7 +66,7 @@ def prepare_data():
     return train_loader, val_loader
 
 
-def prepare_net():
+def prepare_net(optim="adam"):
     # 设置输出通道为1
     net = FCN(n_out=1)
     loss_function = nn.BCEWithLogitsLoss()
@@ -110,9 +76,13 @@ def prepare_net():
         loss_function = loss_function.cuda()
     if is_pretrain:
         print("load the model from {}".format(PRETRAIN_PATH))
-        net.load_state_dict(torch.load(PRETRAIN_PATH))
-    # optimizer = optim.SGD(net.parameters(), lr=lr)
-    optimizer = optim.Adam(net.parameters(), lr=lr)
+        load_checkpoint(PRETRAIN_PATH)
+        # net.load_state_dict(torch.load(PRETRAIN_PATH))
+
+    if optim == "adam":
+        optimizer = optim.Adam(net.parameters(), lr=lr)
+    else:
+        optimizer = optim.SGD(net.parameters(), lr=lr)
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=15, gamma=0.8)  # 设置学习率下降策略
 
     # 创建loss函数
@@ -124,19 +94,11 @@ def prepare_net():
     return net, optimizer, loss_function, scheduler
 
 
-
-
-def train(epoch):
-    # for epoch in range(EPOCH):
-    # 设置网络为训练模式
+def train(epoch, optim):
     net.train()
-    num_iter = 0
     train_loss = 0
     n_total = 0
-    # 开始每个批次
     for image, mask in train_loader:
-        # 检查输入的图像是否有问题
-        # num_iter += 1
         n_total += len(image)
         if is_use_gpu:
             # 将数据放入GPU
@@ -174,24 +136,70 @@ def train(epoch):
         valid_loss /= total
         # 必须使用loss的data属性，不能直接print cuda上的数据
         print("Epoch{}:\t valid_loss:{:.6f}\t ".format(epoch, valid_loss))
-    # todo 增加是否保存模型的判断
-    print("==============saving model data===============")
-    model_save_path = os.path.join(MODEL_PATH,
-                                   'FCN_NLL_ep{}_{}.pkl'.format(epoch, time_util.get_time("%H-%M-%S")))
-    torch.save(net.state_dict(), model_save_path)
-    print("==============saving at {}===============".format(model_save_path))
-
     scheduler.step()
 
 
-if __name__ == '__main__':
-    train_loader, val_loader = prepare_data()
+import shutil
 
-    net, optimizer, loss_function, scheduler = prepare_net()
+
+def save_checkpoint(is_best):
+    print("==============saving model data===============")
+    save_path = os.path.join(MODEL_PATH,
+                             'FCN_NLL_ep{}_{}.pkl'.format(epoch, time_util.get_time("%H-%M-%S")))
+    state = {
+        'epoch': epoch + 1,
+        'state_dict': net.state_dict(),
+        'optimizer': optimizer.state_dict(),
+    }
+    torch.save(state, save_path)
+    if is_best:
+        shutil.copyfile(save_path, 'model_best.pth.tar')
+
+    print("==============saving at {}===============".format(save_path))
+
+
+def load_checkpoint(path):
+    if os.path.isfile(path):
+        print("=" * 10 + " loading checkpoint '{}'".format(path) + "=" * 10)
+        checkpoint = torch.load(path)
+        start_epoch.load_state_dict(checkpoint['epoch'])
+        net.load_state_dict(checkpoint['state_dict'])
+        optimizer.load_state_dict(checkpoint['optimizer'])
+        print("=> loaded checkpoint '{}' (epoch {})"
+              .format(path, checkpoint['epoch']))
+    else:
+        print("=> no checkpoint found at '{}'".format(path))
+
+
+if __name__ == '__main__':
+    BATCH_SIZE = 2
+    EPOCH = 500
+    is_use_gpu = True
+    DATA_PATH = "/home/straw/Downloads/dataset/polyp/TMP/05/data"
+    MASK_PATH = "/home/straw/Downloads/dataset/polyp/TMP/05/mask"
+    MODEL_PATH = "/home/straw/Downloads/models/polyp/"
+    MODEL_PATH = os.path.join(MODEL_PATH, time_util.get_date())
+    file_util.make_directory(MODEL_PATH)
+    lr = 0.002
+    # is_pretrain = True
+    is_pretrain = False
+
+    # 用于训练和验证的所有数据集
+    N_TRAIN = 600
+    # 训练集数据总共的训练集数据中的百分比
+    VALID_RATE = 0.2
+    PRETRAIN_PATH = ""
+
+    # 准备数据
+    train_loader, val_loader = prepare_data()
+    optim = "adam"
+    net, optimizer, loss_function, scheduler = prepare_net(optim=optim)
     eval_miou = []
     best = [0]
-
+    start_epoch = 0
     print("================training start=================")
-    for epoch in range(EPOCH):
+    for epoch in range(start_epoch, start_epoch + EPOCH):
         train(epoch)
+        # todo 增加是否保存模型的判断
+        save_checkpoint(is_best=False)
     print("================training is over=================")
