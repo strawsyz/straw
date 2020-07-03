@@ -32,9 +32,38 @@ class TestClass(object):
         assert hasattr(x, 'check')
 
 
+from torchvision import transforms
+
+image_transforms = transforms.Compose([
+    # 随机调整亮度，对比度，饱和度，色相
+    transforms.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1, hue=0.1),
+    # 随机水平翻转
+    transforms.RandomHorizontalFlip(),
+    # transforms.RandomVerticalFlip(),
+    # transforms.RandomRotation(100),
+
+    transforms.Resize((224, 224)),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    # transforms.Normalize(mean=[0.482, 0.456, 0.406],
+    #                      std=[0.229, 0.224, 0.225])
+])
+mask_transforms = transforms.Compose([
+    transforms.Resize((224, 224)),
+    transforms.RandomHorizontalFlip(),
+    # 将输出设置为一个通道
+    transforms.Grayscale(),
+    transforms.ToTensor(),
+])
 import numpy as np
 
 if __name__ == '__main__':
+    path = ""
+    import os
+
+    for filename in os.listdir(path):
+        os.path.join(path, filename)
+
     te = np.array([1 for _ in range(4)])
     te1 = [1, 20, 3, 4]
     te2 = [1, 2, 3, 4]

@@ -38,7 +38,7 @@ mask_transforms = transforms.Compose([
 
 
 def prepare_data():
-    # 准备数据
+    # 准备测试用数据
     tset_data = dataset(DATA_PATH, MASK_PATH, image_transforms, mask_transforms, test=True)
     # 设置全部训练数据集的大小
     tset_data.set_data_num(N_TEST)

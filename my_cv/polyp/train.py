@@ -11,15 +11,10 @@ import time_util
 from dataset import PolypDataset as dataset
 from models import FCN
 
-# 将vgg改为ResNet
-
 # EPOCH:1989 train_loss:0.287866
 # Epoch1989:	 valid_loss:0.328060
 # ==============saving model data===============
 # ==============saving at /home/straw/Downloads/models/polyp/2020-06-26/FCN_NLL_ep1989_04-57-10.pkl===============
-
-# 设置训练参数
-# 由于最后处理的时候要将去掉通道数1的通道，所以不能设置为1
 
 image_transforms = transforms.Compose([
     # 随机调整亮度，对比度，饱和度，色相
@@ -53,7 +48,7 @@ def prepare_data():
     random.seed(7)  # random and transforms
     torch.backends.cudnn.deterministic = True  # cudnn
 
-    # 准备数据
+    # 准备训练用数据
     train_data = dataset(DATA_PATH, MASK_PATH, image_transforms, mask_transforms)
     # 设置全部训练数据集的大小
     train_data.set_data_num(N_TRAIN)
