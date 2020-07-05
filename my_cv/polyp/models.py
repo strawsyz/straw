@@ -72,7 +72,7 @@ class FCN(nn.Module):
         # 输出中间结果，对中间结果也进行优化
         decoder_4 = self.decoder_4(decoder_3 + out_2)
         out = self.decoder_5(decoder_4 + out_1)
-        return out, decoder_4
+        return out
 
 
 def network():

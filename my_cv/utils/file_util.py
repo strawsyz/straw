@@ -1,6 +1,5 @@
 import os
 
-import zipfile36 as zipfile
 from PIL import Image
 
 
@@ -38,6 +37,7 @@ def is_valid_png(png_file):
 
 
 def is_valid_zip(zip_file):
+    import zipfile36 as zipfile
     try:
         zipfile.ZipFile(zip_file)  # 能检测文件是否完整
         # return z_file.testzip()  # 测试能否解压zip文件

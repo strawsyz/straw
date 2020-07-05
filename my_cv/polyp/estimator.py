@@ -32,7 +32,7 @@ def bbox_iou(box1, box2):
     return iou
 
 
-def iou(pred, target):
+def calcu_iou(pred, target):
     pred_mask = pred == 255
     # print("image size is {}".format(pred.size))
     # print((pred == 255).sum())
@@ -73,8 +73,8 @@ def my_iou(pred_part, gt_part, threshold=127, draw=False):
     pred_part[pred_part >= threshold] = 255
     pred_part[pred_part < threshold] = 0
 
-    res = iou(pred_part, gt_part)
-    # print("iou is {}".format(res))
+    res = calcu_iou(pred_part, gt_part)
+    # print("calcu_iou is {}".format(res))
     if draw:
         ax = plt.subplot("121")
         ax.imshow(gt_part, cmap="gray")
@@ -85,7 +85,7 @@ def my_iou(pred_part, gt_part, threshold=127, draw=False):
     return res
 
 
-def analysis_iou_by_threshold(paths):
+def analysis_iou_by_threshold4unet(paths):
     plt.figure()
     all_ious = []
     for index, path in enumerate(paths):
@@ -107,19 +107,73 @@ def analysis_iou_by_threshold(paths):
     for ious in all_ious:
         iousum += ious
     print("best is threshold is {}".format(np.argmax(iousum)))
-    print("average iou is {}".format(np.max(iousum) / len(paths)))
+    print("average calcu_iou is {}".format(np.max(iousum) / len(paths)))
     plt.xlabel("threshold")
-    plt.ylabel("iou")
-    plt.title("threshold-iou")
+    plt.ylabel("calcu_iou")
+    plt.title("threshold-calcu_iou")
     plt.legend()
     plt.show()
+
+
+def get_image(result_path, ind, pattern):
+    path = os.path.join(result_path, pattern.format(ind))
+    return np.array(Image.open(path))
+
+
+pattern_dict = {"GT": "{}_M.png",
+                "o": "{}_testT.png",
+                "pGT": "{}_mask.png",
+                "0": "{}_test.png",
+                "1": "{}_test2.png",
+                "2": "{}_test3.png",
+                "3": "{}_test4.png"}
+
+
+def analysis_iou_on_miyazakidata(result_path, pattern="GT_o"):
+    """对最终4张图片统合的结果进行测试"""
+    ious = []
+    pattern1, pattern2 = pattern.strip().split("_")
+    pattern1 = pattern_dict[pattern1]
+    pattern2 = pattern_dict[pattern2]
+    for i in range(1, 21):
+        image1 = get_image(result_path, i, pattern1)
+        image2 = get_image(result_path, i, pattern2)
+        # handled_gt_path = os.path.join(result_path, "{}_mask.png".format(i))
+        # gt_path = os.path.join(result_path, "{}_M.png".format(i))
+        # image_path = os.path.join(result_path, "{}_testT.png".format(i))
+        # gt_path = np.array(Image.open(gt_path))
+        # image_path = np.array(Image.open(image_path))
+        ious.append(calcu_iou(image1, image2))
+    print(ious)
+    print("average of iou is {:.4f}".format(np.mean(ious)))
+
+    return ious
 
 
 import os
 
 if __name__ == '__main__':
-    paths = [os.path.join("miyazaki", file) for file in os.listdir("miyazaki")]
-    # paths = ["temp{}.png".format(x) for x in range(5)]
-    analysis_iou_by_threshold(paths)
+    # paths = [os.path.join("miyazaki", file) for file in os.listdir("miyazaki")]
+    # analysis_iou_by_threshold4unet(paths)
+
+    result_path = "D:\(lab\graduate\プログラム\精度評価\\result8"
+    # 统合后结果和经过处理的mask图像进行比较的结果
+    # [0.2994350282485876, 0.3698630136986301, 0.5714285714285714, 0.45977011494252873, 0.31693989071038253, 0.7478260869565218, 0.5465116279069767, 0.5921787709497207, 0.49528301886792453, 0.7666666666666667, 0.26, 0.5590551181102362, 0.5887850467289719, 0.5813953488372093, 0.603448275862069, 0.5217391304347826, 0.8282828282828283, 0.7043478260869566, 0.43703703703703706, 0.5070422535211268]
+    # average of iou is 0.5379
+
+    # 统合后的结果和没进处理的mask图像进行比较的结果
+    # [0.30212647928994085, 0.3400622964072568, 0.5107691887984068, 0.47855264707036616, 0.2962299802051467, 0.709828415331645, 0.5456218826696223, 0.5622599202337849, 0.47452334622868614, 0.7463442323113101, 0.2693508568109207, 0.5635920465233345, 0.5373213500856308, 0.5528669635184751, 0.5973892975623828, 0.5279812553952399, 0.802314950860352, 0.6955302417023245, 0.4125245717495086, 0.49188054731559755]
+    # average of iou is 0.5209
+
+    fig = plt.figure()  # 创建画布
+    ax = plt.subplot()  # 创建作图区域
+    patterns = ["GT_o", "pGT_o", "GT_0", "GT_1", "GT_2", "GT_3"]
+    ious4pattern = []
+    for pattern in patterns:
+        ious = analysis_iou_on_miyazakidata(result_path, pattern)
+        ious4pattern.append(ious)
+    ax.boxplot(ious4pattern, whis=[5, 95])  # 设置最大值不超过95分位点；最小值不小于5%分位点。
+    ax.set_xticklabels(patterns)
+    plt.show()
 # best is threshold is 99
-# average iou is 0.40121014292501733
+# average calcu_iou is 0.40121014292501733

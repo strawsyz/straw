@@ -3,6 +3,7 @@ import os
 import numpy as np
 from PIL import Image
 
+
 # 经测试当前版本可以在win上正常运行
 def read_img(file_name):
     # 特殊情况下需要转换，为了速度暂时不转换为RGB
@@ -44,6 +45,7 @@ def read_img(file_name):
 
 def on_key_release(event):
     if event.key == 'n':
+        print("123")
         if index[0] < len(file_names) - 1:
             index[0] += 1
             show_images(file_names[index[0]])
@@ -62,22 +64,26 @@ def show_images(file_name):
     image_path = os.path.join(IMAGE_PATH, file_name)
     mask_path = os.path.join(MASK_PATH, file_name)
     result_path = os.path.join(RESLUT_PATH, file_name)
-    ax = plt.subplot(131)
-    ax.set_title(file_name)
-    ax.imshow(read_img(image_path))
-    plt.axis("off")
+    if os.path.exists(image_path) and os.path.exists(mask_path) \
+            and os.path.exists(result_path):
+        ax = plt.subplot(131)
+        ax.set_title(file_name)
+        ax.imshow(read_img(image_path))
+        plt.axis("off")
 
-    ax = plt.subplot(132)
-    ax.imshow(read_img(mask_path))
-    ax.set_title("mask")
-    plt.axis("off")
+        ax = plt.subplot(132)
+        ax.imshow(read_img(mask_path))
+        ax.set_title("mask")
+        plt.axis("off")
 
-    ax = plt.subplot(133)
-    ax.imshow(read_img(result_path))
-    ax.set_title("result")
-    plt.axis("off")
+        ax = plt.subplot(133)
+        ax.imshow(read_img(result_path))
+        ax.set_title("result")
+        plt.axis("off")
 
-    plt.show()
+        plt.show()
+    else:
+        print("can not find file : {}".format(file_name))
 
 
 if __name__ == '__main__':
@@ -85,11 +91,16 @@ if __name__ == '__main__':
     file_names = []
     # IMAGE_PATH = '/home/straw/下载/dataset/gray2color/train/color/'
     # IMAGE_PATH = "/home/straw/.straw's back/image"
-    IMAGE_PATH = '/home/straw/Downloads/dataset/polyp/data/'
-    MASK_PATH = '/home/straw/Downloads/dataset/polyp/mask/'
-    RESLUT_PATH = '/home/straw/Downloads/dataset/polyp/result/2020-05-28'
+    import config
 
-    for file_name in os.listdir(IMAGE_PATH):
+    IMAGE_PATH = '/home/straw/Downloads/dataset/polyp/data/'
+    IMAGE_PATH = config.image_path
+    MASK_PATH = '/home/straw/Downloads/dataset/polyp/mask/'
+    MASK_PATH = config.mask_path
+
+    RESLUT_PATH = '/home/straw/Downloads/dataset/polyp/result/2020-05-28'
+    RESLUT_PATH = os.path.join(config.result_save_path, "2020-07-05")
+    for file_name in os.listdir(RESLUT_PATH):
         file_names.append(file_name)
 
     from matplotlib import pyplot as plt

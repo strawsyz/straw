@@ -134,21 +134,18 @@ def train(epoch, optim):
     scheduler.step()
 
 
-import shutil
-
-
-def save_checkpoint(is_best):
+def save_checkpoint(epoch):
     print("==============saving model data===============")
     save_path = os.path.join(MODEL_PATH,
                              'FCN_NLL_ep{}_{}.pkl'.format(epoch, time_util.get_time("%H-%M-%S")))
     state = {
-        'epoch': epoch + 1,
+        'epoch': epoch,
         'state_dict': net.state_dict(),
         'optimizer': optimizer.state_dict(),
     }
     torch.save(state, save_path)
-    if is_best:
-        shutil.copyfile(save_path, 'model_best.pth.tar')
+    # if is_best:
+    #     shutil.copyfile(save_path, 'model_best.pth.tar')
 
     print("==============saving at {}===============".format(save_path))
 
@@ -162,6 +159,7 @@ def load_checkpoint(path):
         optimizer.load_state_dict(checkpoint['optimizer'])
         print("=> loaded checkpoint '{}' (epoch {})"
               .format(path, checkpoint['epoch']))
+        return start_epoch, net, optimizer
     else:
         print("=> no checkpoint found at '{}'".format(path))
 
@@ -196,5 +194,5 @@ if __name__ == '__main__':
     for epoch in range(start_epoch, start_epoch + EPOCH):
         train(epoch)
         # todo 增加是否保存模型的判断
-        save_checkpoint(is_best=False)
+        save_checkpoint(epoch)
     print("================training is over=================")

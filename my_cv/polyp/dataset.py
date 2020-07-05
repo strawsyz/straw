@@ -38,12 +38,7 @@ class PolypDataset(Dataset):
         if self.transforms is not None:
             image = self.transforms(image)
         if self.mask_transforms is not None:
-            # todo 存在一些不是0也不是1的数字，非常小，对结果应该没有太大影响，但姑且记录一下
             mask = self.mask_transforms(mask)
-            # 要对数据二值化
-            # 应该不需要对mask图像做处理
-            # label = self.transforms(label)
-        # sample = self.transform(image, label)
         if self.test:
             # 如果是测试模型，就会返回图像的名字
             return image, mask, os.path.basename(self.image_paths[index])
@@ -90,7 +85,6 @@ class NYU(Dataset):
 
 
     def __getitem__(self, index):
-
         image = Image.open(self.image_paths[index])
         label = Image.open(self.label_paths[index])
         # 对图像进行处理

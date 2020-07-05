@@ -58,18 +58,9 @@ mask_transforms = transforms.Compose([
 import numpy as np
 
 if __name__ == '__main__':
-    path = ""
-    import os
+    te = [1, 2, 4, 45, 5]
+    print(np.median(te))
 
-    for filename in os.listdir(path):
-        os.path.join(path, filename)
-
-    te = np.array([1 for _ in range(4)])
-    te1 = [1, 20, 3, 4]
-    te2 = [1, 2, 3, 4]
-    print(te + te1)
-    res = np.argmax(te1)
-    print(res)
     # pytest.main(["temp.py"])
     #
     # from PIL import Image

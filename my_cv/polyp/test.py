@@ -1,3 +1,5 @@
+import os
+
 import torch
 import torch.nn as nn
 from PIL import Image
@@ -5,36 +7,11 @@ from torch.autograd import Variable
 from torch.utils.data import DataLoader
 from torchvision import transforms
 
+import config
 import file_util
+import time_util
 from dataset import PolypDataset as dataset
 from models import FCN
-
-# 设置训练参数
-# 由于最后处理的时候要将去掉通道数1的通道，所以不能设置为1
-BATCH_SIZE = 16  # 设置为32 ，内存就炸了
-N_TEST = 140
-is_use_gpu = True
-DATA_PATH = "/home/straw/Downloads/dataset/polyp/data/"
-MASK_PATH = "/home/straw/Downloads/dataset/polyp/mask/"
-
-# 使用的预训练模型的路径
-PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/2020-06-04/FCN_NLL_ep156_12-39-27.pkl"
-PRETRAIN_PATH = "/home/straw/Downloads/models/polyp/2020-06-05/FCN_NLL_ep91_15-27-52.pkl"
-
-RESULT_SAVE_PATH = "/home/straw/Downloads/dataset/polyp/result/"
-
-image_transforms = transforms.Compose([
-    transforms.Resize((224, 224)),
-    transforms.ToTensor(),
-    # transforms.Normalize(mean=[0.482, 0.456, 0.406],
-    #                      std=[0.229, 0.224, 0.225])
-])
-mask_transforms = transforms.Compose([
-    transforms.Resize((224, 224)),
-    # 将输出设置为一个通道
-    transforms.Grayscale(),
-    transforms.ToTensor(),
-])
 
 
 def prepare_data():
@@ -50,8 +27,6 @@ def prepare_data():
     return test_loader
 
 
-
-
 # polpy_dataset = dataset(DATA_PATH, MASK_PATH, image_transforms, mask_transforms, test=True)
 # polpy_dataset.set_data_num(4)
 
@@ -63,7 +38,18 @@ def prepare_net():
     # 加载预训练模型
     if not os.path.exists(PRETRAIN_PATH):
         print("Can't find the pretrain model")
-    net.load_state_dict(torch.load(PRETRAIN_PATH))
+    # torch.load('tensors.pt')
+    # # 把所有的张量加载到CPU中
+    # torch.load('tensors.pt', map_location=lambda storage, loc: storage)
+    # # 把所有的张量加载到GPU 1中
+    # torch.load('tensors.pt', map_location=lambda storage, loc: storage.cuda(1))
+    # # 把张量从GPU 1 移动到 GPU 0
+    # torch.load('tensors.pt', map_location={'cuda:1': 'cuda:0'})
+    if is_use_gpu:
+        temp = torch.load(PRETRAIN_PATH, map_location=lambda storage, loc: storage.cuda(0))
+    else:
+        temp = torch.load(PRETRAIN_PATH, map_location=lambda storage, loc: storage)
+    net.load_state_dict(temp)
 
     # 创建loss函数
     if is_use_gpu:
@@ -74,14 +60,37 @@ def prepare_net():
     return net, loss_fucntion
 
 
+# 设置训练参数
+# 由于最后处理的时候要将去掉通道数1的通道，所以不能设置为1
+BATCH_SIZE = 12  # 设置为32 ，内存就炸了
+N_TEST = 140
+is_use_gpu = False
+DATA_PATH = config.image_path
+MASK_PATH = config.mask_path
+
+# 使用的预训练模型的路径
+PRETRAIN_PATH = config.pretrain_path
+RESULT_SAVE_PATH = config.result_save_path
+
+image_transforms = transforms.Compose([
+    transforms.Resize((224, 224)),
+    transforms.ToTensor(),
+    # transforms.Normalize(mean=[0.482, 0.456, 0.406],
+    #                      std=[0.229, 0.224, 0.225])
+])
+mask_transforms = transforms.Compose([
+    transforms.Resize((224, 224)),
+    # 将输出设置为一个通道
+    transforms.Grayscale(),
+    transforms.ToTensor(),
+])
+
 test_loader = prepare_data()
 
 net, loss_function = prepare_net()
 
 # 变成验证模式
 net.eval()
-import os
-import time_util
 
 # 当前的设置当时会按照天数来保存文件
 # todo 有必要改进
@@ -98,6 +107,8 @@ for i, (image, mask, image_name) in enumerate(test_loader):
     # optimizer.zero_grad()
     out = net(image)
     _, _, width, height = mask.size()
+    print(out.size())
+    print(mask.size())
     # 计算损失
     loss = loss_function(out, mask)
     print(loss)
