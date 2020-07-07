@@ -5,7 +5,7 @@ import torch.nn as nn
 from torch.autograd import Variable
 from torch.utils.data import DataLoader
 from torchvision import transforms
-
+from torch import optim
 import file_util
 import time_util
 from dataset import PolypDataset as dataset
@@ -61,7 +61,7 @@ def prepare_data():
     return train_loader, val_loader
 
 
-def prepare_net(optim="adam"):
+def prepare_net(optim_name="adam"):
     # 设置输出通道为1
     net = FCN(n_out=1)
     loss_function = nn.BCEWithLogitsLoss()
@@ -74,7 +74,7 @@ def prepare_net(optim="adam"):
         load_checkpoint(PRETRAIN_PATH)
         # net.load_state_dict(torch.load(PRETRAIN_PATH))
 
-    if optim == "adam":
+    if optim_name == "adam":
         optimizer = optim.Adam(net.parameters(), lr=lr)
     else:
         optimizer = optim.SGD(net.parameters(), lr=lr)
@@ -89,7 +89,7 @@ def prepare_net(optim="adam"):
     return net, optimizer, loss_function, scheduler
 
 
-def train(epoch, optim):
+def train(epoch):
     net.train()
     train_loss = 0
     n_total = 0
@@ -185,8 +185,8 @@ if __name__ == '__main__':
 
     # 准备数据
     train_loader, val_loader = prepare_data()
-    optim = "adam"
-    net, optimizer, loss_function, scheduler = prepare_net(optim=optim)
+    optim_name = "adam"
+    net, optimizer, loss_function, scheduler = prepare_net(optim_name=optim_name)
     eval_miou = []
     best = [0]
     start_epoch = 0
