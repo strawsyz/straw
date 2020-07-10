@@ -45,7 +45,6 @@ def read_img(file_name):
 
 def on_key_release(event):
     if event.key == 'n':
-        print("123")
         if index[0] < len(file_names) - 1:
             index[0] += 1
             show_images(file_names[index[0]])
