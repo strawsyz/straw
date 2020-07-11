@@ -1,6 +1,9 @@
+from collections import OrderedDict
+
 import torch
 import torch.nn.functional as F
-from collections import OrderedDict
+
+
 # four ways to create net
 
 class Net_1(torch.nn.Module):

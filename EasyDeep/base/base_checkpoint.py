@@ -24,7 +24,7 @@ class BaseCheckPoint:
         return self
 
     @staticmethod
-    def create_checkpoint(data):
+    def create_checkpoint(data: dict):
         return BaseCheckPoint()(data)
 
 

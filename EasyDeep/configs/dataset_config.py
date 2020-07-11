@@ -1,14 +1,10 @@
 from torchvision import transforms
 
 
-# 这边有的参数可以设置为None，但是不能删除
-# 可以再配置一个配置文件
 class ImageDataSetConfig:
     def __init__(self):
-        self.image_path = "D:\Download\datasets\polyp\\05\data"
-        self.image_path = "D:\Download\\back\艺术\莲华"
-        self.mask_path = "D:\Download\datasets\polyp\\05\mask"
-        self.mask_path = "D:\Download\\back\艺术\莲华"
+        self.image_path = "D:\Download\datasets\sample"
+        self.mask_path = "D:\Download\datasets\sample"
         self.random_state = 0
         self.shuffle = True
         self.image_transforms = transforms.Compose([
@@ -22,7 +18,14 @@ class ImageDataSetConfig:
         ])
         self.mask_transforms = transforms.Compose([
             transforms.Resize((224, 224)),
-            # 将输出设置为一个通道
             transforms.Grayscale(),
             transforms.ToTensor(),
         ])
+
+        # dataloader
+        self.random_state = 0
+        self.batch_size = 2
+        self.num_train = 600
+        self.num_test = 140
+        self.valid_rate = 0.5
+        self.batch_size4test = 8

@@ -6,9 +6,6 @@ class BaseExpriment(BaseLogger):
     def __init__(self):
         super(BaseExpriment, self).__init__()
         self.load_config()
-        # self.logger = Logger.get_logger()
-
-        pass
 
     def load_config(self):
         raise NotImplementedError
