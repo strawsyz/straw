@@ -1,10 +1,12 @@
 from base.base_logger import BaseLogger
+from utils.config_utils import ConfigChecker
 
 
-class BaseExpriment(BaseLogger):
+class BaseExpriment(BaseLogger, ConfigChecker):
 
     def __init__(self):
         super(BaseExpriment, self).__init__()
+        self.needed_config = None
         self.load_config()
 
     def load_config(self):

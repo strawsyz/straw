@@ -4,7 +4,6 @@ import torch
 from PIL import Image
 from torch.autograd import Variable
 
-from base import base_recorder
 from experiments.deep_experiment import DeepExperiment
 
 
@@ -38,6 +37,10 @@ class Experiment(DeepExperiment):
 
         self.logger.info("================testing end=================")
 
+    def list_config(self):
+        configs = super(Experiment, self).list_config()
+        self.logger.info("\n".join(configs))
+
     def train_one_epoch(self, epoch):
         self.net.train()
         train_loss = 0
@@ -50,7 +53,7 @@ class Experiment(DeepExperiment):
             self.optimizer.zero_grad()
             out = self.net(image)
             loss = self.loss_function(out, mask)
-            # 调用了这个函数就无法关闭进程了
+            # todo on win7 调用了这个函数就无法关闭进程了
             loss.backward()
             self.optimizer.step()
             train_loss += loss.data * len(image)
@@ -76,9 +79,11 @@ class Experiment(DeepExperiment):
 
 
 if __name__ == '__main__':
-    base_recorder.main()
+    from base.base_recorder import HistoryRecorder
+
+    recoder = HistoryRecorder
     experiment = Experiment()
     # experiment.train()
     # experiment.save_history()
-    # experiment.test()
-    experiment.estimate()
+    experiment.test()
+    # experiment.estimate()

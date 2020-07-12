@@ -1,5 +1,5 @@
 class Score:
-    def __init__(self, name, value, model_path, desciption={}):
+    def __init__(self, name, value, model_path, desciption):
         self.name = name
         self.value = value
         self.model_path = model_path
@@ -16,7 +16,7 @@ class BaseSelector:
         for score_name in score_names:
             self.scores_rank.setdefault(score_name, [None for _ in range(self.n_models)])
 
-    def add_model(self, scores: dict, model_path):
+    def add_model(self, scores: dict, model_path: str):
         need_save = False
         for name, score_value in scores.items():
             scores = self.scores_rank[name]
@@ -37,3 +37,4 @@ class BaseSelector:
                 new_scores.extend(scores[postion + 1:])
             self.scores_rank[name] = new_scores
         return need_save
+

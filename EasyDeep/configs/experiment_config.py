@@ -1,10 +1,6 @@
-import os
-
 from base.base_recorder import HistoryRecorder
 from datasets.image_dataset import ImageDataSet
-from nets.FCN_net import FCNNet
-from utils import file_utils
-from utils import time_utils
+from nets.FCNNet import FCNNet
 
 
 class DeepConfig:
@@ -18,8 +14,6 @@ class DeepConfig:
         self.history_save_dir = "D:\Download\models\polyp"
         self.history_save_path = "D:\Download\models\polyp\hitory_1594448749.744286.pth"
         self.model_save_path = "D:\Download\models\polyp"
-        self.model_save_path = os.path.join(self.model_save_path, time_utils.get_date())
-        file_utils.make_directory(self.model_save_path)
         # if None,then use all data
 
         self.is_pretrain = True

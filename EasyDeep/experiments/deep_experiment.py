@@ -15,17 +15,29 @@ from utils.utils_ import copy_attr
 class DeepExperiment(BaseExpriment):
 
     def __init__(self):
-        super(DeepExperiment, self).__init__()
         # if not load net from pretrained model, then 0
         self.current_epoch = 0
         self.history = {}
-        self.init_params()
+        self.recorder = None
+        self.net = None
+        self.dataset = None
 
-    def init_params(self):
-        self.scheduler_step_size = 15
-        self.scheduler_gamma = 0.8
+        self.num_epoch = None
+        self.is_use_gpu = None
+        self.history_save_dir = None
+        self.history_save_path = None
+        self.model_save_path = ""
+        # if None,then use all data
+        self.model_selector = None
+        self.is_pretrain = None
+        self.pretrain_path = None
+        self.result_save_path = None
+        super(DeepExperiment, self).__init__()
+
+        self.list_config()
 
     def load_config(self):
+        self.selector = None
         copy_attr(config(), self)
 
     def prepare_data(self, test_model=False):
@@ -49,19 +61,19 @@ class DeepExperiment(BaseExpriment):
 
         for epoch in range(self.current_epoch, self.current_epoch + self.num_epoch):
             recorder = self.train_one_epoch(epoch)
-            # 增加历史记录，历史记录的保存方式
             self.history[epoch] = recorder
-            # todo 增加是否保存模型的判断
-            self.save(epoch)
+            if self.model_selector is None:
+                self.save(epoch)
+            elif self.model_selector(recorder):
+                self.save(epoch)
         self.logger.info("================training is over=================")
 
     def test(self):
         self.prepare_data(test_model=True)
         self.prepare_net()
         self.net.eval()
-        # todo 有必要改进
-        # self.RESULT_SAVE_PATH = os.path.join(self.result_save_path, time_util.get_date())
-        file_utils.make_directory(self.result_save_path)
+        result_save_path = os.path.join(self.result_save_path, time_utils.get_date())
+        file_utils.make_directory(result_save_path)
 
     def create_optimizer(self, epoch):
         return {"epoch": epoch,
@@ -70,13 +82,14 @@ class DeepExperiment(BaseExpriment):
 
     def save(self, epoch):
         self.logger.info("==============saving model data===============")
-        model_save_path = os.path.join(self.model_save_path,
+        model_save_path = os.path.join(self.model_save_path, time_utils.get_date())
+        file_utils.make_directory(model_save_path)
+        model_save_path = os.path.join(model_save_path,
                                        'ep{}_{}.pkl'.format(epoch, time_utils.get_time("%H-%M-%S")))
         experiment_data = self.create_optimizer(epoch)
-
         checkpoint = BaseCheckPoint.create_checkpoint(experiment_data)
         save(checkpoint, model_save_path)
-        self.logger.info("==============saving at {}===============".format(model_save_path))
+        self.logger.info("==============saved at {}===============".format(model_save_path))
 
     def load(self):
         model_save_path = self.pretrain_path
@@ -97,7 +110,6 @@ class DeepExperiment(BaseExpriment):
         self.logger.info("=" * 10 + " saving history" + "=" * 10)
         file_utils.make_directory(self.history_save_dir)
         history_save_path = os.path.join(self.history_save_dir, "history_{}.pth".format(time_utils.timestamp()))
-        # torch.save(self.history, history_save_path)
         history = {}
         for epoch_no in self.history:
             if epoch_no < self.current_epoch:
@@ -119,6 +131,7 @@ class DeepExperiment(BaseExpriment):
             self.logger.error("not set history_save_path")
 
     def show_history(self):
+        self.logger.info("showing history")
         epoches = deque()
         train_losses = deque()
         valid_losses = deque()
@@ -130,7 +143,11 @@ class DeepExperiment(BaseExpriment):
         plot([epoches, epoches], [train_losses, valid_losses], ["train_loss", "valid_loss"], "loss analysis")
 
     def estimate(self):
+        # load history data
         self.load_history()
+        if self.history == {}:
+            self.logger.info("not history")
+        # display history data
         self.show_history()
 
 

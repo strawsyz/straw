@@ -40,7 +40,6 @@ class ImageDataSet(BaseDataSet):
             torch.backends.cudnn.deterministic = True  # cudnn
 
         if not self.test_model:
-            # self.train_data = self()
             if self.num_train is not None:
                 if len(self) > self.num_train:
                     self.set_data_num(self.num_train)
@@ -61,7 +60,6 @@ class ImageDataSet(BaseDataSet):
                 self.train_loader = DataLoader(self.train_data, batch_size=self.batch_size, shuffle=True)
                 self.val_loader = DataLoader(self.val_data, batch_size=self.batch_size, shuffle=True)
         else:
-            # self.test_data = dataset(test_model=True)
             if self.num_test is not None:
                 self.set_data_num(self.num_test)
             else:
