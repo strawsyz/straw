@@ -85,5 +85,5 @@ if __name__ == '__main__':
     experiment = Experiment()
     # experiment.train()
     # experiment.save_history()
-    experiment.test()
-    # experiment.estimate()
+    # experiment.test()
+    experiment.estimate()

@@ -3,8 +3,9 @@ from torchvision import transforms
 
 class ImageDataSetConfig:
     def __init__(self):
-        self.image_path = "D:\Download\datasets\sample"
-        self.mask_path = "D:\Download\datasets\sample"
+        self.image_path = "C:\datasets\samples"
+        self.mask_path = "C:\datasets\samples"
+
         self.shuffle = True
         self.image_transforms = transforms.Compose([
             transforms.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1, hue=0.1),

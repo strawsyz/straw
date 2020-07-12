@@ -9,7 +9,7 @@ class DeepConfig:
         self.net = FCNNet
         self.dataset = ImageDataSet
 
-        self.num_epoch = 2
+        self.num_epoch = 5
         self.is_use_gpu = False
         self.history_save_dir = "D:\Download\models\polyp"
         self.history_save_path = "D:\Download\models\polyp\hitory_1594448749.744286.pth"
@@ -19,3 +19,13 @@ class DeepConfig:
         self.is_pretrain = True
         self.pretrain_path = "D:\Download\models\polyp\\2020-07-11\ep0_14-50-09.pkl"
         self.result_save_path = "D:\Download\models\deepeasy"
+
+        # temp
+        self.history_save_dir = "C:\models"
+        self.history_save_path = "C:\models\history.pth"
+        self.model_save_path = "C:\models\deepeasy"
+        # if None,then use all data
+
+        self.is_pretrain = False
+        self.pretrain_path = "C:\models\polyp\\2020-07-11\ep0_14-50-09.pkl"
+        self.result_save_path = "C:\models\deepeasy"

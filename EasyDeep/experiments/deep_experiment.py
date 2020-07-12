@@ -40,8 +40,8 @@ class DeepExperiment(BaseExpriment):
         self.selector = None
         copy_attr(config(), self)
 
-    def prepare_data(self, test_model=False):
-        self.dataset = self.dataset(test_model)
+    def prepare_data(self, testing=False):
+        self.dataset = self.dataset(testing)
         self.dataset.get_dataloader(self)
 
     def prepare_net(self):
@@ -69,7 +69,7 @@ class DeepExperiment(BaseExpriment):
         self.logger.info("================training is over=================")
 
     def test(self):
-        self.prepare_data(test_model=True)
+        self.prepare_data(testing=True)
         self.prepare_net()
         self.net.eval()
         result_save_path = os.path.join(self.result_save_path, time_utils.get_date())
@@ -109,7 +109,7 @@ class DeepExperiment(BaseExpriment):
     def save_history(self):
         self.logger.info("=" * 10 + " saving history" + "=" * 10)
         file_utils.make_directory(self.history_save_dir)
-        history_save_path = os.path.join(self.history_save_dir, "history_{}.pth".format(time_utils.timestamp()))
+        history_save_path = os.path.join(self.history_save_dir, "history.pth")
         history = {}
         for epoch_no in self.history:
             if epoch_no < self.current_epoch:
@@ -146,9 +146,10 @@ class DeepExperiment(BaseExpriment):
         # load history data
         self.load_history()
         if self.history == {}:
-            self.logger.info("not history")
-        # display history data
-        self.show_history()
+            self.logger.error("no history")
+        else:
+            # display history data
+            self.show_history()
 
 
 if __name__ == '__main__':
