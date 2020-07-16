@@ -1,16 +1,20 @@
 from base.base_logger import BaseLogger
 from utils.config_utils import ConfigChecker
+from utils.utils_ import copy_attr
 
 
-class BaseExpriment(BaseLogger, ConfigChecker):
+class BaseExperiment(BaseLogger, ConfigChecker):
 
-    def __init__(self):
-        super(BaseExpriment, self).__init__()
-        self.needed_config = None
-        self.load_config()
+    def __init__(self, config_cls=None):
+        super(BaseExperiment, self).__init__()
+        # self.needed_config = None
+        self.load_config(config_cls)
 
-    def load_config(self):
-        raise NotImplementedError
+    def load_config(self, config_cls):
+        if config_cls is not None:
+            copy_attr(config_cls(), self)
+        else:
+            self.logger.error("need a eperiment config file!")
 
     def prepare_net(self):
         pass
@@ -48,6 +52,6 @@ class BaseExpriment(BaseLogger, ConfigChecker):
 
 
 if __name__ == '__main__':
-    expriment = BaseExpriment()
+    expriment = BaseExperiment()
     expriment.train()
     expriment.show_history()

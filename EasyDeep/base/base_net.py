@@ -7,15 +7,17 @@ from utils.utils_ import copy_attr
 
 
 class BaseNet(BaseLogger):
-
-    def __init__(self):
+    __slots__ = "net"
+    def __init__(self, config=None):
+        self.config = config
         super(BaseNet, self).__init__()
         self.net = None
-        self.loss_function = None
+        self.loss_func_name = None
         self.optimizer = None
         self.scheduler = None
         self.is_use_cuda = None
-        if not hasattr(self, "config") or self.config is None:
+        self.n_out = None
+        if self.config is None:
             self.config = NetConfig
         self.load_config()
 

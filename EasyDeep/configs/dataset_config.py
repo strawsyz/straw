@@ -29,3 +29,21 @@ class ImageDataSetConfig:
         self.num_test = 140
         self.valid_rate = 0.5
         self.batch_size4test = 8
+
+
+class CSVDataSetConfig:
+    def __init__(self):
+        # path = "ecg_list.xlsx"
+        # dir = "csv"
+        self.xls_path = "ecg_list.xlsx"
+        self.csv_dir = "csv"
+        self.test_size = 0.3
+
+        self.shuffle = True
+        # dataloader
+        self.random_state = 0
+        self.batch_size = 2
+        self.num_train = 600
+        self.num_test = 140
+        self.valid_rate = 0.5
+        self.batch_size4test = 8

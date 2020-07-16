@@ -3,8 +3,8 @@ import pickle
 from collections import deque
 
 from base.base_checkpoint import BaseCheckPoint
-from base.base_experiment import BaseExpriment
-from configs.experiment_config import DeepConfig as config
+from base.base_experiment import BaseExperiment
+from configs.experiment_config import ImageSegmentationConfig as default_config
 from utils import file_utils
 from utils import time_utils
 from utils.matplotlib_utils import plot
@@ -12,11 +12,12 @@ from utils.net_utils import save, load
 from utils.utils_ import copy_attr
 
 
-class DeepExperiment(BaseExpriment):
+class DeepExperiment(BaseExperiment):
 
-    def __init__(self):
+    def __init__(self, config_cls=None):
         # if not load net from pretrained model, then 0
         self.current_epoch = 0
+
         self.history = {}
         self.recorder = None
         self.net = None
@@ -27,18 +28,21 @@ class DeepExperiment(BaseExpriment):
         self.history_save_dir = None
         self.history_save_path = None
         self.model_save_path = ""
-        # if None,then use all data
         self.model_selector = None
         self.is_pretrain = None
         self.pretrain_path = None
         self.result_save_path = None
-        super(DeepExperiment, self).__init__()
+        self.selector = None
+        super(DeepExperiment, self).__init__(config_cls)
 
         self.list_config()
 
-    def load_config(self):
-        self.selector = None
-        copy_attr(config(), self)
+    def load_config(self, config_cls):
+        if config_cls is not None:
+            copy_attr(config_cls(), self)
+        else:
+            # 默认的加载文件的路径
+            copy_attr(default_config(), self)
 
     def prepare_data(self, testing=False):
         self.dataset = self.dataset(testing)
@@ -50,8 +54,8 @@ class DeepExperiment(BaseExpriment):
 
         if self.is_pretrain:
             self.load()
-
-    def train_one_epoch(self, epoch):
+    from base.base_recorder import BaseHistory
+    def train_one_epoch(self, epoch)->BaseHistory:
         raise NotImplementedError
 
     def train(self):
@@ -150,6 +154,11 @@ class DeepExperiment(BaseExpriment):
         else:
             # display history data
             self.show_history()
+
+
+class FNNExperiment(DeepExperiment):
+    def __init__(self, config):
+        super(FNNExperiment, self).__init__(config_cls=config)
 
 
 if __name__ == '__main__':

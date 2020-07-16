@@ -61,27 +61,31 @@ class Experiment(DeepExperiment):
         self.logger.info("EPOCH:{}\t train_loss:{:.6f}".format(epoch, train_loss))
         self.scheduler.step()
 
-        self.net.eval()
-        with torch.no_grad():
-            valid_loss = 0
-            for image, mask in self.val_loader:
-                if self.is_use_gpu:
-                    image, mask = Variable(image.cuda()), Variable(mask.cuda())
-                else:
-                    image, mask = Variable(image), Variable(mask)
+        if self.val_loader is not None:
+            self.net.eval()
+            with torch.no_grad():
+                valid_loss = 0
+                for image, mask in self.val_loader:
+                    if self.is_use_gpu:
+                        image, mask = Variable(image.cuda()), Variable(mask.cuda())
+                    else:
+                        image, mask = Variable(image), Variable(mask)
 
-                self.net.zero_grad()
-                predict = self.net(image)
-                valid_loss += self.loss_function(predict, mask) * len(image)
-            valid_loss /= len(self.val_loader)
-            self.logger.info("Epoch{}:\t valid_loss:{:.6f}".format(epoch, valid_loss))
-        return self.recorder(train_loss, valid_loss)
+                    self.net.zero_grad()
+                    predict = self.net(image)
+                    valid_loss += self.loss_function(predict, mask) * len(image)
+                valid_loss /= len(self.val_loader)
+                self.logger.info("Epoch{}:\t valid_loss:{:.6f}".format(epoch, valid_loss))
+
+            return self.recorder(train_loss, valid_loss)
+        else:
+            return self.recorder(train_loss)
 
 
 if __name__ == '__main__':
-    from base.base_recorder import HistoryRecorder
+    from base.base_recorder import BaseHistory
 
-    recoder = HistoryRecorder
+    recoder = BaseHistory
     experiment = Experiment()
     # experiment.train()
     # experiment.save_history()

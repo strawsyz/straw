@@ -4,7 +4,7 @@
 # @Author  : Shi
 # @FileName: ml_experiment.py
 # @Description：
-from base.base_experiment import BaseExpriment
+from base.base_experiment import BaseExperiment
 
 
 class MLExperiment(BaseExperiment):

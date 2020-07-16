@@ -1,7 +1,8 @@
 class NetConfig:
     def __init__(self):
+        # net structure config
         self.n_out = 1
-
+        # other net config
         self.loss_func_name = "BCEWithLogitsLoss"
         self.optim_name = "adam"
         self.is_scheduler = True

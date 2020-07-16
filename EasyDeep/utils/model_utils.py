@@ -39,7 +39,7 @@ def models_compare(X, Y):
 
     for name, model in zip(model_names, models):
         score = rmse_cv(model, X, Y)
-    print("{}: {:6f}, {:6f}".format(name, score.mean(), score.std()))
+        print("{}: {:6f}, {:6f}".format(name, score.mean(), score.std()))
 
 
 class GridSearch():
