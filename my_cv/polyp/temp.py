@@ -55,12 +55,33 @@ mask_transforms = transforms.Compose([
     transforms.Grayscale(),
     transforms.ToTensor(),
 ])
-import numpy as np
 
 if __name__ == '__main__':
-    te = [1, 2, 4, 45, 5]
-    print(np.median(te))
+    import os
 
+    path = "C:\\Users\Administrator\PycharmProjects\straw\EasyDeep\\utils\experiment_utils.py"
+    # print(os.path.dirname(path))
+    # res = os.path.basename(path)
+    # print(res)
+    res = os.path.splitext(path)
+    print(res[0])
+    print(res[1][1:])
+
+    # img = Image.open("sample.jpg").convert("L")
+    # from convert_utils import *
+    # # te = np.where(img == 0)
+    # img = Image2np(img)
+    # te = (img == 0)
+    # print(te)
+    # # print(720*1280)
+    # print(len(te) )
+    # print(te.shape)
+    # print(te.sum()/(720*1280))
+    # print(len(te))
+    # print(te)
+    # print(te.shape)
+    # for i in range(100):
+    #     print(random.randint(0, 1) == 0)
     # pytest.main(["temp.py"])
     #
     # from PIL import Image

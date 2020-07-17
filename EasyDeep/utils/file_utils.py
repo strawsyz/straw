@@ -132,6 +132,14 @@ def get_filename(path):
     return get_filename_ext(path)[0]
 
 
+def split_path(path):
+    dir_path = os.path.dirname(path)
+    full_file_name = os.path.basename(path)
+    file_name, extension = os.path.splitext(full_file_name)
+    extension = extension[1:]
+    return (dir_path, full_file_name, file_name, extension)
+
+
 if __name__ == '__main__':
     batch_img2thumbnail('D:\Temp\收藏', (300, 400))
     print("ok")

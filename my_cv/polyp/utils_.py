@@ -1,8 +1,6 @@
 import os
 
 import h5py
-import numpy as np
-from PIL import Image
 from matplotlib import pyplot as plt
 
 
@@ -262,7 +260,8 @@ def copy_images(source_path, target_path):
 
 def convert2PNG(source_path, target_path, mask=False):
     img = Image.open(source_path)
-    target_path = os.path.join(target_path, "{}.png".format(file_util.get_filename(source_path)))
+    from utils import file_utils
+    target_path = os.path.join(target_path, "{}.png".format(file_utils.get_filename(source_path)))
     if mask:
         # 如果是处理mask图像,把文件名中M去掉
         target_path = target_path.replace("M.png", ".png")
@@ -275,7 +274,7 @@ def get_needed_data(source_path, target_path, needed_part, ext=None):
     将需要的部分图像从原图像切下来，然后保存到目标目录中
     :param source_path:
     :param target_path:
-    :param needed_part: 下标是从0开始[top, left, bottom,right]
+    :param needed_part: 下标是从0开始[ left, upper, right, lower]
     :param ext: 防止图片重名，用于标注
     :return:
     """
@@ -286,10 +285,31 @@ def get_needed_data(source_path, target_path, needed_part, ext=None):
         # 理论上来讲经过之前的处理之后，所有的文件都被保存为png格式了。
         # 但为了保险，还是重新处理一遍后缀名
         # target_path = os.path.join(target_path, "{}.png".format(file_util.get_filename(file_path)))
+        from utils import file_utils
         if ext is None:
-            cropped.save(os.path.join(target_path, "{}.png".format(file_util.get_filename(file_path))))
+            cropped.save(os.path.join(target_path, "{}.png".format(file_utils.get_filename(file_path))))
         else:
-            cropped.save(os.path.join(target_path, "{}_{}.png".format(file_util.get_filename(file_path), ext)))
+            cropped.save(os.path.join(target_path, "{}_{}.png".format(file_utils.get_filename(file_path), ext)))
+
+
+def save_patch(source_path, target_dir, patch_box, ext, is_convert_gray=False):
+    """
+    将需要的部分图像从原图像切下来，然后保存到目标目录中
+    :param source_path:
+    :param target_dir:
+    :param patch_box: 下标是从0开始[ left, upper, right, lower]
+    :param ext: 防止图片重名，用于标注
+    :return:
+    """
+    img = Image.open(source_path)
+    if is_convert_gray:
+        img = img.convert("L")
+    from utils.file_utils import split_path
+    _, _, filename, extension = split_path(source_path)
+    target_path = os.path.join(target_dir, "{}_{}.{}".format(filename, ext, extension))
+    print(target_path)
+    cropped = img.crop(patch_box)
+    cropped.save(target_path)
 
 
 # 将图片切成小块增加图像数量
@@ -313,6 +333,56 @@ def create_patch(source_path, target_path, width, height, n_width, n_height):
             get_needed_data(source_path, target_path,
                             needed_part=(start_x, start_y, start_x + patch_width, start_y + patch_height), ext=label)
             label += 1
+
+
+# 将图片切成小块增加图像数量
+# 原本的图像大小1000width  800height
+def create_patch_by_absolute_size(image_dir_path, mask_dir_path, target_image_dir_path, target_mask_dir_path,
+                                  detected_size,
+                                  patch_width, patch_height):
+    import random
+    random.seed(0)
+    sample_mask_image = os.path.join(mask_dir_path, os.listdir(mask_dir_path)[0])
+    sample_mask_image = Image.open(sample_mask_image)
+    sample_mask_image = sample_mask_image.convert("L")
+    sample_width, sample_height = sample_mask_image.size
+    num_pixels = patch_width * patch_height
+    for mask_filename in os.listdir(mask_dir_path):
+        mask_filepath = os.path.join(mask_dir_path, mask_filename)
+        image_filepath = os.path.join(image_dir_path, mask_filename)
+        mask_image = Image.open(mask_filepath).convert('L')
+        index = 0
+        for _ in range(5):
+            start_x, start_y = get_point(sample_width - patch_width, sample_height - patch_height)
+            patch_box = [start_x, start_y, start_x + sample_width, start_y + sample_height]
+            patch_image = mask_image.crop(patch_box)
+            if check_mask_valid(patch_image, num_pixels, detected_size=detected_size):
+                index += 1
+                # 保存切割后的mask文件
+                save_patch(mask_filepath, target_mask_dir_path, patch_box, index, is_convert_gray=True)
+                # 将原图像对应的位置保存到目标文件夹
+                save_patch(image_filepath, target_image_dir_path, patch_box, index)
+                # path = os.path.join(mask_dir_path, "{}_{}".format(mask_image))
+
+
+import random
+
+
+def get_point(max_x, max_y):
+    start_x = random.randint(0, max_x)
+    start_y = random.randint(0, max_y)
+    return start_x, start_y
+
+
+from convert_utils import *
+
+
+def check_mask_valid(mask_image, num_pixels, detected_size=0.3):
+    mask_array = Image2np(mask_image)
+    if np.where(mask_array == 0).sum() < num_pixels * detected_size:
+        return False
+    else:
+        return True
 
 
 def analy_image(path):
