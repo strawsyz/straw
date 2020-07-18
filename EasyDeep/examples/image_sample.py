@@ -39,7 +39,7 @@ class Experiment(DeepExperiment):
 
     def list_config(self):
         configs = super(Experiment, self).list_config()
-        self.logger.info("\n".join(configs))
+        self.logger.info("\n" + "\n".join(configs))
 
     def train_one_epoch(self, epoch):
         self.net.train()
@@ -53,7 +53,6 @@ class Experiment(DeepExperiment):
             self.optimizer.zero_grad()
             out = self.net(image)
             loss = self.loss_function(out, mask)
-            # todo on win7 调用了这个函数就无法关闭进程了
             loss.backward()
             self.optimizer.step()
             train_loss += loss.data * len(image)
@@ -87,7 +86,7 @@ if __name__ == '__main__':
 
     recoder = BaseHistory
     experiment = Experiment()
-    # experiment.train()
+    experiment.train()
     # experiment.save_history()
     # experiment.test()
     experiment.estimate()

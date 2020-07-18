@@ -41,7 +41,6 @@ class DeepExperiment(BaseExperiment):
         if config_cls is not None:
             copy_attr(config_cls(), self)
         else:
-            # 默认的加载文件的路径
             copy_attr(default_config(), self)
 
     def prepare_data(self, testing=False):
@@ -54,8 +53,9 @@ class DeepExperiment(BaseExperiment):
 
         if self.is_pretrain:
             self.load()
+
     from base.base_recorder import BaseHistory
-    def train_one_epoch(self, epoch)->BaseHistory:
+    def train_one_epoch(self, epoch) -> BaseHistory:
         raise NotImplementedError
 
     def train(self):

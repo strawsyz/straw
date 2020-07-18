@@ -40,12 +40,14 @@ class BaseNet(BaseLogger):
             self.loss_function = self.loss_function.cuda()
 
         if self.optim_name == "adam":
-            self.optimizer = optim.Adam(self.net.parameters(), lr=self.lr)
+            self.optimizer = optim.Adam(self.net.parameters(), lr=self.lr, weight_decay=self.weight_decay)
         else:
             self.optimizer = optim.SGD(self.net.parameters(), lr=self.lr)
         if self.is_scheduler:
             self.scheduler = optim.lr_scheduler.StepLR(self.optimizer, step_size=self.scheduler_step_size,
                                                        gamma=self.scheduler_gamma)
+        # todo 不知道为什么，使用__dict__不会显示net属性
+        target.net = self.net
         copy_attr(self, target)
 
 

@@ -1,10 +1,20 @@
+import platform
+
 from torchvision import transforms
 
 
 class ImageDataSetConfig:
     def __init__(self):
-        self.image_path = "C:\datasets\samples"
-        self.mask_path = "C:\datasets\samples"
+        __system = platform.system()
+        # self.image_path = "C:\datasets\samples"
+        # self.mask_path = "C:\datasets\samples"
+        if __system == "Windows":
+            self.image_path = "D:\Download\datasets\polyp\\05\data"
+            self.mask_path = "D:\Download\datasets\polyp\\05\mask"
+
+        elif __system == "Linux":
+            self.image_path = "/home/straw/Downloads/dataset/polyp/TMP/06/data"
+            self.mask_path = "/home/straw/Downloads/dataset/polyp/TMP/06/mask"
 
         self.shuffle = True
         self.image_transforms = transforms.Compose([
@@ -25,9 +35,12 @@ class ImageDataSetConfig:
         # dataloader
         self.random_state = 0
         self.batch_size = 2
-        self.num_train = 600
-        self.num_test = 140
-        self.valid_rate = 0.5
+        self.test_rate = 0.2
+        import os
+        num_samples = len(os.listdir(self.mask_path))
+        self.num_test = int(num_samples * self.test_rate)
+        self.num_train = num_samples - self.num_test
+        self.valid_rate = 0.2
         self.batch_size4test = 8
 
 

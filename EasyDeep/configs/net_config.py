@@ -9,3 +9,4 @@ class NetConfig:
         self.scheduler_step_size = 15
         self.scheduler_gamma = 0.8
         self.lr = 0.002
+        self.weight_decay = 0.001
