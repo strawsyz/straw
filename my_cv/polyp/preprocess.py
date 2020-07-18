@@ -159,8 +159,9 @@ from my_data_auge import edge_detector
 flag = True
 # flag = False
 if flag:
-    SOURCE_IMAGE_PATH = "D:\Download\datasets\polyp\\06\data"
-    TARGET_EDGE_PATH = "D:\Download\datasets\polyp\\06\edge"
+    SOURCE_IMAGE_PATH = "/home/straw/Downloads/dataset/polyp/TMP/06/data/"
+    # SOURCE_IMAGE_PATH = "D:\Download\datasets\polyp\\06\data"
+    TARGET_EDGE_PATH = "/home/straw/Downloads/dataset/polyp/TMP/06/edge/"
     file_util.make_directory(TARGET_EDGE_PATH)
 
     for filename in os.listdir(SOURCE_IMAGE_PATH):

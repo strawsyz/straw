@@ -76,7 +76,7 @@ def prepare_net(optim_name="adam"):
         # net.load_state_dict(torch.load(PRETRAIN_PATH))
 
     if optim_name == "adam":
-        optimizer = optim.Adam(net.parameters(), lr=lr, weight_decay=0.01)
+        optimizer = optim.Adam(net.parameters(), lr=lr, weight_decay=0.001)
     else:
         optimizer = optim.SGD(net.parameters(), lr=lr)
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=15, gamma=0.8)  # 设置学习率下降策略

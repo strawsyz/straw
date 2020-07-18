@@ -11,9 +11,7 @@ class ImageSegmentationConfig:
         self.net = FCNNet
         self.dataset = ImageDataSet
 
-        self.num_epoch = 5
-        self.history_save_dir = "D:\Download\models\polyp"
-        self.history_save_path = "D:\Download\models\polyp\hitory_1594448749.744286.pth"
+        self.num_epoch = 500
 
         # temp
         # self.history_save_dir = "C:\models"
@@ -38,6 +36,7 @@ class ImageSegmentationConfig:
             self.is_use_gpu = True
             self.is_pretrain = False
             self.history_save_dir = "/home/straw/Downloads/models/polyp/history"
+            self.history_save_path = "D:\Download\models\polyp\hitory.pth"
             self.pretrain_path = ""
             self.model_save_path = "/home/straw/Downloads/models/polyp/"
             self.result_save_path = "/home/straw/Download\models\polyp\\result"
