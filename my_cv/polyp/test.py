@@ -63,7 +63,8 @@ def prepare_net():
 # 设置训练参数
 # 由于最后处理的时候要将去掉通道数1的通道，所以不能设置为1
 BATCH_SIZE = 12  # 设置为32 ，内存就炸了
-N_TEST = 140
+N_TEST = 79
+# N_TEST = 140
 is_use_gpu = False
 DATA_PATH = config.image_path
 MASK_PATH = config.mask_path

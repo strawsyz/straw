@@ -350,11 +350,17 @@ def create_patch_by_absolute_size(image_dir_path, mask_dir_path, target_image_di
     for mask_filename in os.listdir(mask_dir_path):
         mask_filepath = os.path.join(mask_dir_path, mask_filename)
         image_filepath = os.path.join(image_dir_path, mask_filename)
+        if os.path.isfile(mask_filepath) and os.path.isfile(image_filepath):
+            pass
+        else:
+            print("{} or {} is not exist!".format(mask_filepath,image_filepath))
+            continue
+        # read mask file as gray image
         mask_image = Image.open(mask_filepath).convert('L')
         index = 0
-        for _ in range(5):
+        for _ in range(20):
             start_x, start_y = get_point(sample_width - patch_width, sample_height - patch_height)
-            patch_box = [start_x, start_y, start_x + sample_width, start_y + sample_height]
+            patch_box = [start_x, start_y, start_x + patch_width, start_y + patch_width]
             patch_image = mask_image.crop(patch_box)
             if check_mask_valid(patch_image, num_pixels, detected_size=detected_size):
                 index += 1
@@ -379,7 +385,11 @@ from convert_utils import *
 
 def check_mask_valid(mask_image, num_pixels, detected_size=0.3):
     mask_array = Image2np(mask_image)
-    if np.where(mask_array == 0).sum() < num_pixels * detected_size:
+    # print((mask_array==0).sum())
+    print((mask_array==255).sum()/num_pixels)
+    print(mask_image.size)
+    if (mask_array == 255).sum() < num_pixels * detected_size or (mask_array == 255).sum() > num_pixels * 0.9:
+        print('==========================')
         return False
     else:
         return True

@@ -2,10 +2,11 @@ import os
 
 import torch
 import torch.nn as nn
+from torch import optim
 from torch.autograd import Variable
 from torch.utils.data import DataLoader
 from torchvision import transforms
-from torch import optim
+
 import file_util
 import time_util
 from dataset import PolypDataset as dataset
@@ -75,7 +76,7 @@ def prepare_net(optim_name="adam"):
         # net.load_state_dict(torch.load(PRETRAIN_PATH))
 
     if optim_name == "adam":
-        optimizer = optim.Adam(net.parameters(), lr=lr)
+        optimizer = optim.Adam(net.parameters(), lr=lr, weight_decay=0.01)
     else:
         optimizer = optim.SGD(net.parameters(), lr=lr)
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=15, gamma=0.8)  # 设置学习率下降策略
@@ -168,9 +169,17 @@ if __name__ == '__main__':
     BATCH_SIZE = 2
     EPOCH = 500
     is_use_gpu = True
-    DATA_PATH = "/home/straw/Downloads/dataset/polyp/TMP/05/data"
-    MASK_PATH = "/home/straw/Downloads/dataset/polyp/TMP/05/mask"
-    MODEL_PATH = "/home/straw/Downloads/models/polyp/"
+    import config
+
+    DATA_PATH = config.image_path
+    MASK_PATH = config.mask_path
+    MODEL_PATH = config.model_save_path
+    # DATA_PATH = "/home/straw/Downloads/dataset/polyp/TMP/06/data"
+    # MASK_PATH = "/home/straw/Downloads/dataset/polyp/TMP/06/mask"
+    # MODEL_PATH = "/home/straw/Downloads/models/polyp/"
+    # best model
+
+    # /home/straw/Downloads/models/polyp/2020-07-18/FCN_NLL_ep15_11-43-49.pkl
     MODEL_PATH = os.path.join(MODEL_PATH, time_util.get_date())
     file_util.make_directory(MODEL_PATH)
     lr = 0.002
@@ -178,7 +187,12 @@ if __name__ == '__main__':
     is_pretrain = False
 
     # 用于训练和验证的所有数据集
-    N_TRAIN = 600
+    # new dataset
+    # use 350 data for train
+    # use 429-350 data for test
+    num_sample = len(os.listdir(MASK_PATH))
+    N_TRAIN = int(num_sample * 0.8)
+    print(N_TRAIN)
     # 训练集数据总共的训练集数据中的百分比
     VALID_RATE = 0.2
     PRETRAIN_PATH = ""

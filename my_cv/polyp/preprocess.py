@@ -130,16 +130,44 @@ if flag:
     copy_images(SOURCE_IMAGE_PATH, TARGET_IMAGE_PATH)
     convert_imgs(SOURCE_MASK_PATH, TARGET_MASK_PATH)
 
-# flag = True
-flag = False
+flag = True
+# flag = False
 # 将原来的图像patch化
 if flag:
     SOURCE_IMAGE_PATH = "/home/straw/Downloads/dataset/polyp/TMP/03/data/"
     SOURCE_MASK_PATH = "/home/straw/Downloads/dataset/polyp/TMP/03/mask/"
     TARGET_IMAGE_PATH = "/home/straw/Downloads/dataset/polyp/TMP/06/data/"
     TARGET_MASK_PATH = "/home/straw/Downloads/dataset/polyp/TMP/06/mask/"
+    import shutil
+    shutil.rmtree(TARGET_IMAGE_PATH)
+    shutil.rmtree(TARGET_MASK_PATH)
+
     file_util.make_directory(TARGET_IMAGE_PATH)
     file_util.make_directory(TARGET_MASK_PATH)
+
+    detected_size = 0.3
+    patch_width = 224
+    patch_height = 224
+    create_patch_by_absolute_size(SOURCE_IMAGE_PATH, SOURCE_MASK_PATH, TARGET_IMAGE_PATH, TARGET_MASK_PATH,
+                                  detected_size,
+                                  patch_width, patch_height)
+
+
+flag = True
+# flag = False
+# 将原来的图像patch化
+if flag:
+    SOURCE_IMAGE_PATH = "/home/straw/Downloads/dataset/polyp/TMP/03/data/"
+    SOURCE_MASK_PATH = "/home/straw/Downloads/dataset/polyp/TMP/03/mask/"
+    TARGET_IMAGE_PATH = "/home/straw/Downloads/dataset/polyp/TMP/06/data/"
+    TARGET_MASK_PATH = "/home/straw/Downloads/dataset/polyp/TMP/06/mask/"
+    import shutil
+    shutil.rmtree(TARGET_IMAGE_PATH)
+    shutil.rmtree(TARGET_MASK_PATH)
+
+    file_util.make_directory(TARGET_IMAGE_PATH)
+    file_util.make_directory(TARGET_MASK_PATH)
+
     detected_size = 0.3
     patch_width = 224
     patch_height = 224
