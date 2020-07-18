@@ -11,38 +11,6 @@ def read_img(file_name):
     # img = img.convert('RGB')
     return img
 
-
-# todo 点击某个按钮进入编辑模式，然后编辑图像
-# def on_mouse_release(event):
-#     if event.button == 1:
-#         # 画点
-#         global last_point
-#         global center_of_hand_point
-#         global points
-#         global No
-#         global last_text
-#         if last_text:
-#             last_text.remove()
-#         if No > 15:
-#             last_text = plt.text(0, 0, '16 points in enough', color='red')
-#         else:
-#             last_text = plt.text(0, 0, 'point' + str(No))
-#             points[No] = [event.xdata, event.ydata]
-#             No += 1
-#             if not center_of_hand_point:
-#                 center_of_hand_point = [event.xdata, event.ydata]
-#             ax.scatter(event.xdata, event.ydata, color='black')
-#             plt.text(event.xdata, event.ydata,
-#                      str(No) + ':[' + str(int(event.xdata)) + "," + str(int(event.ydata)) + "]",
-#                      color='red')
-#             # 画线
-#             if last_point:
-#                 plt.plot([event.xdata, last_point[0]], [event.ydata, last_point[1]])
-#             # fig.canvas.draw()
-#             last_point = [event.xdata, event.ydata]
-#         fig.canvas.draw_idle()
-
-
 def on_key_release(event):
     if event.key == 'n':
         if index[0] < len(file_names) - 1:
@@ -98,6 +66,9 @@ if __name__ == '__main__':
     IMAGE_PATH = "/home/straw/Downloads/dataset/polyp/TMP/05/data"
     MASK_PATH = "/home/straw/Downloads/dataset/polyp/TMP/05/mask"
     RESLUT_PATH = '/home/straw/Downloads/dataset/polyp/result/2020-06-15/'
+    IMAGE_PATH = "D:\Download\datasets\polyp\\06\mask"
+    MASK_PATH = "D:\Download\datasets\polyp\\06\mask"
+    RESLUT_PATH = 'D:\Download\datasets\polyp\\06\mask'
 
     for file_name in os.listdir(RESLUT_PATH):
         file_names.append(file_name)

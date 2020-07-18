@@ -122,7 +122,7 @@ def canny_gray(img, threshold1=200, threshold2=300):
     return cv2.Canny(img, threshold1=threshold1, threshold2=threshold2)
 
 
-def canny(path):
+def canny_dege_detector(path):
     """
     检测在图像上使用Canny检测边缘的效果
     :param path:
@@ -167,5 +167,22 @@ def canny(path):
 
 
 if __name__ == '__main__':
-    path = "C:\\Users\Administrator\PycharmProjects\straw\my_cv\polyp\source\Proc201506160021_1_1.png"
-    canny(path)
+    path = "C:\\Users\Administrator\PycharmProjects\straw\my_cv\polyp\source"
+    import os
+
+    for i in os.listdir(path)[1:3]:
+        temp_path = os.path.join(path, i)
+        print(temp_path)
+        img = cv2.imread(temp_path)
+        img = cv2.resize(img, (224, 224))
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        # canny_gray(gray)
+        detected_edges = cv2.GaussianBlur(gray, (3, 3), 0)
+        detected_edges = cv2.Canny(gray, 10, 188, apertureSize=3)
+        # just add some colours to edges from original image.
+        dst = cv2.bitwise_and(img, img, mask=detected_edges)
+        cv2.imshow('canny demo', dst)
+        print(type(dst))
+        cv2.imwrite("1.png", dst)
+        cv2.waitKey(0)
+        # canny_dege_detector(path)
