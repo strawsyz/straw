@@ -6,8 +6,6 @@ from torchvision import transforms
 class ImageDataSetConfig:
     def __init__(self):
         __system = platform.system()
-        # self.image_path = "C:\datasets\samples"
-        # self.mask_path = "C:\datasets\samples"
         if __system == "Windows":
             self.image_path = "D:\Download\datasets\polyp\\05\data"
             self.mask_path = "D:\Download\datasets\polyp\\05\mask"
@@ -46,8 +44,6 @@ class ImageDataSetConfig:
 
 class CSVDataSetConfig:
     def __init__(self):
-        # path = "ecg_list.xlsx"
-        # dir = "csv"
         self.xls_path = "ecg_list.xlsx"
         self.csv_dir = "csv"
         self.test_size = 0.3

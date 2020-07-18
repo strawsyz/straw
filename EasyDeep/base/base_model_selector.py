@@ -1,40 +1,71 @@
-class Score:
-    def __init__(self, name, value, model_path, desciption):
+class ScoreModel:
+    def __init__(self, name, bigger_better=True, best_num=1, desciption=None):
         self.name = name
-        self.value = value
-        self.model_path = model_path
-        # 用字典记录模型的其他数据
+        # 也许将最差的分数拿出来维护会比较好
+        # key : path, value :score
+
+        self.bigger_better = bigger_better
+        self.best_num = best_num
+        self.best_scores = {}
+
         self.description = desciption
+
+    def is_needed_add(self, score):
+        if len(self.best_scores) < self.best_num:
+            return True
+        if min([value for value in self.best_scores.values()]) < score:
+            return True
+        else:
+            return False
+
+    def add_score(self, score, model_path):
+        if len(self.best_scores) < self.best_num:
+            pass
+        else:
+            worst_score = float("inf")
+            path_worst_model = ""
+            for model_path, value in self.best_scores.items():
+                if value < worst_score:
+                    worst_score = value
+                    path_worst_model = model_path
+            self.best_scores.pop(path_worst_model)
+        if not self.bigger_better:
+            score = - score
+        # add new score
+        self.best_num[model_path] = score
 
 
 class BaseSelector:
-    def __init__(self, score_names):
-        # 基本按照分数越低越好来保留模型
-        self.scores_rank = {}
+    def __init__(self, score_models=None):
         # 每个分数保留前5名的模型
-        self.n_models = 5
-        for score_name in score_names:
-            self.scores_rank.setdefault(score_name, [None for _ in range(self.n_models)])
+        self.best_num = 1
+        self.score_models = {}
+        self.strict = False
+        if score_models is not None:
+            self.score_models = score_models
 
     def add_model(self, scores: dict, model_path: str):
-        need_save = False
+        if self.strict:
+            need_save = True
+        else:
+            need_save = False
+
         for name, score_value in scores.items():
-            scores = self.scores_rank[name]
-            postion = 0
-            # 从最后往上比较
-            for index, score_ in enumerate(reversed(scores)):
-                if score_ is not None and score_.value < score_value:
-                    # 如果模型最后找到的值要变之前的值更大，说明找到模型的位置了
-                    postion = self.n_models - index
+            score_model = self.score_models[name]
+            if self.strict:
+                need_save = need_save and score_model.is_needed_add(score_value)
+                if not need_save:
                     break
-            # 如果不能替换。position等于self.n_models
-            new_score = Score(name, score_value, model_path)
-            new_scores = scores[:postion]
-            if postion < self.n_models:
-                # 只要有一个指标进入了榜单就保存模型
-                need_save = True
-                new_scores.appnend(new_score)
-                new_scores.extend(scores[postion + 1:])
-            self.scores_rank[name] = new_scores
+            else:
+                need_save = need_save or score_model.is_needed_add(score_value)
+                if need_save:
+                    break
+        if need_save:
+            for name, score_value in scores.items():
+                score_model = self.score_models[name]
+                score_model.add_score(score_value, model_path)
         return need_save
 
+    def add_score(self, name, bigger_better=True, best_num=1, desciption=None):
+        # 增加分数指标
+        self.score_models[name] = ScoreModel(name, bigger_better, best_num, desciption)

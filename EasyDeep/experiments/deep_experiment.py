@@ -1,5 +1,6 @@
 import os
 import pickle
+import time
 from collections import deque
 
 from base.base_checkpoint import BaseCheckPoint
@@ -64,12 +65,15 @@ class DeepExperiment(BaseExperiment):
         self.logger.info("================training start=================")
 
         for epoch in range(self.current_epoch, self.current_epoch + self.num_epoch):
+            start_time = time.time()
             recorder = self.train_one_epoch(epoch)
             self.history[epoch] = recorder
+            self.save_history()
             if self.model_selector is None:
                 self.save(epoch)
             elif self.model_selector(recorder):
                 self.save(epoch)
+            self.logger.info("use {} seconds in the epoch".format(int(time.time() - start_time)))
         self.logger.info("================training is over=================")
 
     def test(self):

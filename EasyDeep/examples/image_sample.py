@@ -38,8 +38,8 @@ class Experiment(DeepExperiment):
         self.logger.info("================testing end=================")
 
     def list_config(self):
-        configs = super(Experiment, self).list_config()
-        self.logger.info("\n" + "\n".join(configs))
+        config_view = super(Experiment, self).list_config()
+        self.logger.info(config_view)
 
     def train_one_epoch(self, epoch):
         self.net.train()

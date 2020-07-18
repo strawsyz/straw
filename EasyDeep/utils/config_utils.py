@@ -3,10 +3,12 @@ class ConfigChecker:
         super(ConfigChecker, self).__init__()
 
     def list_config(self):
-        configs = []
+        from prettytable import PrettyTable
+        config_view = PrettyTable()
+        config_view.field_names = ["name", "value"]
         for attr in self.__dict__:
-            configs.append("{} \t {}".format(attr, getattr(self, attr)))
-        return configs
+            config_view.add_row([attr, getattr(self, attr)])
+        return "\n{}".format(config_view)
 
     def check_config(self):
         if getattr(self, "needed_config", None) is not None:
