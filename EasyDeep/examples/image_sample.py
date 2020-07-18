@@ -39,6 +39,8 @@ class Experiment(DeepExperiment):
 
     def list_config(self):
         config_view = super(Experiment, self).list_config()
+        # print(type(config_view))
+        # print(config_view)
         self.logger.info(config_view)
 
     def train_one_epoch(self, epoch):

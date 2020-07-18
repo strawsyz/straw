@@ -33,11 +33,13 @@ class ImageSegmentationConfig:
             self.result_save_path = "D:\Download\models\polyp\\result"
 
         elif __system == "Linux":
+            self.num_epoch = 1000
             self.is_use_gpu = True
-            self.is_pretrain = False
+            self.is_pretrain = True
             self.history_save_dir = "/home/straw/Downloads/models/polyp/history"
-            self.history_save_path = "/home/straw/Downloads/models/polyp/history/hitory.pth"
-            self.pretrain_path = ""
+            self.history_save_path = "/home/straw/Downloads/models/polyp/history/history.pth"
+            # self.pretrain_path = "/home/straw/Downloads/models/polyp/2020-07-18/ep212_20-10-46.pkl"
+            self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-07-18/ep331_22-49-39.pkl'
             self.model_save_path = "/home/straw/Downloads/models/polyp/"
             self.result_save_path = "/home/straw/Download\models\polyp\\result"
 
