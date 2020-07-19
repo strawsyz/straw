@@ -82,7 +82,7 @@ class ImageSegmentationConfig(BaseExperimentConfig):
             self.history_save_dir = "/home/straw/Downloads/models/polyp/history"
             import time
             # todo 覆盖保存历史记录的时候也许需要提醒一下
-            self.history_save_path = "/home/straw/Downloads/models/polyp/history/history.pth"
+            self.history_save_path = None
             # self.history_save_path = ""
             # self.pretrain_path = "/home/straw/Downloads/models/polyp/2020-07-18/ep212_20-10-46.pkl"
             # self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-07-18/ep331_22-49-39.pkl'
@@ -96,7 +96,7 @@ class ImageSegmentationConfig(BaseExperimentConfig):
         import os
         if not hasattr(self, "history_save_path") or \
                 not isinstance(self.history_save_path, str) or \
-                not os.path.isfile(self):
+                not os.path.isfile(self.history_save_path):
             import time
             self.history_save_path = \
                 os.path.join(self.history_save_dir, "history{}.pth".format(int(time.time())))
