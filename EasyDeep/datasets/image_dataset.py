@@ -12,6 +12,7 @@ from utils.utils_ import copy_attr
 
 
 class ImageDataSet(BaseDataSet):
+
     def __init__(self, config_instance=None):
         super(ImageDataSet, self).__init__(config_instance)
         # self.test_model = test_model

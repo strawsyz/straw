@@ -170,6 +170,8 @@ if flag:
         print(target_path)
         edge_detector(source_path, target_path)
 
+# 重新处理mask图像，将mask图像，变成只有黑色和白色的图像
+
 # 轮廓图和mask图像重叠的部分作为正确的图
 # 输入原图像，从图像检测出轮廓，获得轮廓图
 # 输出是一个轮廓图。真值是轮廓图和mask图像重叠的部分

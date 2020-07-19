@@ -81,11 +81,10 @@ class DeepExperiment(BaseExperiment):
             self.prepare_data(testing=True)
         self.prepare_net()
         self.net.eval()
-        result_save_path = os.path.join(self.result_save_path, time_utils.get_date())
-        file_utils.make_directory(result_save_path)
+        # result_save_path = os.path.join(self.result_save_path, time_utils.get_date())
+        file_utils.make_directory(self.result_save_path)
         # add methods for test
-
-    #     todo 提取为注解，分别设置，before_test, after_test两个，train也同理
+        #     todo 提取为注解，分别设置，before_test, after_test两个，train也同理
 
     def create_optimizer(self, epoch):
         return {"epoch": epoch,

@@ -69,18 +69,16 @@ class ImageSegmentationConfig(BaseExperimentConfig):
         if __system == "Windows":
             self.is_use_gpu = False
             self.is_pretrain = False
+            self.model_save_path = "D:\Download\models\polyp"
             self.history_save_dir = "D:\Download\models\polyp"
             self.history_save_path = "D:\Download\models\polyp\hitory_1594448749.744286.pth"
-            self.pretrain_path = "D:\Download\models\polyp\FCN_NLL_ep1989_04-57-10.pkl"
-            self.model_save_path = "D:\Download\models\polyp"
+            self.pretrain_path = "D:\Download\models\polyp\ep825_07-17-43.pkl"
             self.result_save_path = "D:\Download\models\polyp\\result"
-
         elif __system == "Linux":
             self.num_epoch = 1000
             self.is_use_gpu = True
             self.is_pretrain = True
             self.history_save_dir = "/home/straw/Downloads/models/polyp/history"
-            import time
             # todo 覆盖保存历史记录的时候也许需要提醒一下
             self.history_save_path = None
             # self.history_save_path = ""
@@ -90,7 +88,7 @@ class ImageSegmentationConfig(BaseExperimentConfig):
             self.model_save_path = "/home/straw/Downloads/models/polyp/"
             self.result_save_path = "/home/straw/Download\models\polyp\\result"
 
-            self.init_attr()
+        self.init_attr()
 
     def init_attr(self):
         import os
@@ -100,6 +98,9 @@ class ImageSegmentationConfig(BaseExperimentConfig):
             import time
             self.history_save_path = \
                 os.path.join(self.history_save_dir, "history{}.pth".format(int(time.time())))
+        from utils.time_utils import get_date
+        self.history_save_dir = "D:\Download\models\polyp"
+        self.result_save_path = os.path.join(self.result_save_path, get_date())
 
 
 class FNNConfig:

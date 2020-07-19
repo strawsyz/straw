@@ -23,7 +23,7 @@ class Experiment(DeepExperiment):
             out = self.net(image)
             _, _, width, height = mask.size()
             loss = self.loss_function(out, mask)
-            self.info("".format(loss))
+            self.logger.info("test_loss is {}".format(loss))
             predict = out.squeeze().cpu().data.numpy()
             # save predict result
             for index, pred in enumerate(predict):
@@ -39,10 +39,6 @@ class Experiment(DeepExperiment):
 
     def list_config(self):
         self.logger.info(str(self.config_instance))
-        # config_view = super(Experiment, self).list_config()
-        # print(type(config_view))
-        # print(config_view)
-        # self.logger.info(config_view)
 
     def train_one_epoch(self, epoch):
         self.net.train()
@@ -58,7 +54,7 @@ class Experiment(DeepExperiment):
             loss = self.loss_function(out, mask)
             loss.backward()
             self.optimizer.step()
-            train_loss += loss.data * len(image)
+            train_loss += loss.data
         train_loss = train_loss / len(self.train_loader)
         self.logger.info("EPOCH:{}\t train_loss:{:.6f}".format(epoch, train_loss))
         self.scheduler.step()
@@ -75,7 +71,7 @@ class Experiment(DeepExperiment):
 
                     self.net.zero_grad()
                     predict = self.net(image)
-                    valid_loss += self.loss_function(predict, mask) * len(image)
+                    valid_loss += self.loss_function(predict, mask)
                 valid_loss /= len(self.val_loader)
                 self.logger.info("Epoch{}:\t valid_loss:{:.6f}".format(epoch, valid_loss))
 
@@ -91,6 +87,5 @@ if __name__ == '__main__':
     experiment = Experiment(ImageSegmentationConfig())
     # experiment.sample_test()
     experiment.train()
-    # experiment.save_history()
     # experiment.test()
     # experiment.estimate()

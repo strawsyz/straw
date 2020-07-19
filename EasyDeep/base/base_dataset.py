@@ -1,7 +1,6 @@
 from torch.utils.data import Dataset
 
 from base.base_logger import BaseLogger
-from configs.net_config import NetConfig
 from utils.config_utils import ConfigChecker
 from utils.utils_ import copy_attr
 
@@ -22,8 +21,8 @@ class BaseDataSet(Dataset, BaseLogger, ConfigChecker):
         if self.config_instance is not None:
             copy_attr(self.config_instance, self)
         else:
-            self.config_instance = NetConfig()
-            copy_attr(self.config_instance, self)
+            self.logger.error("not set a config file for dataset")
+            raise NotImplementedError
 
     def test(self):
         self.test_model = True
