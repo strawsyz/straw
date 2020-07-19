@@ -36,12 +36,6 @@ class DeepExperiment(BaseExperiment):
 
         self.list_config()
 
-    # def load_config(self, config_cls):
-    #     if config_cls is not None:
-    #         copy_attr(config_cls(), self)
-    #     else:
-    #         copy_attr(default_config(), self)
-
     def prepare_data(self, testing=False):
         if testing:
             self.dataset.test()
@@ -127,14 +121,14 @@ class DeepExperiment(BaseExperiment):
     def save_history(self):
         self.logger.info("=" * 10 + " saving history" + "=" * 10)
         file_utils.make_directory(self.history_save_dir)
-        history_save_path = os.path.join(self.history_save_dir, "history.pth")
         history = {}
+        # todo 应该在每次加载的时候去掉，多余的数据
         for epoch_no in self.history:
             if epoch_no < self.current_epoch:
                 history[epoch_no] = self.history[epoch_no]
-        with open(history_save_path, "wb") as f:
+        with open(self.history_save_path, "wb") as f:
             pickle.dump(self.history, f)
-        self.logger.info("=" * 10 + " saved history at {}".format(history_save_path) + "=" * 10)
+        self.logger.info("=" * 10 + " saved history at {}".format(self.history_save_path) + "=" * 10)
 
     def load_history(self):
         if hasattr(self, "history_save_path") and self.history_save_path is not None:

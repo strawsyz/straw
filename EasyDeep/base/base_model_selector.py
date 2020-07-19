@@ -71,7 +71,7 @@ class BaseSelector:
 
     def add_record(self, recoder, model_path):
         recoder_dict = recoder.get_recoder()
-        self._add_record(recoder_dict, model_path)
+        return self._add_record(recoder_dict, model_path)
 
     def __str__(self):
         return str([score_model.name for score_model in self.score_models])

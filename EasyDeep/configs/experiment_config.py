@@ -81,14 +81,25 @@ class ImageSegmentationConfig(BaseExperimentConfig):
             self.is_pretrain = True
             self.history_save_dir = "/home/straw/Downloads/models/polyp/history"
             import time
-            # every experiment use a new file.
-            self.history_save_path = "/home/straw/Downloads/models/polyp/history/history{}.pth".format(int(time.time()))
+            # todo 覆盖保存历史记录的时候也许需要提醒一下
+            self.history_save_path = "/home/straw/Downloads/models/polyp/history/history.pth"
             # self.history_save_path = ""
             # self.pretrain_path = "/home/straw/Downloads/models/polyp/2020-07-18/ep212_20-10-46.pkl"
             # self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-07-18/ep331_22-49-39.pkl'
             self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-07-19/ep825_07-17-43.pkl'
             self.model_save_path = "/home/straw/Downloads/models/polyp/"
             self.result_save_path = "/home/straw/Download\models\polyp\\result"
+
+            self.init_attr()
+
+    def init_attr(self):
+        import os
+        if not hasattr(self, "history_save_path") or \
+                not isinstance(self.history_save_path, str) or \
+                not os.path.isfile(self):
+            import time
+            self.history_save_path = \
+                os.path.join(self.history_save_dir, "history{}.pth".format(int(time.time())))
 
 
 class FNNConfig:
