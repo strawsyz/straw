@@ -7,21 +7,36 @@ from nets.FNNNet import MyFNN
 
 class BaseExperimentConfig:
     def __repr__(self):
-        from prettytable import PrettyTable
-        config_view = PrettyTable()
-        config_view.field_names = ["name", "value"]
-        # todo 可能之后改为__slots__
-        config_view.add_row(["dataset config", "↓" * 10])
-        for attr in self.dataset_config.__dict__:
-            config_view.add_row([attr, getattr(self.dataset_config, attr)])
-        config_view.add_row(["network config", "↓" * 10])
-        for attr in self.net_config.__dict__:
-            config_view.add_row([attr, getattr(self.net_config, attr)])
-        config_view.add_row(["experiment config", "↓" * 50])
-        for attr in self.__dict__:
-            config_view.add_row([attr, getattr(self, attr)])
-        # return config_view
-        return "\n{}".format(config_view)
+        import platform
+        delimiter = "↓" * 50
+        if platform.system() == 'Linux':
+            config_items = []
+            config_items.append("dataset config\t" + "↓" * 50)
+
+            for attr in self.dataset_config.__dict__:
+                config_items.append("{}\t{}".format(attr, getattr(self.dataset_config, attr)))
+            for attr in self.net_config.__dict__:
+                config_items.append("{}\t{}".format(attr, getattr(self.net_config, attr)))
+            for attr in self.__dict__:
+                config_items.append("{}\t{}".format(attr, getattr(self, attr)))
+            return "\n".join(config_items)
+        else:
+            from prettytable import PrettyTable
+            config_view = PrettyTable()
+            config_view.field_names = ["name", "value"]
+            # todo 可能之后改为__slots__
+            config_view.add_row(["dataset config", delimiter])
+            for attr in self.dataset_config.__dict__:
+                config_view.add_row([attr, getattr(self.dataset_config, attr)])
+            config_view.add_row(["network config", delimiter])
+            for attr in self.net_config.__dict__:
+                config_view.add_row([attr, getattr(self.net_config, attr)])
+            config_view.add_row(["experiment config", delimiter])
+            for attr in self.__dict__:
+                config_view.add_row([attr, getattr(self, attr)])
+            # return config_view
+            return str(config_view)
+            # return "\n{}".format(config_view)
 
 
 class ImageSegmentationConfig(BaseExperimentConfig):
@@ -47,6 +62,7 @@ class ImageSegmentationConfig(BaseExperimentConfig):
         # self.is_pretrain = False
         # self.pretrain_path = "C:\models\polyp\\2020-07-11\ep0_14-50-09.pkl"
         # self.result_save_path = "C:\models\deepeasy"
+
         import platform
         __system = platform.system()
 
@@ -64,9 +80,13 @@ class ImageSegmentationConfig(BaseExperimentConfig):
             self.is_use_gpu = True
             self.is_pretrain = True
             self.history_save_dir = "/home/straw/Downloads/models/polyp/history"
-            self.history_save_path = "/home/straw/Downloads/models/polyp/history/history.pth"
+            import time
+            # every experiment use a new file.
+            self.history_save_path = "/home/straw/Downloads/models/polyp/history/history{}.pth".format(int(time.time()))
+            # self.history_save_path = ""
             # self.pretrain_path = "/home/straw/Downloads/models/polyp/2020-07-18/ep212_20-10-46.pkl"
-            self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-07-18/ep331_22-49-39.pkl'
+            # self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-07-18/ep331_22-49-39.pkl'
+            self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-07-19/ep825_07-17-43.pkl'
             self.model_save_path = "/home/straw/Downloads/models/polyp/"
             self.result_save_path = "/home/straw/Download\models\polyp\\result"
 
