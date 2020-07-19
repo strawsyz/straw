@@ -353,7 +353,7 @@ def create_patch_by_absolute_size(image_dir_path, mask_dir_path, target_image_di
         if os.path.isfile(mask_filepath) and os.path.isfile(image_filepath):
             pass
         else:
-            print("{} or {} is not exist!".format(mask_filepath,image_filepath))
+            print("{} or {} is not exist!".format(mask_filepath, image_filepath))
             continue
         # read mask file as gray image
         mask_image = Image.open(mask_filepath).convert('L')
@@ -386,7 +386,7 @@ from convert_utils import *
 def check_mask_valid(mask_image, num_pixels, detected_size=0.3):
     mask_array = Image2np(mask_image)
     # print((mask_array==0).sum())
-    print((mask_array==255).sum()/num_pixels)
+    print((mask_array == 255).sum() / num_pixels)
     print(mask_image.size)
     if (mask_array == 255).sum() < num_pixels * detected_size or (mask_array == 255).sum() > num_pixels * 0.9:
         print('==========================')
@@ -403,6 +403,13 @@ def analy_image(path):
     print("size : {}".format(image.size))
     print("num_channel : {}".format(len(image.split())))
     return image
+
+
+def binary_img(img_path, target_path, threshold=127):
+    img_arr = np.array(Image.open(img_path).convert("L"))
+    img_arr[img_arr < threshold] = 0
+    img_arr[img_arr >= threshold] = 255
+    Image.fromarray(img_arr).save(target_path)
 
 
 if __name__ == '__main__':

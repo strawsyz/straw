@@ -156,8 +156,8 @@ if flag:
 # 使用canny生成轮廓图
 from my_data_auge import edge_detector
 
-flag = True
-# flag = False
+# flag = True
+flag = False
 if flag:
     SOURCE_IMAGE_PATH = "/home/straw/Downloads/dataset/polyp/TMP/06/data/"
     # SOURCE_IMAGE_PATH = "D:\Download\datasets\polyp\\06\data"
@@ -171,6 +171,20 @@ if flag:
         edge_detector(source_path, target_path)
 
 # 重新处理mask图像，将mask图像，变成只有黑色和白色的图像
+
+flag = True
+# flag = False
+if flag:
+    # SOURCE_MASK_PATH = "/home/straw/Downloads/dataset/polyp/TMP/06/mask/"
+    SOURCE_MASK_PATH = "D:\Download\datasets\polyp\\06\mask"
+    # TARGET_MASK_PATH = "/home/straw/Downloads/dataset/polyp/TMP/06/mask/"
+    TARGET_MASK_PATH = "D:\Download\datasets\polyp\\06\mask"
+    file_util.make_directory(TARGET_MASK_PATH)
+
+    for filename in os.listdir(SOURCE_MASK_PATH):
+        source_path = os.path.join(SOURCE_MASK_PATH, filename)
+        target_path = os.path.join(TARGET_MASK_PATH, filename)
+        binary_img(source_path, target_path)
 
 # 轮廓图和mask图像重叠的部分作为正确的图
 # 输入原图像，从图像检测出轮廓，获得轮廓图
