@@ -8,8 +8,9 @@ from utils.utils_ import copy_attr
 
 class BaseNet(BaseLogger):
     __slots__ = "net"
-    def __init__(self, config=None):
-        self.config = config
+
+    def __init__(self, config_instance=None):
+        self.config_instance = config_instance
         super(BaseNet, self).__init__()
         self.net = None
         self.loss_func_name = None
@@ -17,15 +18,16 @@ class BaseNet(BaseLogger):
         self.scheduler = None
         self.is_use_cuda = None
         self.n_out = None
-        if self.config is None:
-            self.config = NetConfig
+        # if self.config_cls is None:
+        #     self.config_cls = NetConfig
         self.load_config()
 
     def load_config(self):
-        if hasattr(self, "config") and self.config is not None:
-            copy_attr(self.config(), self)
+        if self.config_instance is not None:
+            copy_attr(self.config_instance, self)
         else:
-            self.logger.error("please set config file for net")
+            self.config_instance = NetConfig()
+            copy_attr(self.config_instance, self)
 
     def get_net(self, target, is_use_gpu: bool):
         if self.net is None:

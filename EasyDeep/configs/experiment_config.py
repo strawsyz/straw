@@ -5,12 +5,39 @@ from nets.FCNNet import FCNNet
 from nets.FNNNet import MyFNN
 
 
-class ImageSegmentationConfig:
+class BaseExperimentConfig:
+    def __repr__(self):
+        from prettytable import PrettyTable
+        config_view = PrettyTable()
+        config_view.field_names = ["name", "value"]
+        # todo 可能之后改为__slots__
+        config_view.add_row(["dataset config", "↓" * 10])
+        for attr in self.dataset_config.__dict__:
+            config_view.add_row([attr, getattr(self.dataset_config, attr)])
+        config_view.add_row(["network config", "↓" * 10])
+        for attr in self.net_config.__dict__:
+            config_view.add_row([attr, getattr(self.net_config, attr)])
+        config_view.add_row(["experiment config", "↓" * 50])
+        for attr in self.__dict__:
+            config_view.add_row([attr, getattr(self, attr)])
+        # return config_view
+        return "\n{}".format(config_view)
+
+
+class ImageSegmentationConfig(BaseExperimentConfig):
     def __init__(self):
         self.recorder = BaseHistory
-        self.net = FCNNet
-        self.dataset = ImageDataSet
-
+        from configs.net_config import FCNNetConfig
+        self.net_config = FCNNetConfig()
+        self.net = FCNNet(self.net_config)
+        from configs.dataset_config import ImageDataSetConfig
+        self.dataset_config = ImageDataSetConfig()
+        self.dataset = ImageDataSet(self.dataset_config)
+        from base.base_model_selector import BaseSelector, ScoreModel
+        score_models = []
+        score_models.append(ScoreModel("train_loss", bigger_better=False))
+        score_models.append(ScoreModel("valid_loss", bigger_better=False))
+        self.selector = BaseSelector(score_models)
         self.num_epoch = 500
 
         # temp

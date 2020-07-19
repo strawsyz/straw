@@ -7,8 +7,8 @@ class ImageDataSetConfig:
     def __init__(self):
         __system = platform.system()
         if __system == "Windows":
-            self.image_path = "D:\Download\datasets\polyp\\05\data"
-            self.mask_path = "D:\Download\datasets\polyp\\05\mask"
+            self.image_path = "D:\Download\datasets\polyp\\06\data"
+            self.mask_path = "D:\Download\datasets\polyp\\06\mask"
 
         elif __system == "Linux":
             self.image_path = "/home/straw/Downloads/dataset/polyp/TMP/06/data"
@@ -40,6 +40,17 @@ class ImageDataSetConfig:
         self.num_train = num_samples - self.num_test
         self.valid_rate = 0.2
         self.batch_size4test = 8
+
+    # def __str__(self):
+    #     return "124"
+
+    def __repr__(self):
+        return "123"
+
+
+if __name__ == '__main__':
+    a = ImageDataSetConfig()
+    print(a)
 
 
 class CSVDataSetConfig:

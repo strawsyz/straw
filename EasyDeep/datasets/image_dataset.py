@@ -12,9 +12,9 @@ from utils.utils_ import copy_attr
 
 
 class ImageDataSet(BaseDataSet):
-    def __init__(self, test_model=False):
-        super(ImageDataSet, self).__init__()
-        self.test_model = test_model
+    def __init__(self, config_instance=None):
+        super(ImageDataSet, self).__init__(config_instance)
+        # self.test_model = test_model
         self.image_paths = []
         self.mask_paths = []
         self.IMAGE_PATHS = []
@@ -29,6 +29,21 @@ class ImageDataSet(BaseDataSet):
             self.MASK_PATHS.append(os.path.join(self.mask_path, file_name))
             self.image_paths.append(os.path.join(self.image_path, file_name))
             self.mask_paths.append(os.path.join(self.mask_path, file_name))
+
+    def get_samle_dataloader(self, num_samples, target):
+        self.image_paths, self.mask_paths = self.IMAGE_PATHS[:num_samples * 3], self.MASK_PATHS[:num_samples * 3]
+        self.train_data, self.val_data, self.test_data = torch.utils.data.random_split(self,
+                                                                                       [num_samples,
+                                                                                        num_samples,
+                                                                                        num_samples])
+        self.train_loader = DataLoader(self.train_data, batch_size=self.batch_size, shuffle=True)
+        self.val_loader = DataLoader(self.val_data, batch_size=self.batch_size, shuffle=True)
+        self.test_loader = DataLoader(self.test_data, batch_size=self.batch_size, shuffle=True)
+        self.copy_attr(target, ["val_loader", "train_loader", "test_loader"])
+
+    def copy_attr(self, target, attr_names):
+        for attr_name in attr_names:
+            setattr(target, attr_name, getattr(self, attr_name))
 
     def get_dataloader(self, target):
         if self.random_state is not None:
@@ -82,7 +97,8 @@ class ImageDataSet(BaseDataSet):
             image = self.image_transforms(image)
         if self.mask_transforms is not None:
             mask = self.mask_transforms(mask)
-        if self.test_model:
+        # if use few sample for test ,will not have test_model
+        if getattr(self, "test_model", False):
             return image, mask, os.path.basename(self.image_paths[index])
         else:
             return image, mask

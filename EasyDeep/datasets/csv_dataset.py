@@ -1,5 +1,3 @@
-from sklearn.model_selection import train_test_split
-import operator
 import os
 import random
 
@@ -7,18 +5,18 @@ import numpy as np
 import pandas as pd
 import torch
 from torch.utils.data import DataLoader
+
 from base.base_dataset import BaseDataSet
-from utils.utils_ import copy_attr
 from configs.dataset_config import CSVDataSetConfig as default_config
+from utils.utils_ import copy_attr
 
 
 class CsvDataSet(BaseDataSet):
-    def __init__(self, test_model=False, config_cls=None):
-        super(CsvDataSet, self).__init__(config_cls=config_cls)
+    def __init__(self, config_instance=None):
+        super(CsvDataSet, self).__init__(config_instance=config_instance)
         self.load_data()
         self.deduplication()
         self.data_split()
-        self.test_model = test_model
 
     def data_split(self, test_size=0.3):
         if self.test_size is not None:
@@ -56,7 +54,6 @@ class CsvDataSet(BaseDataSet):
             data[i, 1] = time_delta.days
         data = np.hstack([data[:, :2], data[:, 3:]])
 
-        # 每行存储一个numpy矩阵
         X = []
         hm_early = []
         hm_delay = []

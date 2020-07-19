@@ -7,7 +7,6 @@ class ScoreModel:
         self.bigger_better = bigger_better
         self.best_num = best_num
         self.best_scores = {}
-
         self.description = desciption
 
     def is_needed_add(self, score):
@@ -44,12 +43,12 @@ class BaseSelector:
         if score_models is not None:
             self.score_models = score_models
 
-    def add_model(self, scores: dict, model_path: str):
+    def _add_record(self, scores: dict, model_path: str):
+
         if self.strict:
             need_save = True
         else:
             need_save = False
-
         for name, score_value in scores.items():
             score_model = self.score_models[name]
             if self.strict:
@@ -69,3 +68,10 @@ class BaseSelector:
     def add_score(self, name, bigger_better=True, best_num=1, desciption=None):
         # 增加分数指标
         self.score_models[name] = ScoreModel(name, bigger_better, best_num, desciption)
+
+    def add_record(self, recoder, model_path):
+        recoder_dict = recoder.get_recoder()
+        self._add_record(recoder_dict, model_path)
+
+    def __str__(self):
+        return str([score_model.name for score_model in self.score_models])

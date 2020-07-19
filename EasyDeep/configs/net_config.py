@@ -10,3 +10,8 @@ class NetConfig:
         self.scheduler_gamma = 0.8
         self.lr = 0.002
         self.weight_decay = 0.001
+
+
+class FCNNetConfig(NetConfig):
+    def __init__(self):
+        super(FCNNetConfig, self).__init__()

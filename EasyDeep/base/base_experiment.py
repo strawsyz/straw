@@ -5,16 +5,17 @@ from utils.utils_ import copy_attr
 
 class BaseExperiment(BaseLogger, ConfigChecker):
 
-    def __init__(self, config_cls=None):
+    def __init__(self, config_instance=None):
         super(BaseExperiment, self).__init__()
-        # self.needed_config = None
-        self.load_config(config_cls)
+        self.config_instance = config_instance
+        self.load_config()
 
-    def load_config(self, config_cls):
-        if config_cls is not None:
-            copy_attr(config_cls(), self)
+    def load_config(self):
+        if self.config_instance is not None:
+            copy_attr(self.config_instance, self)
         else:
             self.logger.error("need a eperiment config file!")
+            raise NotImplementedError
 
     def prepare_net(self):
         pass

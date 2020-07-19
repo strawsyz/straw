@@ -15,8 +15,6 @@ class cached_property:
 
 def copy_attr(source, target):
     for attr in source.__dict__:
-        if attr == 'net':
-            print(1)
         setattr(target, attr, getattr(source, attr))
     # todo 复制完之后删去配置文件占用的空间
 

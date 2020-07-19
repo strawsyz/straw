@@ -3,10 +3,10 @@ from net_structures.FCN import FCN
 
 
 class FCNNet(BaseNet):
-    def __init__(self):
+    def __init__(self, config_cls=None):
         # if don't want to load basic net config file
         # then set config file before super()
-        super(FCNNet, self).__init__()
+        super(FCNNet, self).__init__(config_cls)
         self.net = FCN
 
 if __name__ == '__main__':

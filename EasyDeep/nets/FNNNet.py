@@ -3,8 +3,8 @@ from net_structures.BaseFNN import MyFNN
 
 
 class FNNNet(BaseNet):
-    def __init__(self, config=None):
-        super(FNNNet, self).__init__(config)
+    def __init__(self, config_CLS=None):
+        super(FNNNet, self).__init__(config_CLS)
         # if don't want to load basic net config file
         # then set config file before super()
         self.net = MyFNN

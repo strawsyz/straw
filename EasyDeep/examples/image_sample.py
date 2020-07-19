@@ -8,11 +8,11 @@ from experiments.deep_experiment import DeepExperiment
 
 
 class Experiment(DeepExperiment):
-    def __init__(self):
-        super(Experiment, self).__init__()
+    def __init__(self, config_instance=None):
+        super(Experiment, self).__init__(config_instance)
 
-    def test(self):
-        super(Experiment, self).test()
+    def test(self, test=False):
+        super(Experiment, self).test(test)
         self.logger.info("=" * 10 + "test start" + "=" * 10)
         for i, (image, mask, image_name) in enumerate(self.test_loader):
             if self.is_use_gpu:
@@ -38,10 +38,11 @@ class Experiment(DeepExperiment):
         self.logger.info("================testing end=================")
 
     def list_config(self):
-        config_view = super(Experiment, self).list_config()
+        self.logger.info(str(self.config_instance))
+        # config_view = super(Experiment, self).list_config()
         # print(type(config_view))
         # print(config_view)
-        self.logger.info(config_view)
+        # self.logger.info(config_view)
 
     def train_one_epoch(self, epoch):
         self.net.train()
@@ -84,11 +85,12 @@ class Experiment(DeepExperiment):
 
 
 if __name__ == '__main__':
-    from base.base_recorder import BaseHistory
+    # recoder = BaseHistory
+    from configs.experiment_config import ImageSegmentationConfig
 
-    recoder = BaseHistory
-    experiment = Experiment()
+    experiment = Experiment(ImageSegmentationConfig())
+    # experiment.sample_test()
     experiment.train()
     # experiment.save_history()
     # experiment.test()
-    experiment.estimate()
+    # experiment.estimate()
