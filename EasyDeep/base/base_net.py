@@ -35,20 +35,26 @@ class BaseNet(BaseLogger):
         self.net = self.net(n_out=self.n_out)
         if self.loss_func_name == "BCEWithLogitsLoss":
             self.loss_function = nn.BCEWithLogitsLoss()
+        elif self.loss_func_name == "MSE":
+            self.loss_function = nn.MSELoss()
         else:
             self.logger.error("please set a valid loss function's name")
+            raise RuntimeError
         if is_use_gpu:
             self.net = self.net.cuda()
             self.loss_function = self.loss_function.cuda()
 
         if self.optim_name == "adam":
             self.optimizer = optim.Adam(self.net.parameters(), lr=self.lr, weight_decay=self.weight_decay)
+        elif self.optim_name == "sgd":
+            self.optimizer = optim.SGD(self.net.parameters(), lr=self.lr, weight_decay=self.weight_decay)
         else:
-            self.optimizer = optim.SGD(self.net.parameters(), lr=self.lr)
+            self.logger.error("please set a valid loss function's name")
+            raise RuntimeError
         if self.is_scheduler:
             self.scheduler = optim.lr_scheduler.StepLR(self.optimizer, step_size=self.scheduler_step_size,
                                                        gamma=self.scheduler_gamma)
-        # todo 不知道为什么，使用__dict__不会显示net属性
+        # todo 不知道为什么，在ubuntu系统上使用__dict__不会显示net属性
         target.net = self.net
         copy_attr(self, target)
 

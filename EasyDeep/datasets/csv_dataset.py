@@ -13,38 +13,50 @@ from utils.utils_ import copy_attr
 
 class CsvDataSet(BaseDataSet):
     def __init__(self, config_instance=None):
+        self.test_model = False
+        self.test_dataloader = None
+        self.train_dataloader = None
+        self.valid_dataloader = None
+        self.test_size = 0
+        self.valid_size = 0
+        self.num_test = 0
+        self.num_valid = 0
         super(CsvDataSet, self).__init__(config_instance=config_instance)
         self.load_data()
         self.deduplication()
-        self.data_split()
 
-    def data_split(self, test_size=0.3):
-        if self.test_size is not None:
-            self.num_test = int(len(self.Y) * test_size)
-            self.num_train = len(self.Y) - self.num_test
-        if self.test_model:
-            self.X = self.X[:-self.num_test]
-            self.Y = self.Y[:-self.num_test]
-        else:
-            if self.num_train is not None:
-                if len(self) > self.num_train:
-                    self.set_data_num(self.num_train)
-                else:
-                    self.num_train = len(self)
+    def get_dataloader(self, target):
+        if self.random_state is not None:
+            torch.manual_seed(self.random_state)  # cpu
+            torch.cuda.manual_seed(self.random_state)  # gpu
+            torch.cuda.manual_seed_all(self.random_state)
+            np.random.seed(self.random_state)  # numpy
+            random.seed(self.random_state)  # random and transforms
+            torch.backends.cudnn.deterministic = True  # cudnn
+        # 根据需要分为测试集和训练集
+        data_types = []
+        data_num = []
+        if self.test_size > 0:
+            self.num_test = int(self.num_data * self.test_size)
+            self.num_train = self.num_train - self.num_test
+            data_types.append("test")
+            data_num.append(self.num_test)
+        if self.valid_size > 0:
+            self.num_valid = int(self.num_data * self.valid_size)
+            self.num_train = self.num_train - self.num_valid
+            data_types.append("valid")
+            data_num.append(self.num_valid)
+        data_types.append("train")
+        data_num.append(self.num_train)
+        self.all_data = torch.utils.data.random_split(self, data_num)
+        for data_type, data in zip(data_types, self.all_data):
+            if data_type == "test":
+                setattr(self, "{}_dataloader".format(data_type),
+                        DataLoader(data, batch_size=self.batch_size4test, shuffle=True))
             else:
-                self.num_train = len(self.train_data)
-            if self.valid_rate is None:
-                self.train_loader = DataLoader(self, batch_size=self.batch_size, shuffle=True)
-                return self.train_loader
-            else:
-                num_valid_data = int(self.num_train * self.valid_rate)
-                if num_valid_data == 0 or num_valid_data == self.num_train:
-                    self.logger.error("valid datateset is None or train dataset is None")
-                self.train_data, self.val_data = torch.utils.data.random_split(self,
-                                                                               [self.num_train - num_valid_data,
-                                                                                num_valid_data])
-                self.train_loader = DataLoader(self.train_data, batch_size=self.batch_size, shuffle=True)
-                self.val_loader = DataLoader(self.val_data, batch_size=self.batch_size, shuffle=True)
+                setattr(self, "{}_dataloader".format(data_type),
+                        DataLoader(data, batch_size=self.batch_size, shuffle=True))
+        self.copy_attr(target)
 
     def load_data(self):
         df = pd.read_excel(self.xls_path, parse_dates=["ecg_date", "mibg_date"])
@@ -87,6 +99,7 @@ class CsvDataSet(BaseDataSet):
         time_delta_data = np.array(time_delta_data)
         self.file_names = file_names
         self.X, self.time_delta_data, self.hm_early, self.hm_delay, self.wr = X, time_delta_data, hm_early, hm_delay, wr
+        self.num_train = self.num_data = len(self.X)
 
     def deduplication(self):
         from collections import namedtuple
@@ -121,48 +134,29 @@ class CsvDataSet(BaseDataSet):
         for ecg_ in ecgs_data:
             self.X.append(ecg_.x)
             self.Y.append(ecg_.y[0])
-
-    def get_dataloader(self, target=None):
-        if self.random_state is not None:
-            torch.manual_seed(self.random_state)  # cpu
-            torch.cuda.manual_seed(self.random_state)  # gpu
-            torch.cuda.manual_seed_all(self.random_state)
-            np.random.seed(self.random_state)  # numpy
-            random.seed(self.random_state)  # random and transforms
-            torch.backends.cudnn.deterministic = True  # cudnn
-
-        if not self.test_model:
-            self.train_loader = DataLoader(self, batch_size=self.batch_size, shuffle=True)
-            return self.train_loader
-        else:
-            self.test_loader = DataLoader(self, batch_size=self.batch_size4test, shuffle=True)
-            return self.test_loader
-        self.copy_attr(target)
+        self.num_train = self.num_data = len(self.X)
 
     def copy_attr(self, target):
-        target.train_loader = self.train_loader
-        target.valid_loader = self.valid_loader
-        target.test_loader = self.test_loader
-
-    def load_config(self):
-        if self.config_cls is not None:
-            copy_attr(self.config_cls(), self)
-        else:
-            copy_attr(default_config(), self)
-
-    def read_from_csv(self, csv_path):
-        df = pd.read_csv(csv_path, usecols=[0, 1, 2, 3, 4, 5, 6, 7], header=1, index_col=False)
-        ecg_data = df.values.transpose().flatten()
-        if ecg_data.shape[0] != 40000:
-            print("{} has some problems on data's size".format(csv_path))
-        else:
-            return ecg_data
+        target.train_loader = self.train_dataloader
+        target.valid_loader = self.valid_dataloader
+        target.test_loader = self.test_dataloader
 
     def __len__(self):
         return len(self.Y)
 
     def __getitem__(self, index):
         return self.X[index], self.Y[index]
+
+    def get_samle_dataloader(self, num_samples, target):
+        self.X, self.Y = self.X[:num_samples * 3], self.Y[:num_samples * 3]
+        self.train_data, self.valid_data, self.test_data = torch.utils.data.random_split(self,
+                                                                                       [num_samples,
+                                                                                        num_samples,
+                                                                                        num_samples])
+        self.train_loader = DataLoader(self.train_data, batch_size=self.batch_size, shuffle=True)
+        self.valid_loader = DataLoader(self.valid_data, batch_size=self.batch_size, shuffle=True)
+        self.test_loader = DataLoader(self.test_data, batch_size=self.batch_size4test, shuffle=True)
+        self.copy_attr(target)
 
 
 if __name__ == '__main__':

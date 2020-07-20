@@ -36,19 +36,19 @@ class DenseLayer(nn.Sequential):
 
 
 class MyFNN(nn.Module):
-    def __init__(self, n_out=3, dropout=None):
+    def __init__(self, n_in=887, n_out=1, dropout=0.3):
         super(MyFNN, self).__init__()
         self.linears = []
         for i in range(8):
             from operator import attrgetter
             attr = attrgetter("linear{}".format(i))
             setattr(self, "linear{}".format(i),
-                    DenseLayer(n_in=5000, n_out=n_out, n_hides=[2048, 1024, 512, 256, 128, 64, 32, 16],
+                    DenseLayer(n_in=n_in, n_out=n_out, n_hides=[2048, 1024, 512, 256, 128, 64, 32, 16],
                                dropout=dropout))
             self.linears.append(attr(self))
 
     def forward(self, input):
-        input = input.reshape(8, 5000)
+        input = input.reshape(8, -1)
         # print(input[0].shape)
         output = self.linears[0](input[0])
         for i in range(1, 8):

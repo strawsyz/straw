@@ -1,3 +1,4 @@
+from torch.autograd import Variable
 import os
 import pickle
 import time
@@ -36,7 +37,7 @@ class DeepExperiment(BaseExperiment):
 
         self.list_config()
 
-    def prepare_data(self, testing=False):
+    def prepare_dataset(self, testing=False):
         if testing:
             self.dataset.test()
         else:
@@ -56,7 +57,7 @@ class DeepExperiment(BaseExperiment):
 
     def train(self, test=False):
         if not test:
-            self.prepare_data()
+            self.prepare_dataset()
         self.prepare_net()
         self.logger.info("================training start=================")
 
@@ -64,21 +65,13 @@ class DeepExperiment(BaseExperiment):
             start_time = time.time()
             record = self.train_one_epoch(epoch)
             self.history[epoch] = record
-            self.save_history()
-            if self.model_selector is None:
-                self.save(epoch)
-            else:
-                is_need_save = self.model_selector.add_record(record)
-                if is_need_save:
-                    self.save(epoch)
-                else:
-                    self.logger.info("the eppoch's result is not good, not save")
+            self.save(epoch, record)
             self.logger.info("use {} seconds in the epoch".format(int(time.time() - start_time)))
         self.logger.info("================training is over=================")
 
     def test(self, test=False):
         if not test:
-            self.prepare_data(testing=True)
+            self.prepare_dataset(testing=True)
         self.prepare_net()
         self.net.eval()
         # result_save_path = os.path.join(self.result_save_path, time_utils.get_date())
@@ -91,12 +84,24 @@ class DeepExperiment(BaseExperiment):
                 "state_dict": self.net.state_dict(),
                 "optimizer": self.optimizer.state_dict()}
 
-    def save(self, epoch):
-        self.logger.info("==============saving model data===============")
+    def save(self, epoch, record):
+        self.save_history()
         model_save_path = os.path.join(self.model_save_path, time_utils.get_date())
         file_utils.make_directory(model_save_path)
         model_save_path = os.path.join(model_save_path,
                                        'ep{}_{}.pkl'.format(epoch, time_utils.get_time("%H-%M-%S")))
+        if self.model_selector is None:
+            self._save_model(epoch, model_save_path)
+        else:
+            is_need_save, need_reason = self.model_selector.add_record(record, model_save_path)
+            if is_need_save:
+                self.logger.info("save this model for {} is better".format(need_reason))
+                self._save_model(epoch, model_save_path)
+            else:
+                self.logger.info("the eppoch's result is not good, not save")
+
+    def _save_model(self, epoch, model_save_path):
+        self.logger.info("==============saving model data===============")
         experiment_data = self.create_optimizer(epoch)
         checkpoint = BaseCheckPoint.create_checkpoint(experiment_data)
         save(checkpoint, model_save_path)
@@ -141,36 +146,53 @@ class DeepExperiment(BaseExperiment):
         else:
             self.logger.error("not set history_save_path")
 
-    def show_history(self):
+    def show_history(self, use_log10=False):
         self.logger.info("showing history")
-        epoches = deque()
-        train_losses = deque()
-        valid_losses = deque()
-        for epoch_no in self.history:
-            epoches.append(epoch_no)
-            recorder = self.history.get(epoch_no)
-            train_losses.append(recorder.train_loss)
-            valid_losses.append(recorder.valid_loss)
-        plot([epoches, epoches], [train_losses, valid_losses], ["train_loss", "valid_loss"], "loss analysis")
+        record_attrs = self.history[list(self.history.keys())[0]].__slots__
+        epoches = [[epoch_no for epoch_no in self.history] for _ in range(len(record_attrs))]
+        import torch
+        if use_log10:
+            all_records = [[torch.log10(getattr(self.history.get(epoch_no), attr_name)) for epoch_no in self.history]
+                            for attr_name in record_attrs]
+            record_attrs = ["log10_{}".format(attr_name) for attr_name in record_attrs]
+            plot(epoches, all_records, record_attrs,
+                 "history analysis with log10")
+        else:
+            all_records = [[getattr(self.history.get(epoch_no), attr_name) for epoch_no in self.history]
+                            for attr_name in record_attrs]
+            plot(epoches, all_records, record_attrs, "history analysis")
 
-    def estimate(self):
+    def estimate(self, use_log10=False):
         # load history data
         self.load_history()
         if self.history == {}:
             self.logger.error("no history")
         else:
             # display history data
-            self.show_history()
+            self.show_history(use_log10)
 
     def sample_test(self, n_sample=3, epoch=3):
         cur_epoch = self.num_epoch
         self.dataset.get_samle_dataloader(num_samples=n_sample, target=self)
         # self.dataset.get_dataloader(self)
         self.num_epoch = epoch
-        # self.train(test=True)
+        self.train(test=True)
         self.test(test=True)
         self.estimate()
         self.num_epoch = cur_epoch
+
+    def prepare_data(self, data, data_type=None):
+        import torch
+        data = Variable(data)
+        if data_type == "float":
+            data = data.float()
+        elif data_type == "double":
+            data = data.double()
+
+        if self.is_use_gpu and torch.cuda.is_available():
+            return data.cuda()
+        else:
+            return data
 
 
 class FNNExperiment(DeepExperiment):

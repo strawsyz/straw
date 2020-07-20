@@ -5,11 +5,11 @@ class BaseHistory:
         self.train_loss = train_loss
         self.valid_loss = valid_loss
 
-    def get_recoder_dict(self):
-        recoder_dict = {}
+    def get_record_dict(self):
+        record_dict = {}
         for attr in self.__slots__:
-            recoder_dict[attr] = getattr(self, attr, None)
-        return recoder_dict
+            record_dict[attr] = getattr(self, attr, None)
+        return record_dict
 
 
 def main():

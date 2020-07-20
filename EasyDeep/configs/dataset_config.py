@@ -41,29 +41,21 @@ class ImageDataSetConfig:
         self.valid_rate = 0.2
         self.batch_size4test = 8
 
-    # def __str__(self):
-    #     return "124"
 
-    def __repr__(self):
-        return "123"
+class CSVDataSetConfig:
+    def __init__(self):
+        self.xls_path = "C:\data_analysis\datasets\ecgs\ecg_list_dummy.xlsx"
+        self.csv_dir = "C:\data_analysis\datasets\ecgs\csv"
+        self.test_size = 0.3
+        self.valid_size = 0.2
+
+        self.shuffle = True
+        # dataloader
+        self.random_state = 0
+        self.batch_size = 1
+        self.batch_size4test = 1
 
 
 if __name__ == '__main__':
     a = ImageDataSetConfig()
     print(a)
-
-
-class CSVDataSetConfig:
-    def __init__(self):
-        self.xls_path = "ecg_list.xlsx"
-        self.csv_dir = "csv"
-        self.test_size = 0.3
-
-        self.shuffle = True
-        # dataloader
-        self.random_state = 0
-        self.batch_size = 2
-        self.num_train = 600
-        self.num_test = 140
-        self.valid_rate = 0.5
-        self.batch_size4test = 8

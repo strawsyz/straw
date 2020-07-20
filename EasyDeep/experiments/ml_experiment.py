@@ -14,13 +14,13 @@ class MLExperiment(BaseExperiment):
 
 
     def train(self):
-        self.prepare_data()
+        self.prepare_dataset()
         assert self.X is not None
         assert self.Y is not None
         self.model.fit(self.X,self.Y)
 
 
-    def prepare_data(self):
+    def prepare_dataset(self):
         pass
 
     def add_model(self,model):

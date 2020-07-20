@@ -17,10 +17,14 @@ class BaseExperiment(BaseLogger, ConfigChecker):
             self.logger.error("need a eperiment config file!")
             raise NotImplementedError
 
+    def list_config(self):
+        """list all config on this experiment"""
+        self.logger.info(str(self.config_instance))
+
     def prepare_net(self):
         pass
 
-    def prepare_data(self):
+    def prepare_dataset(self):
         pass
 
     def train(self):
