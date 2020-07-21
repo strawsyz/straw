@@ -5,11 +5,9 @@ from net_structures.BaseFNN import MyFNN
 class FNNNet(BaseNet):
     def __init__(self, config_instance=None):
         super(FNNNet, self).__init__(config_instance)
-        # if don't want to load basic net config file
-        # then set config file before super()
-        self.net = MyFNN
+        self.net = MyFNN(n_out=self.n_out)
 
 
 if __name__ == '__main__':
-    base_net = FNNNet()
-    base_net.get_net("1", False)
+    net = FNNNet()
+    net.unit_test()

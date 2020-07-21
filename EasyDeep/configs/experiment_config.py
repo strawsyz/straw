@@ -103,22 +103,22 @@ class ImageSegmentationConfig(BaseExperimentConfig):
 class FNNConfig(BaseExperimentConfig):
     def __init__(self):
         self.recorder = BaseHistory
-        from configs.net_config import FNNNetConfig
-        self.net_config = FNNNetConfig()
-        from nets.FNNNet import FNNNet
-        self.net = FNNNet(self.net_config)
+        # net
+        from configs.net_config import CNN1DNetConfig
+        self.net_config = CNN1DNetConfig()
+        from nets.CNN1DNet import CNN1DNet
+        self.net = CNN1DNet(self.net_config)
+        # dataset
         from configs.dataset_config import CSVDataSetConfig
         self.dataset_config = CSVDataSetConfig()
         from datasets.csv_dataset import CsvDataSet
         self.dataset = CsvDataSet(self.dataset_config)
-        from base.base_model_selector import BaseSelector, ScoreModel
-        # score_models = []
-        # score_models.append(ScoreModel("train_loss", bigger_better=False))
-        # score_models.append(ScoreModel("valid_loss", bigger_better=False))
+
+        from base.base_model_selector import BaseSelector
         self.model_selector = BaseSelector()
         self.model_selector.add_score("train_loss", bigger_better=False)
         self.model_selector.add_score("valid_loss", bigger_better=False)
-        # self.model_selector = selector
+
         self.num_epoch = 50
         self.recorder = BaseHistory
 

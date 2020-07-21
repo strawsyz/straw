@@ -146,13 +146,17 @@ class CsvDataSet(BaseDataSet):
 
     def __getitem__(self, index):
         return self.X[index], self.Y[index]
+        import numpy as np
+        # for test on sample data
+        # return np.ones(tuple(self.X[index].shape)), np.ones(tuple(self.Y[index].shape))
+        # return np.ones(40000), np.ones(1)
 
     def get_samle_dataloader(self, num_samples, target):
         self.X, self.Y = self.X[:num_samples * 3], self.Y[:num_samples * 3]
         self.train_data, self.valid_data, self.test_data = torch.utils.data.random_split(self,
-                                                                                       [num_samples,
-                                                                                        num_samples,
-                                                                                        num_samples])
+                                                                                         [num_samples,
+                                                                                          num_samples,
+                                                                                          num_samples])
         self.train_loader = DataLoader(self.train_data, batch_size=self.batch_size, shuffle=True)
         self.valid_loader = DataLoader(self.valid_data, batch_size=self.batch_size, shuffle=True)
         self.test_loader = DataLoader(self.test_data, batch_size=self.batch_size4test, shuffle=True)

@@ -3,12 +3,11 @@ from net_structures.FCN import FCN
 
 
 class FCNNet(BaseNet):
-    def __init__(self, config_cls=None):
-        # if don't want to load basic net config file
-        # then set config file before super()
-        super(FCNNet, self).__init__(config_cls)
-        self.net = FCN
+    def __init__(self, config_instance=None):
+        super(FCNNet, self).__init__(config_instance)
+        self.net = FCN(n_out=self.n_out)
+
 
 if __name__ == '__main__':
-    base_net = FCNNet()
-    base_net.get_net("1", False)
+    net = FCNNet()
+    net.unit_test()

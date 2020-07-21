@@ -7,7 +7,6 @@ from utils.utils_ import copy_attr
 
 
 class BaseNet(BaseLogger):
-    __slots__ = "net"
 
     def __init__(self, config_instance=None):
         self.config_instance = config_instance
@@ -18,8 +17,6 @@ class BaseNet(BaseLogger):
         self.scheduler = None
         self.is_use_cuda = None
         self.n_out = None
-        # if self.config_cls is None:
-        #     self.config_cls = NetConfig
         self.load_config()
 
     def load_config(self):
@@ -32,7 +29,6 @@ class BaseNet(BaseLogger):
     def get_net(self, target, is_use_gpu: bool):
         if self.net is None:
             self.logger.error("select a net_structure to be used")
-        self.net = self.net(n_out=self.n_out)
         if self.loss_func_name == "BCEWithLogitsLoss":
             self.loss_function = nn.BCEWithLogitsLoss()
         elif self.loss_func_name == "MSE":
@@ -43,7 +39,7 @@ class BaseNet(BaseLogger):
         if is_use_gpu:
             self.net = self.net.cuda()
             self.loss_function = self.loss_function.cuda()
-
+        print(self.net.parameters)
         if self.optim_name == "adam":
             self.optimizer = optim.Adam(self.net.parameters(), lr=self.lr, weight_decay=self.weight_decay)
         elif self.optim_name == "sgd":
@@ -55,10 +51,17 @@ class BaseNet(BaseLogger):
             self.scheduler = optim.lr_scheduler.StepLR(self.optimizer, step_size=self.scheduler_step_size,
                                                        gamma=self.scheduler_gamma)
         # todo 不知道为什么，在ubuntu系统上使用__dict__不会显示net属性
-        target.net = self.net
+        # target.net = self.net
+        self.copy_attr(target)
+
+    def copy_attr(self, target):
         copy_attr(self, target)
+
+    def unit_test(self):
+        self.get_net(self, False)
 
 
 if __name__ == '__main__':
     base_net = BaseNet()
-    base_net.get_net("1", False)
+    base_net.unit_test()
+    # base_net.get_net(base_net, False)

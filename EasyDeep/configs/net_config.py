@@ -20,3 +20,8 @@ class FNNNetConfig(NetConfig):
     def __init__(self):
         super(FNNNetConfig, self).__init__()
         self.loss_func_name = "MSE"
+
+class CNN1DNetConfig(NetConfig):
+    def __init__(self):
+        super(CNN1DNetConfig, self).__init__()
+        self.loss_func_name = "MSE"
