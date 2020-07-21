@@ -39,7 +39,6 @@ class BaseNet(BaseLogger):
         if is_use_gpu:
             self.net = self.net.cuda()
             self.loss_function = self.loss_function.cuda()
-        print(self.net.parameters)
         if self.optim_name == "adam":
             self.optimizer = optim.Adam(self.net.parameters(), lr=self.lr, weight_decay=self.weight_decay)
         elif self.optim_name == "sgd":
@@ -50,8 +49,6 @@ class BaseNet(BaseLogger):
         if self.is_scheduler:
             self.scheduler = optim.lr_scheduler.StepLR(self.optimizer, step_size=self.scheduler_step_size,
                                                        gamma=self.scheduler_gamma)
-        # todo 不知道为什么，在ubuntu系统上使用__dict__不会显示net属性
-        # target.net = self.net
         self.copy_attr(target)
 
     def copy_attr(self, target):

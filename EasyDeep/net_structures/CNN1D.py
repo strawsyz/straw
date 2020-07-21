@@ -63,9 +63,8 @@ class CNN1D(nn.Module):
             out = layer(out)
         for layer_no in range(5):
             out = getattr(self, "cnn1d_blocks_1_{}".format(layer_no))(out)
-        for layer in self.cnn2_layers:
+        for layer_no in range(5):
             out = getattr(self, "cnn1d_blocks_2_{}".format(layer_no))(out)
-            # out = layer(out)
         out = self.pool1(out)
 
         return out
