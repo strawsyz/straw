@@ -164,4 +164,13 @@ class CsvDataSet(BaseDataSet):
 
 
 if __name__ == '__main__':
+    from configs import CSVDataSetConfig
+
+    dataset = CsvDataSet(CSVDataSetConfig())
+    dataset.get_dataloader(dataset)
+
+    print(len(dataset.train_loader))
+    print(len(dataset.valid_loader))
+    print(len(dataset.test_loader))
+    print()
     pass

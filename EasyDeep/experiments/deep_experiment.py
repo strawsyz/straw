@@ -8,7 +8,7 @@ from base.base_checkpoint import BaseCheckPoint
 from base.base_experiment import BaseExperiment
 from utils import file_utils
 from utils import time_utils
-from utils.matplotlib_utils import plot
+from utils.matplotlib_utils import lineplot
 from utils.net_utils import save, load
 
 
@@ -135,7 +135,7 @@ class DeepExperiment(BaseExperiment):
         self.logger.info("=" * 10 + " saved history at {}".format(self.history_save_path) + "=" * 10)
 
     def load_history(self):
-        if hasattr(self, "history_save_path") and self.history_save_path is not None:
+        if hasattr(self, "history_save_path") and self.history_save_path is not None and self.history_save_path != "":
             if os.path.isfile(self.history_save_path):
                 self.logger.info("=" * 10 + " loading history" + "=" * 10)
                 with open(self.history_save_path, mode="rb+") as f:
@@ -153,14 +153,15 @@ class DeepExperiment(BaseExperiment):
         import torch
         if use_log10:
             all_records = [[torch.log10(getattr(self.history.get(epoch_no), attr_name)) for epoch_no in self.history]
-                            for attr_name in record_attrs]
+                           for attr_name in record_attrs]
             record_attrs = ["log10_{}".format(attr_name) for attr_name in record_attrs]
-            plot(epoches, all_records, record_attrs,
-                 "history analysis with log10")
+            lineplot(all_records, epoches, labels=record_attrs, title="history analysis with log10")
         else:
             all_records = [[getattr(self.history.get(epoch_no), attr_name) for epoch_no in self.history]
-                            for attr_name in record_attrs]
-            plot(epoches, all_records, record_attrs, "history analysis")
+                           for attr_name in record_attrs]
+            lineplot(all_records, epoches, record_attrs, "history analysis")
+        from utils.matplotlib_utils import show
+        show()
 
     def estimate(self, use_log10=False):
         # load history data

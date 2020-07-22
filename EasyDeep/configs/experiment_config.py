@@ -1,26 +1,17 @@
 from base.base_recorder import BaseHistory
-from datasets.csv_dataset import CsvDataSet
 from datasets.image_dataset import ImageDataSet
 from nets.FCNNet import FCNNet
 from nets.FNNNet import MyFNN
 
 
 class BaseExperimentConfig:
+    def __init__(self):
+        self.use_prettytable = False
+
     def __repr__(self):
         import platform
         delimiter = "↓" * 50
-        if platform.system() == 'Linux':
-            config_items = []
-            config_items.append("dataset config\t" + "↓" * 50)
-
-            for attr in self.dataset_config.__dict__:
-                config_items.append("{}\t{}".format(attr, getattr(self.dataset_config, attr)))
-            for attr in self.net_config.__dict__:
-                config_items.append("{}\t{}".format(attr, getattr(self.net_config, attr)))
-            for attr in self.__dict__:
-                config_items.append("{}\t{}".format(attr, getattr(self, attr)))
-            return "\n".join(config_items)
-        else:
+        if self.use_prettytable and platform == "Windows":
             from prettytable import PrettyTable
             config_view = PrettyTable()
             config_view.field_names = ["name", "value"]
@@ -35,6 +26,18 @@ class BaseExperimentConfig:
             for attr in self.__dict__:
                 config_view.add_row([attr, getattr(self, attr)])
             return "\n{}".format(str(config_view))
+        else:
+            config_items = []
+            config_items.append("dataset config\t" + delimiter)
+            for attr in self.dataset_config.__dict__:
+                config_items.append("{}\t{}".format(attr, getattr(self.dataset_config, attr)))
+            config_items.append("network config\t" + delimiter)
+            for attr in self.net_config.__dict__:
+                config_items.append("{}\t{}".format(attr, getattr(self.net_config, attr)))
+            config_items.append("experiment config\t" + delimiter)
+            for attr in self.__dict__:
+                config_items.append("{}\t{}".format(attr, getattr(self, attr)))
+            return "\n".join(config_items)
 
     def init_attr(self):
         import os
@@ -50,6 +53,9 @@ class BaseExperimentConfig:
 
 class ImageSegmentationConfig(BaseExperimentConfig):
     def __init__(self):
+        super(ImageSegmentationConfig, self).__init__()
+        self.use_prettytable = True
+
         self.recorder = BaseHistory
         from configs.net_config import FCNNetConfig
         self.net_config = FCNNetConfig()
@@ -101,33 +107,46 @@ class ImageSegmentationConfig(BaseExperimentConfig):
 
 
 class FNNConfig(BaseExperimentConfig):
+
     def __init__(self):
         self.recorder = BaseHistory
         # net
-        from configs.net_config import CNN1DNetConfig
-        self.net_config = CNN1DNetConfig()
-        from nets.CNN1DNet import CNN1DNet
-        self.net = CNN1DNet(self.net_config)
+        # from configs.net_config import CNN1DNetConfig
+        # self.net_config = CNN1DNetConfig()
+        # from nets.CNN1DNet import CNN1DNet
+        # self.net = CNN1DNet(self.net_config)
+        from configs.net_config import FNNNetConfig
+        self.net_config = FNNNetConfig()
+        from nets import FNNNet
+        self.net = FNNNet(self.net_config)
         # dataset
         from configs.dataset_config import CSVDataSetConfig
         self.dataset_config = CSVDataSetConfig()
         from datasets.csv_dataset import CsvDataSet
         self.dataset = CsvDataSet(self.dataset_config)
-
+        # model selector
         from base.base_model_selector import BaseSelector
         self.model_selector = BaseSelector()
         self.model_selector.add_score("train_loss", bigger_better=False)
         self.model_selector.add_score("valid_loss", bigger_better=False)
 
-        self.num_epoch = 50
+        self.num_epoch = 500
         self.recorder = BaseHistory
 
-        # temp
-        self.history_save_dir = "C:\data_analysis\models"
-        self.history_save_path = "C:\data_analysis\models\history1595256151.pth"
-        self.model_save_path = "C:\data_analysis\models\deepeasy"
+        self.history_save_dir = "D:\models\Ecg"
+        self.history_save_path = ""
+        self.model_save_path = "D:\models\Ecg"
+        self.result_save_path = "D:\models\Ecg\results"
+        # self.history_save_dir = "C:\data_analysis\models"
+        # self.history_save_path = "C:\data_analysis\models\history1595256151.pth"
+        # self.model_save_path = "C:\data_analysis\models\deepeasy"
         # if None,then use all data
-        self.is_pretrain = True
+        self.is_pretrain = False
         self.pretrain_path = "C:\data_analysis\models\deepeasy\\2020-07-20\ep45_23-45-16.pkl"
+        # "D:\models\Ecg\2020-07-22\ep48_11-53-23.pkl"
         self.result_save_path = "C:\data_analysis\models\deepeasy"
+
+        # is use prettytable
+        self.use_prettytable = False
+
         self.init_attr()

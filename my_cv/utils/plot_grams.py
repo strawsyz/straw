@@ -26,7 +26,7 @@ def lineplot(x_data, y_data, x_label="", y_label="", title=""):
 
     # Plot the best fit line, set the linewidth (lw), color and
     # transparency (alpha) of the line
-    ax.plot(x_data, y_data, lw=2, color='#231312', alpha=1)
+    ax.lineplot(x_data, y_data, lw=2, color='#231312', alpha=1)
 
     # Label the axes and provide a title
     ax.set_title(title)
