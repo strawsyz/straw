@@ -42,14 +42,26 @@ class ImageDataSetConfig:
         self.batch_size4test = 8
 
 
+class BaseDataSetConfig:
+    def __init__(self):
+        self.batch_size = 1
+        self.batch_size4test = 1
+        self.random_state = 0
+
+        self.shuffle = True
+
+        self.test_rate = 0.2
+        self.valid_rate = 0.2
+
+
 class CSVDataSetConfig:
     def __init__(self):
         # self.xls_path = "C:\data_analysis\datasets\ecgs\ecg_list_dummy.xlsx"
         # self.csv_dir = "C:\data_analysis\datasets\ecgs\csv"
         self.xls_path = "D:\dataset\ecgs\ecg_list.xlsx"
         self.csv_dir = "D:\dataset\ecgs\csv"
-        self.test_size = 0.3
-        self.valid_size = 0.2
+        self.test_rate = 0.3
+        self.valid_rate = 0.2
 
         self.shuffle = True
         # dataloader

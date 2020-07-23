@@ -1,7 +1,6 @@
 from base.base_recorder import BaseHistory
-from datasets.image_dataset import ImageDataSet
-from nets.FCNNet import FCNNet
-from nets.FNNNet import MyFNN
+from datasets import ImageDataSet
+from nets import FCNNet
 
 
 class BaseExperimentConfig:
@@ -122,7 +121,8 @@ class FNNConfig(BaseExperimentConfig):
         # dataset
         from configs.dataset_config import CSVDataSetConfig
         self.dataset_config = CSVDataSetConfig()
-        from datasets.csv_dataset import CsvDataSet
+        from datasets import CsvDataSet
+        # from datasets.csv_dataset import CsvDataSet
         self.dataset = CsvDataSet(self.dataset_config)
         # model selector
         from base.base_model_selector import BaseSelector
