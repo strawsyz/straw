@@ -11,8 +11,8 @@ class ImageDataSetConfig:
             self.mask_path = "D:\Download\datasets\polyp\\06\mask"
 
         elif __system == "Linux":
-            self.image_path = "/home/straw/Downloads/dataset/polyp/TMP/06/data"
-            self.mask_path = "/home/straw/Downloads/dataset/polyp/TMP/06/mask"
+            self.image_path = "/home/straw/Downloads/dataset/polyp/TMP/07/data"
+            self.mask_path = "/home/straw/Downloads/dataset/polyp/TMP/07/mask"
 
         self.shuffle = True
         self.image_transforms = transforms.Compose([
