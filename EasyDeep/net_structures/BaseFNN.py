@@ -36,7 +36,7 @@ class DenseLayer(nn.Sequential):
 
 
 class MyFNN(nn.Module):
-    def __init__(self, n_in=5000, n_out=1, dropout=0.05):
+    def __init__(self, n_in, n_out, dropout=0.05):
         super(MyFNN, self).__init__()
         self.linears = []
         for i in range(8):

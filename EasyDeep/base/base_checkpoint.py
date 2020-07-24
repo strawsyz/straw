@@ -3,12 +3,15 @@ from builtins import dict
 import torch
 
 
-class UnValidAttr(Exception):
-    def __init__(self):
-        super(UnValidAttr, self).__init__()
+class InvalidAttr(Exception):
+    def __init__(self, attr_name):
+        message = "attr:{} is not exist!".format(attr_name)
+        super(InvalidAttr, self).__init__(message)
 
 
 class BaseCheckPoint:
+    __slots__ = ["state_dict", "epoch", "optimizer"]
+
     def __init__(self):
         super(BaseCheckPoint, self).__init__()
         self.state_dict = None
@@ -17,15 +20,25 @@ class BaseCheckPoint:
 
     def __call__(self, data: dict):
         for attr in data:
-            if hasattr(self, attr):
+            if attr in self.__dict__:
+            # if hasattr(self, attr):
                 setattr(self, attr, data[attr])
             else:
-                raise UnValidAttr
+                raise InvalidAttr(attr)
         return self
 
     @staticmethod
     def create_checkpoint(data: dict):
         return BaseCheckPoint()(data)
+
+
+class CustomCheckPoint(BaseCheckPoint):
+    def __init__(self, attr_names: list):
+        for attr_name in attr_names:
+            # attr_names[attr_name] = None
+            self.__dict__[attr_name] = None
+            # setattr(self, attr_name, 1)
+        # self.__dict__ = attr_names
 
 
 def save(checkpoint, path):
@@ -40,9 +53,13 @@ def load(checkpoint, path):
 
 
 if __name__ == '__main__':
-    data = {"state_dict": 123, "epoch": 123}
-    checkpoint = BaseCheckPoint.create_checkpoint(data)
-    print(checkpoint.state_dict)
+    data = {"asd": 123, "epoch": 123}
+    checkpoint = CustomCheckPoint(data.keys())(data)
+    # 初始化
+    # checkpoint = BaseCheckPoint.create_checkpoint(data)
+    print(checkpoint.asd)
+    # 保存
     save(checkpoint, "1.pth")
-    load(BaseCheckPoint(), "1.pth")
-    print(checkpoint.state_dict)
+    # 读取
+    load(checkpoint, "1.pth")
+    print(checkpoint.asd)

@@ -1,8 +1,4 @@
-import os
-
 import torch
-from PIL import Image
-from torch.autograd import Variable
 
 from configs.experiment_config import FNNConfig as experiment_config
 from experiments.deep_experiment import FNNExperiment
