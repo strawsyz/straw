@@ -10,6 +10,8 @@ class ScoreModel:
         self.description = desciption
 
     def is_needed_add(self, score):
+        if score is None:
+            score = 0
         if not self.bigger_better:
             score = -score
         if len(self.best_scores) < self.best_num:
@@ -20,6 +22,8 @@ class ScoreModel:
             return False
 
     def add_score(self, score, model_path):
+        if score is None:
+            score = 0
         if len(self.best_scores) < self.best_num:
             pass
         else:

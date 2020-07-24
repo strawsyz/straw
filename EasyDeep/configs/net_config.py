@@ -16,10 +16,14 @@ class FCNNetConfig(NetConfig):
     def __init__(self):
         super(FCNNetConfig, self).__init__()
 
+
 class FNNNetConfig(NetConfig):
     def __init__(self):
         super(FNNNetConfig, self).__init__()
         self.loss_func_name = "MSE"
+        self.n_in = 887
+        self.n_out = 1
+
 
 class CNN1DNetConfig(NetConfig):
     def __init__(self):

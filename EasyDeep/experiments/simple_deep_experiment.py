@@ -3,16 +3,17 @@ import os
 import pickle
 import time
 from collections import deque
-
-from base.base_checkpoint import BaseCheckPoint, CustomCheckPoint
+import torch
+from base.base_checkpoint import BaseCheckPoint
 from base.base_experiment import BaseExperiment
+from experiments import DeepExperiment
 from utils import file_utils
 from utils import time_utils
 from utils.matplotlib_utils import lineplot
 from utils.net_utils import save, load
 
 
-class DeepExperiment(BaseExperiment):
+class SimpleDeepExperiment(DeepExperiment):
 
     def __init__(self, config_instance=None):
         # if not load net from pretrained model, then 0
@@ -33,27 +34,9 @@ class DeepExperiment(BaseExperiment):
         self.pretrain_path = None
         self.result_save_path = None
         self.selector = None
-        super(DeepExperiment, self).__init__(config_instance)
+        super(SimpleDeepExperiment, self).__init__(config_instance)
 
         self.list_config()
-
-    def prepare_dataset(self, testing=False):
-        if testing:
-            self.dataset.test()
-        else:
-            self.dataset.train()
-        self.dataset.get_dataloader(self)
-
-    def prepare_net(self):
-        # self.net = self.net()
-        self.net.get_net(self, self.is_use_gpu)
-
-        if self.is_pretrain:
-            self.load()
-
-    from base.base_recorder import BaseHistory
-    def train_one_epoch(self, epoch) -> BaseHistory:
-        raise NotImplementedError
 
     def train(self, test=False):
         if not test:
@@ -69,80 +52,50 @@ class DeepExperiment(BaseExperiment):
             self.logger.info("use {} seconds in the epoch".format(int(time.time() - start_time)))
         self.logger.info("================training is over=================")
 
-    def test(self, test=False):
-        if not test:
-            self.prepare_dataset(testing=True)
-        self.prepare_net()
-        self.net.eval()
-        # result_save_path = os.path.join(self.result_save_path, time_utils.get_date())
-        file_utils.make_directory(self.result_save_path)
-        # add methods for test
-        #     todo 提取为注解，分别设置，before_test, after_test两个，train也同理
+    def create_optimizer(self, epoch):
+        super(SimpleDeepExperiment, self).create_optimizer(epoch)
 
-    def create_checkpoint(self, epoch=None, create4load=False):
-        experiment_data = {"epoch": epoch,
-                           "state_dict": self.net.state_dict(),
-                           "optimizer": self.optimizer.state_dict()}
-        if create4load:
-            return CustomCheckPoint(experiment_data.keys())
-        else:
-            return CustomCheckPoint(experiment_data.keys())(experiment_data)
+    def train(self, num_epoch):
+        for epoch in range(num_epoch):
+            self.train_one_epoch(epoch)
 
-    def save(self, epoch, record):
-        self.save_history()
-        model_save_path = os.path.join(self.model_save_path, time_utils.get_date())
-        file_utils.make_directory(model_save_path)
-        model_save_path = os.path.join(model_save_path,
-                                       'ep{}_{}.pkl'.format(epoch, time_utils.get_time("%H-%M-%S")))
-        if self.model_selector is None:
-            self._save_model(epoch, model_save_path)
-        else:
-            is_need_save, need_reason = self.model_selector.add_record(record, model_save_path)
-            if is_need_save:
-                self.logger.info("save this model for {} is better".format(need_reason))
-                self._save_model(epoch, model_save_path)
-            else:
-                self.logger.info("the eppoch's result is not good, not save")
+    def init(self):
+        # 初始化所有的内容。只要有一个没有设置就使用默认的设置内容
+        if self.loss_funciton is None:
+            self.loss_function = torch.nn.MSELoss()
+        if self.optim_name is None:
+            self.optimizer = torch.optim.SGD(lr=0.0003, weight_decay=0.0001)
 
-    def _save_model(self, epoch, model_save_path):
-        self.logger.info("==============saving model data===============")
-        checkpoint = self.create_checkpoint(epoch)
-        save(checkpoint, model_save_path)
-        self.logger.info("==============saved at {}===============".format(model_save_path))
+    def train_one_epoch(self, epoch):
+        train_loss = 0
+        self.net.train()
+        global data
+        for sample, label in self.train_data:
+            sample = Variable(torch.from_numpy(sample)).double()
+            label = Variable(torch.from_numpy(label)).double()
+            self.optimizer.zero_grad()
+            out = self.net(sample)
+            loss = self.loss_function(out, label)
+            loss.backward()
+            self.optimizer.step()
+            train_loss += loss.data
+        train_loss = train_loss / len(self.train_data)
+        print("train loss \t {}".format(train_loss))
 
-    def load(self):
-        model_save_path = self.pretrain_path
-        if os.path.isfile(model_save_path):
-            self.logger.info("==============loading model data===============")
-            # checkpoint = BaseCheckPoint()
-            # load(checkpoint, model_save_path)
-            # self.current_epoch = checkpoint.epoch + 1
-            # self.net.load_state_dict(checkpoint.state_dict)
-            # self.optimizer.load_state_dict(checkpoint.optimizer)
-            self._load(model_save_path)
-            self.logger.info("=> loaded checkpoint from '{}' ".format(model_save_path))
-            self.load_history()
-        else:
-            self.logger.error("=> no checkpoint found at '{}'".format(model_save_path))
+    def test(self):
+        all_loss = 0
+        for i, (data, gt) in enumerate(self.test_data):
+            data = Variable(torch.from_numpy(data)).double()
+            gt = Variable(torch.from_numpy(gt)).double()
+            batch_loss = self.test_one_batch(data, gt)
+            all_loss += batch_loss
+        print("train loss \t {}".format(all_loss / 20))
 
-    def _load(self, model_save_path):
-        check_point = self.create_checkpoint(create4load=True)
-        load(check_point, model_save_path)
-        self.current_epoch = check_point.epoch + 1
-        self.net.load_state_dict(check_point.state_dict)
-        self.optimizer.load_state_dict(check_point.optimizer)
-
-    def save_history(self):
-        self.logger.info("=" * 10 + " saving history" + "=" * 10)
-        file_utils.make_directory(self.history_save_dir)
-        history = {}
-        # todo 应该在每次加载的时候去掉，多余的数据
-        for epoch_no in self.history:
-            if epoch_no < self.current_epoch:
-                history[epoch_no] = self.history[epoch_no]
-        with open(self.history_save_path, "wb") as f:
-            pickle.dump(self.history, f)
-        self.logger.info("=" * 10 + " saved history at {}".format(self.history_save_path) + "=" * 10)
+    def test_one_batch(self, data, gt):
+        self.optimizer.zero_grad()
+        out = self.net(data)
+        loss = self.loss_function(out, gt)
+        return loss
 
     def load_history(self):
         if hasattr(self, "history_save_path") and self.history_save_path is not None and self.history_save_path != "":
@@ -215,7 +168,7 @@ if __name__ == '__main__':
     # todo win7系统下调用loss.backward()会导致程序无法关闭
     experiment = DeepExperiment()
     # experiment.test()
-    # experiment.estimate()
-    experiment.train()
+    experiment.estimate()
+    # experiment.train()
     # experiment.save_history()
     # print("end")

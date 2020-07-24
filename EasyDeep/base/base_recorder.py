@@ -12,6 +12,12 @@ class BaseHistory:
         return record_dict
 
 
+class CustomHistory:
+    def __init__(self, attr_names: list = []):
+        for attr_name in attr_names:
+            setattr(self, attr_name, None)
+
+
 def main():
     recorder = BaseHistory
 
