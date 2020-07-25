@@ -1,11 +1,11 @@
-from torch.autograd import Variable
 import torch
 from torch import nn
+from torch.autograd import Variable
 
 
-class AutoEncoder(nn.Module):
+class CNNAutoEncoder(nn.Module):
     def __init__(self):
-        super(AutoEncoder, self).__init__()
+        super(CNNAutoEncoder, self).__init__()
         self.encoder = nn.Sequential(
             nn.Conv2d(1, 16, 3, stride=3, padding=1),
             nn.ReLU(True),
@@ -45,14 +45,34 @@ class LinearAutoEncoder(nn.Module):
         )
 
     def forward(self, x):
-        output = self.encoder(x)
-        output = self.decoder(output)
-        return output
+        encoder_output = self.encoder(x)
+        output = self.decoder(encoder_output)
+        return output, encoder_output
 
 
-def train(num_epoch):
-    for epoch in range(num_epoch):
-        train_one_epoch(epoch)
+def train(num_epoch=None):
+    last_loss = float("inf")
+    count = 0
+    try_times = 10
+    if num_epoch is None:
+        epoch = 0
+        while True:
+            train_loss = train_one_epoch(epoch)
+            if train_loss > last_loss:
+                count += 1
+            else:
+                count = 0
+            last_loss = train_loss
+            if count == try_times:
+                print("loss don't decrease in {} epoch".format(try_times))
+                break
+            epoch += 1
+        # save model
+        torch.save(net.state_dict(), "AutoEncoder.pkl")
+
+    else:
+        for epoch in range(num_epoch):
+            train_one_epoch(epoch)
 
 
 def train_one_epoch(epoch):
@@ -63,13 +83,14 @@ def train_one_epoch(epoch):
         sample = Variable(torch.from_numpy(sample)).double()
         label = Variable(torch.from_numpy(label)).double()
         optimizer.zero_grad()
-        out = net(sample)
+        out = net(sample)[0]
         loss = loss_function(out, label)
         loss.backward()
         optimizer.step()
         train_loss += loss.data
     train_loss = train_loss / len(train_data)
-    print("train loss \t {}".format(train_loss))
+    print("epoch:{} \t train loss \t {}".format(epoch, train_loss))
+    return train_loss
 
 
 def test():
@@ -95,8 +116,9 @@ if __name__ == '__main__':
 
     net = LinearAutoEncoder().double()
     loss_function = torch.nn.MSELoss()
-    optimizer = torch.optim.SGD(net.parameters(), lr=0.0003, weight_decay=0.0001)
+    optimizer = torch.optim.SGD(net.parameters(), lr=0.003, weight_decay=0.0001)
     train_data = []
+    last_loss = 0
     for i in range(80):
         m = np.random.rand() * np.pi
         n = np.random.rand() * np.pi / 2
@@ -113,6 +135,6 @@ if __name__ == '__main__':
         z = np.cos(n)
         test_data.append((np.array([x, y, z]), np.array([x, y, z])))
 
-    train(100)
+    train()
 
     test()
