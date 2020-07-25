@@ -96,7 +96,7 @@ class ImageSegmentationConfig(BaseExperimentConfig):
         elif self._system == "Linux":
             self.num_epoch = 1000
             self.is_use_gpu = True
-            self.is_pretrain = True
+            self.is_pretrain = False
             self.history_save_dir = "/home/straw/Downloads/models/polyp/history"
             # todo 覆盖保存历史记录的时候也许需要提醒一下
             self.history_save_path = None

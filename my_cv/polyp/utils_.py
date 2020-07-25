@@ -339,7 +339,7 @@ def create_patch(source_path, target_path, width, height, n_width, n_height):
 # 原本的图像大小1000width  800height
 def create_patch_by_absolute_size(image_dir_path, mask_dir_path, target_image_dir_path, target_mask_dir_path,
                                   detected_size,
-                                  patch_width, patch_height):
+                                  patch_width, patch_height, max_num=20):
     import random
     random.seed(0)
     sample_mask_image = os.path.join(mask_dir_path, os.listdir(mask_dir_path)[0])
@@ -358,7 +358,7 @@ def create_patch_by_absolute_size(image_dir_path, mask_dir_path, target_image_di
         # read mask file as gray image
         mask_image = Image.open(mask_filepath).convert('L')
         index = 0
-        for _ in range(20):
+        for _ in range(max_num):
             start_x, start_y = get_point(sample_width - patch_width, sample_height - patch_height)
             patch_box = [start_x, start_y, start_x + patch_width, start_y + patch_width]
             patch_image = mask_image.crop(patch_box)
