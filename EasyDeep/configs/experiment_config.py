@@ -104,8 +104,6 @@ class ImageSegmentationConfig(BaseExperimentConfig):
             # self.pretrain_path = "/home/straw/Downloads/models/polyp/2020-07-18/ep212_20-10-46.pkl"
             # self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-07-18/ep331_22-49-39.pkl'
             self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-07-23/ep638_16-46-04.pkl'
-            # for test
-            self.pretrain_path = "/home/straw/Downloads/models/polyp/2020-07-25/ep639_15-07-48.pkl"
             self.model_save_path = "/home/straw/Downloads/models/polyp/"
             self.result_save_path = "/home/straw/Download\models\polyp\\result"
 
