@@ -73,7 +73,7 @@ class Experiment(DeepExperiment):
                     predict = self.net(image)
                     valid_loss += self.loss_function(predict, mask)
                 valid_loss /= len(self.val_loader)
-                self.logger.info("Epoch{}:\t valid_loss:{:.6f}".format(epoch, valid_loss))
+                self.logger.info("Epoch:{}\t valid_loss:{:.6f}".format(epoch, valid_loss))
 
             return self.recorder(train_loss, valid_loss)
         else:
@@ -86,6 +86,6 @@ if __name__ == '__main__':
 
     experiment = Experiment(ImageSegmentationConfig())
     # experiment.sample_test()
-    experiment.train()
-    # experiment.test()
+    # experiment.train()
+    experiment.test()
     # experiment.estimate()

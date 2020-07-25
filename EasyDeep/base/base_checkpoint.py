@@ -10,7 +10,8 @@ class InvalidAttr(Exception):
 
 
 class BaseCheckPoint:
-    __slots__ = ["state_dict", "epoch", "optimizer"]
+    # todo if use __slots__, then can't use torch.laod()
+    # __slots__ = ["state_dict", "epoch", "optimizer"]
 
     def __init__(self):
         super(BaseCheckPoint, self).__init__()
@@ -20,8 +21,8 @@ class BaseCheckPoint:
 
     def __call__(self, data: dict):
         for attr in data:
-            if attr in self.__dict__:
-            # if hasattr(self, attr):
+            # if attr in self.__dict__:
+            if hasattr(self, attr):
                 setattr(self, attr, data[attr])
             else:
                 raise InvalidAttr(attr)

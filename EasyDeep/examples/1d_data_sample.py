@@ -52,7 +52,7 @@ class Experiment(FNNExperiment):
                     predict = self.net(data)
                     valid_loss += self.loss_function(predict, label)
                 valid_loss /= len(self.valid_loader)
-                self.logger.info("Epoch{}:\t valid_loss:{:.6f}".format(epoch, valid_loss))
+                self.logger.info("Epoch:{}\t valid_loss:{:.6f}".format(epoch, valid_loss))
             return self.recorder(train_loss, valid_loss)
         else:
             return self.recorder(train_loss)

@@ -14,9 +14,14 @@ class cached_property:
 
 
 def copy_attr(source, target):
-    for attr in source.__dict__:
-        setattr(target, attr, getattr(source, attr))
+    if hasattr(source, "__dict__"):
+        for attr in source.__dict__:
+            setattr(target, attr, getattr(source, attr))
+    else:
+        for attr in source.__slots__:
+            setattr(target, attr, getattr(source, attr))
     # todo 复制完之后删去配置文件占用的空间
+
 
 class Test(object):
     def __init__(self, value):

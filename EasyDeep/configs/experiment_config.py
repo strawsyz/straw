@@ -77,13 +77,6 @@ class ImageSegmentationConfig(BaseExperimentConfig):
         self.model_selector = BaseSelector(score_models)
         self.num_epoch = 500
 
-        # temp
-        # self.history_save_dir = "C:\models"
-        # self.history_save_path = "C:\models\history.pth"
-        # self.model_save_path = "C:\models\deepeasy"
-        # self.is_pretrain = False
-        # self.pretrain_path = "C:\models\polyp\\2020-07-11\ep0_14-50-09.pkl"
-        # self.result_save_path = "C:\models\deepeasy"
 
         if self._system == "Windows":
             self.is_use_gpu = False
@@ -93,17 +86,26 @@ class ImageSegmentationConfig(BaseExperimentConfig):
             self.history_save_path = "D:\Download\models\polyp\hitory_1594448749.744286.pth"
             self.pretrain_path = "D:\Download\models\polyp\ep825_07-17-43.pkl"
             self.result_save_path = "D:\Download\models\polyp\\result"
+            # temp
+            # self.history_save_dir = "C:\models"
+            # self.history_save_path = "C:\models\history.pth"
+            # self.model_save_path = "C:\models\deepeasy"
+            # self.is_pretrain = False
+            # self.pretrain_path = "C:\models\polyp\\2020-07-11\ep0_14-50-09.pkl"
+            # self.result_save_path = "C:\models\deepeasy"
         elif self._system == "Linux":
-            self.num_epoch = 1000
+            self.num_epoch = 2
             self.is_use_gpu = True
-            self.is_pretrain = False
+            self.is_pretrain = True
             self.history_save_dir = "/home/straw/Downloads/models/polyp/history"
             # todo 覆盖保存历史记录的时候也许需要提醒一下
-            self.history_save_path = None
+            self.history_save_path = "/home/straw/Downloads/models/polyp/history/history1595211050.pth"
             # self.history_save_path = ""
             # self.pretrain_path = "/home/straw/Downloads/models/polyp/2020-07-18/ep212_20-10-46.pkl"
             # self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-07-18/ep331_22-49-39.pkl'
-            self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-07-19/ep825_07-17-43.pkl'
+            self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-07-23/ep638_16-46-04.pkl'
+            # for test
+            self.pretrain_path = "/home/straw/Downloads/models/polyp/2020-07-25/ep639_15-07-48.pkl"
             self.model_save_path = "/home/straw/Downloads/models/polyp/"
             self.result_save_path = "/home/straw/Download\models\polyp\\result"
 
