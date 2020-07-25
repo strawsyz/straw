@@ -42,12 +42,15 @@ def show_images(file_name):
 if __name__ == '__main__':
     """比较不同文件下的同名图像"""
     file_names = []
-    MASK_PATH = "D:\Download\datasets\polyp\\06\mask"
-    EDGE_PATH = 'D:\Download\datasets\polyp\\06\edge'
-    EDGE_PATH1 = "D:\Download\datasets\polyp\\06\edge1"
+    # MASK_PATH = "D:\Download\datasets\polyp\\06\mask"
+    # EDGE_PATH = 'D:\Download\datasets\polyp\\06\edge'
+    # EDGE_PATH1 = "D:\Download\datasets\polyp\\06\edge1"
 
-    dir_paths = [MASK_PATH, EDGE_PATH, EDGE_PATH1]
-    for file_name in os.listdir(dir_paths[0]):
+    # dir_paths = [MASK_PATH, EDGE_PATH, EDGE_PATH1]
+    mask_path = "/home/straw/Downloads/dataset/polyp/TMP/07/mask"
+    predict_path = "/home/straw/Download\models\polyp\\result/2020-07-25/"
+    dir_paths = [mask_path, predict_path]
+    for file_name in os.listdir(dir_paths[1]):
         file_names.append(file_name)
     fig, (axs) = plt.subplots(1, len(dir_paths))
 
