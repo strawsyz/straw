@@ -57,6 +57,16 @@ class BaseNet(BaseLogger):
     def unit_test(self):
         self.get_net(self, False)
 
+    def view_net_structure(self, x, file_name=None):
+        from torchviz import make_dot
+        y = self.net(x)
+        # g = make_dot(y)
+        g = make_dot(y, params=dict(self.net.named_parameters()))
+        # g = make_dot(y, params=dict(list(model.named_parameters()) + [('x', x)]))
+
+        # 会生成一个 Digraph.gv.pdf 的PDF文件,用默认软件打开pdf文件
+        g.view(file_name=file_name)
+
 
 if __name__ == '__main__':
     base_net = BaseNet()
