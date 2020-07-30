@@ -6,9 +6,11 @@ from torch.autograd import Variable
 
 from experiments.deep_experiment import DeepExperiment
 
+from configs.experiment_config import ImageSegmentationConfig
+
 
 class Experiment(DeepExperiment):
-    def __init__(self, config_instance=None):
+    def __init__(self, config_instance=ImageSegmentationConfig()):
         super(Experiment, self).__init__(config_instance)
 
     def test(self):
@@ -80,6 +82,6 @@ if __name__ == '__main__':
 
     experiment = Experiment(ImageSegmentationConfig())
     # experiment.sample_test()
-    # experiment.train()
-    experiment.test()
+    experiment.train()
+    # experiment.test()
     # experiment.estimate()
