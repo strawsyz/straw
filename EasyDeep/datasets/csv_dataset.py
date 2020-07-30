@@ -17,8 +17,8 @@ class CsvDataSet(BaseDataSet):
         self.test_dataloader = None
         self.train_dataloader = None
         self.valid_dataloader = None
-        self.test_size = 0
-        self.valid_size = 0
+        self.test_rate = 0
+        self.valid_rate = 0
         self.num_test = 0
         self.num_valid = 0
         super(CsvDataSet, self).__init__(config_instance=config_instance)
@@ -26,23 +26,16 @@ class CsvDataSet(BaseDataSet):
         self.deduplication()
 
     def get_dataloader(self, target):
-        if self.random_state is not None:
-            torch.manual_seed(self.random_state)  # cpu
-            torch.cuda.manual_seed(self.random_state)  # gpu
-            torch.cuda.manual_seed_all(self.random_state)
-            np.random.seed(self.random_state)  # numpy
-            random.seed(self.random_state)  # random and transforms
-            torch.backends.cudnn.deterministic = True  # cudnn
-        # 根据需要分为测试集和训练集
+        self.set_seed()
         data_types = []
         data_num = []
-        if self.test_size > 0:
-            self.num_test = int(self.num_data * self.test_size)
+        if self.test_rate > 0:
+            self.num_test = int(self.num_data * self.test_rate)
             self.num_train = self.num_train - self.num_test
             data_types.append("test")
             data_num.append(self.num_test)
-        if self.valid_size > 0:
-            self.num_valid = int(self.num_data * self.valid_size)
+        if self.valid_rate > 0:
+            self.num_valid = int(self.num_data * self.valid_rate)
             self.num_train = self.num_train - self.num_valid
             data_types.append("valid")
             data_num.append(self.num_valid)

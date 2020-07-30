@@ -19,7 +19,11 @@ class BaseExperiment(BaseLogger, ConfigChecker):
 
     def list_config(self):
         """list all config on this experiment"""
-        self.logger.info(str(self.config_instance))
+        if not hasattr(self, "config_instance") or self.config_instance is None:
+            self.logger.warning("not set a configure file for the experiment")
+            raise RuntimeError
+        else:
+            self.logger.info(str(self.config_instance))
 
     def prepare_net(self):
         pass
@@ -28,16 +32,16 @@ class BaseExperiment(BaseLogger, ConfigChecker):
         pass
 
     def train(self):
-        pass
+        raise NotImplementedError
 
     def train_one_epoch(self, epoch):
         pass
 
     def test(self):
-        pass
+        raise NotImplementedError
 
     def estimate(self):
-        pass
+        raise NotImplementedError
 
     def save(self):
         # 保存模型

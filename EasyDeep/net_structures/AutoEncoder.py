@@ -36,9 +36,9 @@ class LinearAutoEncoder(nn.Module):
             nn.Linear(3, 10),
             nn.Sigmoid(),
             nn.Linear(10, 2),
-            nn.Sigmoid(),
         )
         self.decoder = nn.Sequential(
+            # nn.Sigmoid(),
             nn.Linear(2, 10),
             nn.Sigmoid(),
             nn.Linear(10, 3)
@@ -50,29 +50,27 @@ class LinearAutoEncoder(nn.Module):
         return output, encoder_output
 
 
-def train(num_epoch=None):
+def train(num_epoch=float("inf"), min_loss=0.00001, max_try_times=10):
     last_loss = float("inf")
-    count = 0
-    try_times = 10
-    if num_epoch is None:
-        epoch = 0
-        while True:
-            train_loss = train_one_epoch(epoch)
-            if train_loss > last_loss:
-                count += 1
-            else:
-                count = 0
-            last_loss = train_loss
-            if count == try_times:
-                print("loss don't decrease in {} epoch".format(try_times))
-                break
-            epoch += 1
-        # save model
-        torch.save(net.state_dict(), "AutoEncoder.pkl")
-
-    else:
-        for epoch in range(num_epoch):
-            train_one_epoch(epoch)
+    try_times = 0
+    epoch = 0
+    while True:
+        train_loss = train_one_epoch(epoch)
+        if train_loss > last_loss:
+            try_times += 1
+        else:
+            try_times = 0
+        last_loss = train_loss
+        if try_times == max_try_times:
+            print("loss don't decrease in {} epoch".format(max_try_times))
+            break
+        if train_loss < min_loss:
+            break
+        if num_epoch < epoch:
+            break
+        epoch += 1
+    # save model
+    torch.save(net.state_dict(), model_save_path)
 
 
 def train_one_epoch(epoch):
@@ -95,31 +93,30 @@ def train_one_epoch(epoch):
 
 def test():
     all_loss = 0
-    for i, (data, gt) in enumerate(test_data):
+    net.load_state_dict(torch.load(model_save_path))
+    for i, (m, n, (data, gt)) in enumerate(zip(m_data, n_data, test_data)):
         data = Variable(torch.from_numpy(data)).double()
         gt = Variable(torch.from_numpy(gt)).double()
-        batch_loss = test_one_batch(data, gt)
+        optimizer.zero_grad()
+        out, hidden_ouput = net(data)
+        batch_loss = loss_function(out, gt)
         all_loss += batch_loss
-    print("train loss \t {}".format(all_loss / 20))
-
-
-def test_one_batch(data, gt):
-    optimizer.zero_grad()
-    out = net(data)
-    global loss_function
-    loss = loss_function(out, gt)
-    return loss
+        print("m:{},n:{} output of the hidden layer {}".format(m, n, hidden_ouput.data))
+    print("train loss \t {}".format(all_loss / len(test_data)))
 
 
 if __name__ == '__main__':
     import numpy as np
 
+    model_save_path = "AutoEncoder.pkl"
     net = LinearAutoEncoder().double()
     loss_function = torch.nn.MSELoss()
-    optimizer = torch.optim.SGD(net.parameters(), lr=0.003, weight_decay=0.0001)
+    optimizer = torch.optim.SGD(net.parameters(), lr=0.03, weight_decay=0.0001)
+
+    # prepare data
     train_data = []
     last_loss = 0
-    for i in range(80):
+    for i in range(100):
         m = np.random.rand() * np.pi
         n = np.random.rand() * np.pi / 2
         x = np.cos(m) * np.sin(n)
@@ -127,14 +124,18 @@ if __name__ == '__main__':
         z = np.cos(n)
         train_data.append((np.array([x, y, z], dtype=np.float32), np.array([x, y, z], dtype=np.float32)))
     test_data = []
-    for i in range(20):
+    m_data = []
+    n_data = []
+    for i in range(2000):
         m = np.random.rand() * np.pi
         n = np.random.rand() * np.pi / 2
+        m_data.append(m)
+        n_data.append(n)
         x = np.cos(m) * np.sin(n)
         y = np.sin(m) * np.sin(n)
         z = np.cos(n)
         test_data.append((np.array([x, y, z]), np.array([x, y, z])))
 
-    train()
+    # train(min_loss=0.1)
 
     test()

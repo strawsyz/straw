@@ -1,7 +1,6 @@
 import os
 import random
 
-import numpy as np
 import torch
 from PIL import Image
 from torch.utils.data import DataLoader
@@ -10,18 +9,19 @@ from base.base_dataset import BaseDataSet
 from configs.dataset_config import ImageDataSetConfig
 from utils.utils_ import copy_attr
 
-
+"""
+mask图像和原图像两个文件夹
+根据文件名判断是否是同一个文件夹
+"""
 class ImageDataSet(BaseDataSet):
 
     def __init__(self, config_instance=None):
         super(ImageDataSet, self).__init__(config_instance)
-        # self.test_model = test_model
         self.image_paths = []
         self.mask_paths = []
         self.IMAGE_PATHS = []
         self.MASK_PATHS = []
-        if self.random_state is not None:
-            random.seed(self.random_state)
+        self.set_seed()
         file_names = sorted(os.listdir(self.image_path))
         if self.shuffle:
             random.shuffle(file_names)
@@ -39,7 +39,7 @@ class ImageDataSet(BaseDataSet):
                                                                                         num_samples])
         self.train_loader = DataLoader(self.train_data, batch_size=self.batch_size, shuffle=True)
         self.val_loader = DataLoader(self.val_data, batch_size=self.batch_size, shuffle=True)
-        self.test_loader = DataLoader(self.test_data, batch_size=self.batch_size, shuffle=True)
+        self.test_loader = DataLoader(self.test_data, batch_size=self.batch_size4test, shuffle=True)
         self.copy_attr(target, ["val_loader", "train_loader", "test_loader"])
 
     def copy_attr(self, target, attr_names):
@@ -47,14 +47,6 @@ class ImageDataSet(BaseDataSet):
             setattr(target, attr_name, getattr(self, attr_name))
 
     def get_dataloader(self, target):
-        if self.random_state is not None:
-            torch.manual_seed(self.random_state)  # cpu
-            torch.cuda.manual_seed(self.random_state)  # gpu
-            torch.cuda.manual_seed_all(self.random_state)
-            np.random.seed(self.random_state)  # numpy
-            random.seed(self.random_state)  # random and transforms
-            torch.backends.cudnn.deterministic = True  # cudnn
-
         if not self.test_model:
             if self.num_train is not None:
                 if len(self) > self.num_train:
@@ -74,7 +66,7 @@ class ImageDataSet(BaseDataSet):
                                                                                [self.num_train - num_valid_data,
                                                                                 num_valid_data])
                 self.train_loader = DataLoader(self.train_data, batch_size=self.batch_size, shuffle=True)
-                self.val_loader = DataLoader(self.val_data, batch_size=self.batch_size, shuffle=True)
+                self.valid_loader = DataLoader(self.val_data, batch_size=self.batch_size, shuffle=True)
         else:
             if self.num_test is not None:
                 self.set_data_num(self.num_test)

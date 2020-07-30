@@ -2,9 +2,11 @@ import torch
 
 from configs.experiment_config import FNNConfig as experiment_config
 from experiments.deep_experiment import FNNExperiment
+from experiments.deep_experiment import DeepExperiment
 
 
-class Experiment(FNNExperiment):
+# 一维数据的回归任务
+class Experiment(DeepExperiment):
     def __init__(self, config_instance=experiment_config()):
         super(Experiment, self).__init__(config_instance)
 
@@ -41,27 +43,21 @@ class Experiment(FNNExperiment):
         self.logger.info("EPOCH:{}\t train_loss:{:.6f}\t".format(epoch, train_loss))
         self.scheduler.step()
 
-        if self.valid_loader is not None:
-            self.net.eval()
-            with torch.no_grad():
-                valid_loss = 0
-                for data, label in self.valid_loader:
-                    data = self.prepare_data(data, 'float')
-                    label = self.prepare_data(label, 'float')
-                    self.net.zero_grad()
-                    predict = self.net(data)
-                    valid_loss += self.loss_function(predict, label)
-                valid_loss /= len(self.valid_loader)
-                self.logger.info("Epoch:{}\t valid_loss:{:.6f}".format(epoch, valid_loss))
-            return self.recorder(train_loss, valid_loss)
-        else:
-            return self.recorder(train_loss)
+    def valid_one_epoch(self, epoch):
+        self.net.eval()
+        with torch.no_grad():
+            valid_loss = 0
+            for data, label in self.valid_loader:
+                data = self.prepare_data(data, 'float')
+                label = self.prepare_data(label, 'float')
+                self.net.zero_grad()
+                predict = self.net(data)
+                valid_loss += self.loss_function(predict, label)
+            valid_loss /= len(self.valid_loader)
+            self.logger.info("Epoch:{}\t valid_loss:{:.6f}".format(epoch, valid_loss))
 
 
 if __name__ == '__main__':
-    from base.base_recorder import BaseHistory
-
-    recoder = BaseHistory
     experiment = Experiment()
     experiment.train()
     # experiment.test()

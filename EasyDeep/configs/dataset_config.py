@@ -7,9 +7,11 @@ class ImageDataSetConfig:
     def __init__(self):
         __system = platform.system()
         if __system == "Windows":
-            self.image_path = "D:\Download\datasets\polyp\\06\data"
-            self.mask_path = "D:\Download\datasets\polyp\\06\mask"
-
+            # self.image_path = "D:\Download\datasets\polyp\\06\data"
+            # self.mask_path = "D:\Download\datasets\polyp\\06\mask"
+            # tmp
+            self.image_path = "C:\data_analysis\datasets\samples"
+            self.mask_path = "C:\data_analysis\datasets\samples"
         elif __system == "Linux":
             self.image_path = "/home/straw/Downloads/dataset/polyp/TMP/07/data"
             self.mask_path = "/home/straw/Downloads/dataset/polyp/TMP/07/mask"

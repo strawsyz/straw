@@ -1,4 +1,4 @@
-from base.base_recorder import BaseHistory
+from base.base_recorder import EpochRecord
 from datasets import ImageDataSet
 from nets import FCNNet
 import platform
@@ -8,9 +8,10 @@ class BaseExperimentConfig:
     def __init__(self):
         self.use_prettytable = False
         self._system = platform.system()
+        self.dataset_config = None
+        self.net_config = None
 
     def __repr__(self):
-        import platform
         delimiter = "↓" * 50
         if self.use_prettytable and self._system == "Windows":
             from prettytable import PrettyTable
@@ -63,7 +64,7 @@ class ImageSegmentationConfig(BaseExperimentConfig):
         super(ImageSegmentationConfig, self).__init__()
         self.use_prettytable = True
 
-        self.recorder = BaseHistory
+        self.recorder = EpochRecord
         from configs.net_config import FCNNetConfig
         self.net_config = FCNNetConfig()
         self.net = FCNNet(self.net_config)
@@ -77,7 +78,6 @@ class ImageSegmentationConfig(BaseExperimentConfig):
         self.model_selector = BaseSelector(score_models)
         self.num_epoch = 500
 
-
         if self._system == "Windows":
             self.is_use_gpu = False
             self.is_pretrain = False
@@ -87,12 +87,12 @@ class ImageSegmentationConfig(BaseExperimentConfig):
             self.pretrain_path = "D:\Download\models\polyp\ep825_07-17-43.pkl"
             self.result_save_path = "D:\Download\models\polyp\\result"
             # temp
-            # self.history_save_dir = "C:\models"
-            # self.history_save_path = "C:\models\history.pth"
-            # self.model_save_path = "C:\models\deepeasy"
-            # self.is_pretrain = False
-            # self.pretrain_path = "C:\models\polyp\\2020-07-11\ep0_14-50-09.pkl"
-            # self.result_save_path = "C:\models\deepeasy"
+            self.history_save_dir = "C:\data_analysis\models"
+            self.history_save_path = "C:\data_analysis\models\history.pth"
+            self.model_save_path = "C:\data_analysis\models\images"
+            self.is_pretrain = False
+            self.pretrain_path = "C:\data_analysis\models\polyp\\2020-07-11\ep0_14-50-09.pkl"
+            self.result_save_path = "C:\data_analysis\models\images"
         elif self._system == "Linux":
             self.num_epoch = 2
             self.is_use_gpu = True
@@ -114,7 +114,7 @@ class FNNConfig(BaseExperimentConfig):
 
     def __init__(self):
         super(FNNConfig, self).__init__()
-        self.recorder = BaseHistory
+        self.recorder = EpochRecord
         self.net_name = "fnn"
         # net
         if self.net_name == "cnn1d":
@@ -131,8 +131,8 @@ class FNNConfig(BaseExperimentConfig):
         from configs.dataset_config import CSVDataSetConfig
         self.dataset_config = CSVDataSetConfig()
         from datasets import CsvDataSet
-        # from datasets.csv_dataset import CsvDataSet
         self.dataset = CsvDataSet(self.dataset_config)
+
         # model selector
         from base.base_model_selector import BaseSelector
         self.model_selector = BaseSelector()
@@ -140,7 +140,7 @@ class FNNConfig(BaseExperimentConfig):
         self.model_selector.add_score("valid_loss", bigger_better=False)
 
         self.num_epoch = 500
-        self.recorder = BaseHistory
+        self.recorder = EpochRecord
 
         # self.history_save_dir = "D:\models\Ecg"
         # self.history_save_path = ""
@@ -155,9 +155,7 @@ class FNNConfig(BaseExperimentConfig):
         # if None,then use all data
         self.is_pretrain = True
         # self.is_pretrain = True
-        # self.pretrain_path = "C:\data_analysis\models\deepeasy\\2020-07-20\ep45_23-45-16.pkl"
-        # self.pretrain_path = "C:\data_analysis\models\deepeasy\\2020-07-23\ep31_19-59-45.pkl"
-        self.pretrain_path = "C:\data_analysis\models\deepeasy\\2020-07-24\ep1_09-46-26.pkl"
+        self.pretrain_path = "C:\data_analysis\models\deepeasy\2020-07-27\ep0_15-02-58.pkl"
         # "D:\models\Ecg\2020-07-22\ep48_11-53-23.pkl"
 
         # is use prettytable

@@ -3,10 +3,10 @@ import os
 from PIL import Image
 
 
-def make_directory(dir_name):
+def make_directory(dir_name, mode=0o777):
     """判断文件夹是否存在，如果不存在就新建文件夹"""
     if not os.path.exists(dir_name):
-        os.makedirs(dir_name, mode=0o777)
+        os.makedirs(dir_name, mode=mode)
 
 
 def is_valid_jpg(jpg_file):
@@ -79,18 +79,18 @@ def valid_file_batch(root_path, recursive=False):
 
 def batch_img2thumbnail(file_dir, size, dest_dir=None, ignore=[]):
     if dest_dir is None:
-        dest_dir = os.path.join(file_dir, 'thumbnail')  # pixiv/thumbnail
+        dest_dir = os.path.join(file_dir, 'thumbnail')
     for file in os.listdir(file_dir):
         if file in ignore:
             continue
         path = os.path.join(file_dir, file)
-        if os.path.isdir(path):  # pixiv/12321/
+        if os.path.isdir(path):
             if path != dest_dir:
-                batch_img2thumbnail(path, size, os.path.join(dest_dir, file))  # pixiv/thumbnail/12321/
+                batch_img2thumbnail(path, size, os.path.join(dest_dir, file))
             else:
                 continue
         else:
-            # 防止win中自动生成的缩略图文件被处理
+            # for windows
             if file == 'Thumbs.db':
                 continue
             img2thumbnail(path, os.path.join(dest_dir, file), size)
@@ -138,8 +138,3 @@ def split_path(path):
     file_name, extension = os.path.splitext(full_file_name)
     extension = extension[1:]
     return (dir_path, full_file_name, file_name, extension)
-
-
-if __name__ == '__main__':
-    batch_img2thumbnail('D:\Temp\收藏', (300, 400))
-    print("ok")

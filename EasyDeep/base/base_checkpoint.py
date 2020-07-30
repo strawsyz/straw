@@ -10,8 +10,6 @@ class InvalidAttr(Exception):
 
 
 class BaseCheckPoint:
-    # todo if use __slots__, then can't use torch.laod()
-    # __slots__ = ["state_dict", "epoch", "optimizer"]
 
     def __init__(self):
         super(BaseCheckPoint, self).__init__()
@@ -21,7 +19,6 @@ class BaseCheckPoint:
 
     def __call__(self, data: dict):
         for attr in data:
-            # if attr in self.__dict__:
             if hasattr(self, attr):
                 setattr(self, attr, data[attr])
             else:
@@ -34,12 +31,9 @@ class BaseCheckPoint:
 
 
 class CustomCheckPoint(BaseCheckPoint):
-    def __init__(self, attr_names: list):
+    def __init__(self, attr_names: list = []):
         for attr_name in attr_names:
-            # attr_names[attr_name] = None
-            self.__dict__[attr_name] = None
-            # setattr(self, attr_name, 1)
-        # self.__dict__ = attr_names
+            setattr(self, attr_name, None)
 
 
 def save(checkpoint, path):
