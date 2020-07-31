@@ -82,6 +82,6 @@ if __name__ == '__main__':
 
     experiment = Experiment(ImageSegmentationConfig())
     # experiment.sample_test()
-    experiment.train()
+    experiment.train(max_try_times=8)
     # experiment.test()
     # experiment.estimate()

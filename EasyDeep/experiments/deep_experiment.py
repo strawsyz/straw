@@ -73,9 +73,9 @@ class DeepExperiment(BaseExperiment):
             record = self.recorder(train_loss=train_loss)
         return record
 
-    def train(self, num_epoch=float("inf"), max_try_times=None):
-        if self.selector is None and max_try_times is not None:
-            self.logger.warning("you have set a model_selector")
+    def train(self, max_try_times=None):
+        if self.model_selector is None and max_try_times is not None:
+            self.logger.warning("you have not set a model_selector!")
 
         self.prepare_dataset()
         self.prepare_net()
@@ -95,8 +95,6 @@ class DeepExperiment(BaseExperiment):
             self.logger.info("use {} seconds in the epoch".format(int(time.time() - start_time)))
         self.logger.info("================training is over=================")
 
-    def valid_one_epoch(self):
-        raise NotImplementedError
 
     def test(self):
         self.prepare_dataset(testing=True)
