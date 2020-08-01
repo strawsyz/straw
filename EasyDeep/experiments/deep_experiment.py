@@ -189,12 +189,13 @@ class DeepExperiment(BaseExperiment):
 
     def show_history(self, use_log10=False):
         self.logger.info("showing history")
-        record_attrs = self.history[list(self.history.keys())[0]].__slots__
+        record_attrs = self.history[list(self.history.keys())[0]].scores
         epoches = [[epoch_no for epoch_no in self.history] for _ in range(len(record_attrs))]
         import torch
         if use_log10:
-            all_records = [[torch.log10(getattr(self.history.get(epoch_no), attr_name)) for epoch_no in self.history]
-                           for attr_name in record_attrs]
+            all_records = [
+                [torch.log10(getattr(self.history.get(epoch_no), attr_name)) for epoch_no in self.history]
+                for attr_name in record_attrs]
             record_attrs = ["log10_{}".format(attr_name) for attr_name in record_attrs]
             lineplot(all_records, epoches, labels=record_attrs, title="history analysis with log10")
         else:

@@ -94,16 +94,17 @@ class ImageSegmentationConfig(BaseExperimentConfig):
             self.pretrain_path = "C:\data_analysis\models\polyp\\2020-07-11\ep0_14-50-09.pkl"
             self.result_save_path = "C:\data_analysis\models\images"
         elif self._system == "Linux":
-            self.num_epoch = 2
+            self.num_epoch = 1000
             self.is_use_gpu = True
             self.is_pretrain = True
             self.history_save_dir = "/home/straw/Downloads/models/polyp/history"
             # todo 覆盖保存历史记录的时候也许需要提醒一下
-            self.history_save_path = "/home/straw/Downloads/models/polyp/history/history1595211050.pth"
-            # self.history_save_path = ""
+            # self.history_save_path = "/home/straw/Downloads/models/polyp/history/history1595211050.pth"
+            self.history_save_path = "/home/straw/Downloads/models/polyp/history/history_1596127749.pth"
             # self.pretrain_path = "/home/straw/Downloads/models/polyp/2020-07-18/ep212_20-10-46.pkl"
             # self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-07-18/ep331_22-49-39.pkl'
             self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-07-23/ep638_16-46-04.pkl'
+            self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-08-01/ep410_00-30-36.pkl'
             self.model_save_path = "/home/straw/Downloads/models/polyp/"
             self.result_save_path = "/home/straw/Download\models\polyp\\result"
 
@@ -148,7 +149,7 @@ class FNNConfig(BaseExperimentConfig):
         # self.result_save_path = "D:\models\Ecg\results"
 
         self.history_save_dir = "C:\data_analysis\models"
-        self.history_save_path = "C:\data_analysis\models\history1595256151.pth"
+        self.history_save_path = "C:\data_analysis\models\history1595256151s.pth"
         self.model_save_path = "C:\data_analysis\models\deepeasy"
         self.result_save_path = "C:\data_analysis\models\deepeasy"
 

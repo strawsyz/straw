@@ -1,34 +1,41 @@
-import time
 import os
+import time
+
 import torch
 from PIL import Image
 from torch.autograd import Variable
 
-from experiments.deep_experiment import DeepExperiment
-
 from configs.experiment_config import ImageSegmentationConfig
+from experiments.deep_experiment import DeepExperiment
 
 
 class Experiment(DeepExperiment):
     def __init__(self, config_instance=ImageSegmentationConfig()):
         super(Experiment, self).__init__(config_instance)
 
-    def test(self, debug_mode=False):
+    def test(self, debug_mode=False, save_predict_result=False):
         super(Experiment, self).test(debug_mode)
         self.logger.info("=" * 10 + " test start " + "=" * 10)
         pps = 0
+        loss = 0
         for i, (image, mask, image_name) in enumerate(self.test_loader):
-            pps += self.test_one_batch(image, mask, image_name)
+            pps_batch, loss_batch = self.test_one_batch(image, mask, image_name, save_predict_result)
+            pps += pps_batch
+            loss += loss_batch
+        pps /= len(self.test_loader)
+        loss /= len(self.test_loader)
         self.logger.info("average predict images per second is {}".format(pps))
+        self.logger.info("average loss is {}".format(loss))
         self.logger.info("=" * 10 + " testing end " + "=" * 10)
 
     def test_one_batch(self, image, mask, image_name, save_predict_result=False):
         image = self.prepare_data(image)
         mask = self.prepare_data(mask)
-        self.optimizer.zero_grad()
+        # self.optimizer.zero_grad()
         start_time = time.time()
         out = self.net(image)
-        pps = len(image) / (time.time() - start_time)
+        end_time = time.time()
+        pps = len(image) / (end_time - start_time)
         _, _, width, height = mask.size()
         loss = self.loss_function(out, mask)
         self.logger.info("test_loss is {}".format(loss))
@@ -43,7 +50,7 @@ class Experiment(DeepExperiment):
                 save_path = os.path.join(self.result_save_path, image_name[index])
                 pred.save(save_path)
                 self.logger.info("================{}=================".format(save_path))
-        return pps
+        return pps, loss.data
 
     def train_one_epoch(self, epoch):
         self.net.train()
@@ -88,6 +95,7 @@ if __name__ == '__main__':
 
     experiment = Experiment(ImageSegmentationConfig())
     # experiment.sample_test()
-    experiment.train(max_try_times=8)
-    # experiment.test()
-    # experiment.estimate()
+    # experiment.train(max_try_times=8)
+    # experiment.test(save_predict_result=True)
+    experiment.estimate(use_log10=True)
+# /home/straw/Downloads/models/polyp/history/history_1596127749.pth
