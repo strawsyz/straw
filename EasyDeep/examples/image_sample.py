@@ -1,5 +1,5 @@
+import time
 import os
-
 import torch
 from PIL import Image
 from torch.autograd import Variable
@@ -13,31 +13,37 @@ class Experiment(DeepExperiment):
     def __init__(self, config_instance=ImageSegmentationConfig()):
         super(Experiment, self).__init__(config_instance)
 
-    def test(self):
-        super(Experiment, self).test()
-        self.logger.info("=" * 10 + "test start" + "=" * 10)
+    def test(self, debug_mode=False):
+        super(Experiment, self).test(debug_mode)
+        self.logger.info("=" * 10 + " test start " + "=" * 10)
+        pps = 0
         for i, (image, mask, image_name) in enumerate(self.test_loader):
-            self.test_one_batch(image, mask, image_name)
-        self.logger.info("================testing end=================")
+            pps += self.test_one_batch(image, mask, image_name)
+        self.logger.info("average predict images per second is {}".format(pps))
+        self.logger.info("=" * 10 + " testing end " + "=" * 10)
 
-    def test_one_batch(self, image, mask, image_name):
+    def test_one_batch(self, image, mask, image_name, save_predict_result=False):
         image = self.prepare_data(image)
         mask = self.prepare_data(mask)
         self.optimizer.zero_grad()
+        start_time = time.time()
         out = self.net(image)
+        pps = len(image) / (time.time() - start_time)
         _, _, width, height = mask.size()
         loss = self.loss_function(out, mask)
         self.logger.info("test_loss is {}".format(loss))
-        predict = out.squeeze().cpu().data.numpy()
         # save predict result
-        for index, pred in enumerate(predict):
-            pred = pred * 255
-            pred = pred.astype('uint8')
-            pred = Image.fromarray(pred)
-            pred = pred.resize((width, height))
-            save_path = os.path.join(self.result_save_path, image_name[index])
-            pred.save(save_path)
-            self.logger.info("================{}=================".format(save_path))
+        if save_predict_result:
+            predict = out.squeeze().cpu().data.numpy()
+            for index, pred in enumerate(predict):
+                pred = pred * 255
+                pred = pred.astype('uint8')
+                pred = Image.fromarray(pred)
+                pred = pred.resize((width, height))
+                save_path = os.path.join(self.result_save_path, image_name[index])
+                pred.save(save_path)
+                self.logger.info("================{}=================".format(save_path))
+        return pps
 
     def train_one_epoch(self, epoch):
         self.net.train()

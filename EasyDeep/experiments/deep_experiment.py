@@ -73,12 +73,17 @@ class DeepExperiment(BaseExperiment):
             record = self.recorder(train_loss=train_loss)
         return record
 
-    def train(self, max_try_times=None):
+    def train(self, max_try_times=None, debug_mode=False):
+        """
+
+        :param max_try_times: 数据没有优化后，重复训练的次数
+        :return:
+        """
         if self.model_selector is None and max_try_times is not None:
             self.logger.warning("you have not set a model_selector!")
-
-        self.prepare_dataset()
-        self.prepare_net()
+        if not debug_mode:
+            self.prepare_dataset()
+            self.prepare_net()
         self.logger.info("================training start=================")
         try_times = 1
         for epoch in range(self.current_epoch, self.current_epoch + self.num_epoch):
@@ -95,13 +100,12 @@ class DeepExperiment(BaseExperiment):
             self.logger.info("use {} seconds in the epoch".format(int(time.time() - start_time)))
         self.logger.info("================training is over=================")
 
-
-    def test(self):
-        self.prepare_dataset(testing=True)
-        self.prepare_net()
+    def test(self, debug_mode=False):
+        if not debug_mode:
+            self.prepare_dataset(testing=True)
+            self.prepare_net()
         self.net.eval()
         file_utils.make_directory(self.result_save_path)
-        # add methods for test
         #     todo 提取为注解，分别设置，before_test, after_test两个，train也同理
 
     def create_checkpoint(self, epoch=None, create4load=False):
