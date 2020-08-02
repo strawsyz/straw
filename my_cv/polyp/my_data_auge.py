@@ -69,7 +69,7 @@ def edge_detector(source_path, save_path):
     img = cv2.resize(img, (224, 224))
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     # canny_gray(gray)
-    detected_edges = cv2.GaussianBlur(gray, (3, 3), 0)
+    # detected_edges = cv2.GaussianBlur(gray, (3, 3), 0)
     detected_edges = cv2.Canny(gray, 60, 110, apertureSize=3)
     # just add some colours to edges from original image.
     dst = cv2.bitwise_and(img, img, mask=detected_edges)

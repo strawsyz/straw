@@ -171,7 +171,6 @@ if flag:
         edge_detector(source_path, target_path)
 
 # 重新处理mask图像，将mask图像，变成只有黑色和白色的图像
-
 # flag = True
 flag = False
 if flag:
@@ -185,7 +184,6 @@ if flag:
         source_path = os.path.join(SOURCE_MASK_PATH, filename)
         target_path = os.path.join(TARGET_MASK_PATH, filename)
         binary_img(source_path, target_path)
-
 
 # increase number of images
 # flag = True
@@ -203,11 +201,11 @@ if flag:
     patch_height = 224
     create_patch_by_absolute_size(SOURCE_IMAGE_PATH, SOURCE_MASK_PATH, TARGET_IMAGE_PATH, TARGET_MASK_PATH,
                                   detected_size,
-                                  patch_width, patch_height,max_num=200)
+                                  patch_width, patch_height, max_num=200)
 
-
-flag = True
-# flag = False
+# flag = True
+flag = False
+# binarization
 if flag:
     SOURCE_MASK_PATH = "/home/straw/Downloads/dataset/polyp/TMP/07/mask/"
     TARGET_MASK_PATH = "/home/straw/Downloads/dataset/polyp/TMP/07/mask/"
@@ -219,6 +217,42 @@ if flag:
         binary_img(source_path, target_path)
     # print(len(os.listdir(SOURCE_MASK_PATH)))
 
+# 使用canny生成轮廓图
+from my_data_auge import edge_detector
+
+# flag = True
+flag = False
+if flag:
+    SOURCE_IMAGE_PATH = "/home/straw/Downloads/dataset/polyp/TMP/07/data/"
+    TARGET_EDGE_PATH = "/home/straw/Downloads/dataset/polyp/TMP/07/edge/"
+    file_util.make_directory(TARGET_EDGE_PATH)
+
+    for filename in os.listdir(SOURCE_IMAGE_PATH):
+        source_path = os.path.join(SOURCE_IMAGE_PATH, filename)
+        target_path = os.path.join(TARGET_EDGE_PATH, filename)
+        print(target_path)
+        edge_detector(source_path, target_path)
+
+# step 2 use predict result from step one
+# copy predict result in step one to dataset fold
+# flag = True
+flag = False
+if flag:
+    SOURCE_IMAGE_PATH = "/home/straw/Download\models\polyp\\result/2020-08-02"
+    TARGET_PREDICT_PATH = "/home/straw/Downloads/dataset/polyp/TMP/07/predict_step_one/"
+    file_util.make_directory(TARGET_PREDICT_PATH)
+    copy_images(SOURCE_IMAGE_PATH, TARGET_PREDICT_PATH)
+
+# flag = True
+flag = False
+if flag:
+    EDGE_IMAGE_PATH = "/home/straw/Downloads/dataset/polyp/TMP/07/edge/"
+    EDGE_TARGET_PATH = "/home/straw/Downloads/dataset/polyp/TMP/07/edge_bi/"
+    file_util.make_directory(EDGE_TARGET_PATH)
+    for file_name in os.listdir(EDGE_IMAGE_PATH):
+        source_path = os.path.join(EDGE_IMAGE_PATH, file_name)
+        target_path = os.path.join(EDGE_TARGET_PATH, file_name)
+        binary_img(source_path, target_path)
 
 
 # 轮廓图和mask图像重叠的部分作为正确的图

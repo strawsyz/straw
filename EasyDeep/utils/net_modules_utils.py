@@ -25,6 +25,7 @@ class SELayer(nn.Module):
         y = self.fc(y).view(b, c, 1, 1)
         return x * y.expand_as(x)
 
+
 class Conv(nn.Sequential):
     def __init__(self, in_n, out_n, kernel_size=3, stride=1, padding=1, bias=False):
         super(Conv, self).__init__()
@@ -43,3 +44,22 @@ class LinearReLU(nn.Sequential):
         super(LinearReLU, self).__init__()
         self.add_module("Linear", nn.Linear(in_n, out_n))
         self.add_module("ReLU", nn.ReLU(inplace=True))
+
+
+class ConvBnReLU(Conv):
+    def __init__(self, in_n, out_n, kernel_size=3, stride=1, padding=1, bias=False):
+        super(ConvBnReLU, self).__init__(in_n, out_n, kernel_size, stride, padding, bias)
+        # 添加BN层
+        self.add_module("BN", nn.BatchNorm2d(out_n, eps=1e-5, momentum=0.999))
+        # 如果需要使用relu就添加relu层
+        self.add_module("ReLU", nn.ReLU(inplace=True))
+
+
+
+
+if __name__ == '__main__':
+    import torch
+
+    data = torch.randn((5, 5, 224, 224))
+    net = Deconv(5, 3, True)
+    print(net(data).shape)

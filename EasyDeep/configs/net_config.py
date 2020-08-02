@@ -17,6 +17,12 @@ class FCNNetConfig(NetConfig):
         super(FCNNetConfig, self).__init__()
 
 
+class FCNNet4EdgeConfig(NetConfig):
+    def __init__(self):
+        super(FCNNet4EdgeConfig, self).__init__()
+        self.is_init = True
+
+
 class FNNNetConfig(NetConfig):
     def __init__(self):
         super(FNNNetConfig, self).__init__()

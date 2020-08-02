@@ -89,13 +89,35 @@ class Experiment(DeepExperiment):
             self.logger.info("Epoch:{}\t valid_loss:{:.6f}".format(epoch, valid_loss))
         return valid_loss
 
+    def predict_all_data(self):
+        self.prepare_net()
+        # self.prepare_dataset()
+        self.dataset.get_dataloader(self)
+        self.net.eval()
+
+        from utils.file_utils import make_directory
+        make_directory(self.result_save_path)
+        for image, image_names in self.all_dataloader:
+            image = self.prepare_data(image)
+            self.optimizer.zero_grad()
+            out = self.net(image)
+            predict = out.squeeze().cpu().data.numpy()
+            for index, pred in enumerate(predict):
+                pred = pred * 255
+                pred = pred.astype('uint8')
+                pred = Image.fromarray(pred)
+                pred = pred.resize((224, 224))
+                save_path = os.path.join(self.result_save_path, image_names[index])
+                pred.save(save_path)
+                self.logger.info("================{}=================".format(save_path))
 
 if __name__ == '__main__':
     from configs.experiment_config import ImageSegmentationConfig
 
     experiment = Experiment(ImageSegmentationConfig())
+    # experiment.predict_all_data()
     # experiment.sample_test()
-    # experiment.train(max_try_times=8)
+    experiment.train(max_try_times=8)
     # experiment.test(save_predict_result=True)
-    experiment.estimate(use_log10=True)
+    # experiment.estimate(use_log10=True)
 # /home/straw/Downloads/models/polyp/history/history_1596127749.pth

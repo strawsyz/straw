@@ -1,7 +1,7 @@
-from base.base_recorder import EpochRecord
-from datasets import ImageDataSet
-from nets import FCNNet
 import platform
+
+from base.base_recorder import EpochRecord
+from nets import FCNNet
 
 
 class BaseExperimentConfig:
@@ -10,6 +10,15 @@ class BaseExperimentConfig:
         self._system = platform.system()
         self.dataset_config = None
         self.net_config = None
+
+    def set_dataset(self):
+        raise NotImplementedError
+
+    def set_net(self):
+        raise NotImplementedError
+
+    def set_model_selector(self):
+        raise NotImplementedError
 
     def __repr__(self):
         delimiter = "↓" * 50
@@ -64,18 +73,12 @@ class ImageSegmentationConfig(BaseExperimentConfig):
         super(ImageSegmentationConfig, self).__init__()
         self.use_prettytable = True
 
+        self.set_net()
+
+        self.set_dataset()
+        self.set_model_selector()
         self.recorder = EpochRecord
-        from configs.net_config import FCNNetConfig
-        self.net_config = FCNNetConfig()
-        self.net = FCNNet(self.net_config)
-        from configs.dataset_config import ImageDataSetConfig
-        self.dataset_config = ImageDataSetConfig()
-        self.dataset = ImageDataSet(self.dataset_config)
-        from base.base_model_selector import BaseSelector, ScoreModel
-        score_models = []
-        score_models.append(ScoreModel("train_loss", bigger_better=False))
-        score_models.append(ScoreModel("valid_loss", bigger_better=False))
-        self.model_selector = BaseSelector(score_models)
+
         self.num_epoch = 500
 
         if self._system == "Windows":
@@ -96,19 +99,56 @@ class ImageSegmentationConfig(BaseExperimentConfig):
         elif self._system == "Linux":
             self.num_epoch = 1000
             self.is_use_gpu = True
-            self.is_pretrain = True
+            self.is_pretrain = False
             self.history_save_dir = "/home/straw/Downloads/models/polyp/history"
             # todo 覆盖保存历史记录的时候也许需要提醒一下
             # self.history_save_path = "/home/straw/Downloads/models/polyp/history/history1595211050.pth"
-            self.history_save_path = "/home/straw/Downloads/models/polyp/history/history_1596127749.pth"
+            # self.history_save_path = "/home/straw/Downloads/models/polyp/history/history_1596127749.pth"
             # self.pretrain_path = "/home/straw/Downloads/models/polyp/2020-07-18/ep212_20-10-46.pkl"
             # self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-07-18/ep331_22-49-39.pkl'
-            self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-07-23/ep638_16-46-04.pkl'
+            # self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-07-23/ep638_16-46-04.pkl'
+            # best model
             self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-08-01/ep410_00-30-36.pkl'
+
             self.model_save_path = "/home/straw/Downloads/models/polyp/"
             self.result_save_path = "/home/straw/Download\models\polyp\\result"
-
+        # remove some useless or wrong attribute
         self.init_attr()
+
+    def set_net(self):
+        # STEP 1 use source image to predict mask image
+        # from configs.net_config import FCNNetConfig
+        # self.net_config = FCNNetConfig()
+        # self.net = FCNNet(self.net_config)
+
+        # STEP 2 USE predict result in step 1 and edge image to predict image
+        from configs.net_config import FCNNet4EdgeConfig
+        self.net_config = FCNNet4EdgeConfig()
+        from nets import FCN4EdgeNet
+        self.net = FCN4EdgeNet(self.net_config)
+
+    def set_dataset(self):
+        # dataset setting
+        # from configs.dataset_config import ImageDataSetConfig
+        # self.dataset_config = ImageDataSetConfig()
+        # self.dataset = ImageDataSet(self.dataset_config)
+
+        # from configs.dataset_config import ImageDataSet4TestConfig
+        # self.dataset_config = ImageDataSet4TestConfig()
+        # from datasets.image_dataset import ImageDataSet4Test
+        # self.dataset = ImageDataSet4Test(self.dataset_config)
+
+        from configs.dataset_config import ImageDataSet4EdgeConfig
+        self.dataset_config = ImageDataSet4EdgeConfig()
+        from datasets.image_dataset import ImageDataSet4Edge
+        self.dataset = ImageDataSet4Edge(self.dataset_config)
+
+    def set_model_selector(self):
+        from base.base_model_selector import BaseSelector, ScoreModel
+        score_models = []
+        score_models.append(ScoreModel("train_loss", bigger_better=False))
+        score_models.append(ScoreModel("valid_loss", bigger_better=False))
+        self.model_selector = BaseSelector(score_models)
 
 
 class FNNConfig(BaseExperimentConfig):
