@@ -189,7 +189,7 @@ class FNNConfig(BaseExperimentConfig):
         # self.result_save_path = "D:\models\Ecg\results"
 
         self.history_save_dir = "C:\data_analysis\models"
-        self.history_save_path = "C:\data_analysis\models\history1595256151s.pth"
+        # self.history_save_path = "C:\data_analysis\models\history1595256151.pth"
         self.model_save_path = "C:\data_analysis\models\deepeasy"
         self.result_save_path = "C:\data_analysis\models\deepeasy"
 

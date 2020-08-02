@@ -30,7 +30,7 @@ class Logger:
         # self.logger.addHandler(fh)
         if config.console_output:
             console = logging.StreamHandler()
-            formatter = logging.Formatter(fmt=config.console_format, datefmt=config.console_datafmt)
+            formatter = logging.Formatter(fmt=config.console_format, datefmt=config.console_datefmt)
             console.setFormatter(formatter)
             cls.logger.addHandler(console)
             console.close()
@@ -40,7 +40,7 @@ class Logger:
                                                    when="midnight",
                                                    backupCount=0,
                                                    encoding='utf-8')  # 往文件里写入#指定间隔时间自动生成文件的处理器
-            formatter = logging.Formatter(fmt=config.file_format, datefmt=config.console_datafmt)
+            formatter = logging.Formatter(fmt=config.file_format, datefmt=config.file_datefmt)
             th.setFormatter(formatter)
             cls.logger.addHandler(th)
 
