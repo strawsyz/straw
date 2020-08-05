@@ -49,8 +49,14 @@ class MyFNN(nn.Module):
 
     def forward(self, input):
         input = input.reshape(8, -1)
-        # print(input[0].shape)
         output = self.linears[0](input[0])
         for i in range(1, 8):
             output += self.linears[i](input[i])
         return output
+# [INFO]<2020-07-29 14:20:58,394> ecg_sample.py->train_one_epoch line:45 { EPOCH:346	 train_loss:0.040702	 }
+# [INFO]<2020-07-29 14:20:59,599> ecg_sample.py->train_one_epoch line:59 { Epoch346:	 valid_loss:0.588721 }
+# [INFO]<2020-07-29 14:20:59,600> deep_experiment.py->save_history line:126 { ========== saving history========== }
+# [INFO]<2020-07-29 14:20:59,622> deep_experiment.py->save_history line:135 { ========== saved history at D:\models\Ecg\history_1595399946.pth========== }
+# [INFO]<2020-07-29 14:20:59,622> deep_experiment.py->save line:98 { save this model for ['train_loss', 'valid_loss'] is better }
+# [INFO]<2020-07-29 14:20:59,622> deep_experiment.py->_save_model line:104 { ==============saving model data=============== }
+# [INFO]<2020-07-29 14:21:04,992> deep_experiment.py->_save_model line:108 { ==============saved at D:\models\Ecg\2020-07-29\ep346_14-20-59.pkl=============== }

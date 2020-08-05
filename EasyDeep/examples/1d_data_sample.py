@@ -42,6 +42,7 @@ class Experiment(DeepExperiment):
         train_loss = train_loss / len(self.train_loader)
         self.logger.info("EPOCH:{}\t train_loss:{:.6f}\t".format(epoch, train_loss))
         self.scheduler.step()
+        return train_loss
 
     def valid_one_epoch(self, epoch):
         self.net.eval()
@@ -56,9 +57,9 @@ class Experiment(DeepExperiment):
             valid_loss /= len(self.valid_loader)
             self.logger.info("Epoch:{}\t valid_loss:{:.6f}".format(epoch, valid_loss))
 
-
+        return valid_loss
 if __name__ == '__main__':
     experiment = Experiment()
-    experiment.train()
+    experiment.train(max_try_times=8)
     # experiment.test()
     # experiment.estimate(True)

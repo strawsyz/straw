@@ -29,6 +29,8 @@ class FNNNetConfig(NetConfig):
         self.loss_func_name = "MSE"
         self.n_in = 887
         self.n_out = 1
+        self.weight_decay = 0.005
+
 
 
 class CNN1DNetConfig(NetConfig):

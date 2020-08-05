@@ -37,7 +37,7 @@ class BaseExperimentConfig:
             for attr in sorted(self.__dict__):
                 config_view.add_row([attr, getattr(self, attr)])
             return "\n{}".format(str(config_view))
-        elif self._system == 'Linux':
+        elif self._system == 'Linux' or (self._system == 'Windows' and self.use_prettytable == False):
             config_items = []
             config_items.append("dataset config\t" + delimiter)
             for attr in sorted(self.dataset_config.__dict__):
@@ -156,30 +156,9 @@ class FNNConfig(BaseExperimentConfig):
     def __init__(self):
         super(FNNConfig, self).__init__()
         self.recorder = EpochRecord
-        self.net_name = "fnn"
-        # net
-        if self.net_name == "cnn1d":
-            from configs.net_config import CNN1DNetConfig
-            self.net_config = CNN1DNetConfig()
-            from nets.CNN1DNet import CNN1DNet
-            self.net = CNN1DNet(self.net_config)
-        elif self.net_name == "fnn":
-            from configs.net_config import FNNNetConfig
-            self.net_config = FNNNetConfig()
-            from nets import FNNNet
-            self.net = FNNNet(self.net_config)
-        # dataset
-        from configs.dataset_config import CSVDataSetConfig
-        self.dataset_config = CSVDataSetConfig()
-        from datasets import CsvDataSet
-        self.dataset = CsvDataSet(self.dataset_config)
-
-        # model selector
-        from base.base_model_selector import BaseSelector
-        self.model_selector = BaseSelector()
-        self.model_selector.add_score("train_loss", bigger_better=False)
-        self.model_selector.add_score("valid_loss", bigger_better=False)
-
+        self.set_net()
+        self.set_dataset()
+        self.set_model_selector()
         self.num_epoch = 500
         self.recorder = EpochRecord
 
@@ -194,12 +173,40 @@ class FNNConfig(BaseExperimentConfig):
         self.result_save_path = "C:\data_analysis\models\deepeasy"
 
         # if None,then use all data
-        self.is_pretrain = True
+        self.is_pretrain = False
         # self.is_pretrain = True
         self.pretrain_path = "C:\data_analysis\models\deepeasy\2020-07-27\ep0_15-02-58.pkl"
         # "D:\models\Ecg\2020-07-22\ep48_11-53-23.pkl"
 
         # is use prettytable
-        self.use_prettytable = True
+        self.use_prettytable = False
 
         self.init_attr()
+
+    def set_net(self):
+        self.net_name = "cnn1d"
+        # net
+        if self.net_name == "cnn1d":
+            from configs.net_config import CNN1DNetConfig
+            self.net_config = CNN1DNetConfig()
+            from nets.CNN1DNet import CNN1DNet
+            self.net = CNN1DNet(self.net_config)
+        elif self.net_name == "fnn":
+            from configs.net_config import FNNNetConfig
+            self.net_config = FNNNetConfig()
+            from nets import FNNNet
+            self.net = FNNNet(self.net_config)
+
+    def set_dataset(self):
+        # dataset
+        from configs.dataset_config import CSVDataSetConfig
+        self.dataset_config = CSVDataSetConfig()
+        from datasets import CsvDataSet
+        self.dataset = CsvDataSet(self.dataset_config)
+
+    def set_model_selector(self):
+        # model selector
+        from base.base_model_selector import BaseSelector
+        self.model_selector = BaseSelector()
+        self.model_selector.add_score("train_loss", bigger_better=False)
+        self.model_selector.add_score("valid_loss", bigger_better=False)
