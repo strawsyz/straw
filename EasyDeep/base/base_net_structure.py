@@ -37,3 +37,19 @@ class BaseNetStructure(BaseLogger):
         self.scheduler = optim.lr_scheduler.StepLR(self.optimizer, step_size=self.scheduler_step_size,
                                                    gamma=self.scheduler_gamma)
         return
+
+    def view_net_structure(self, x, file_name=None):
+        from torchviz import make_dot
+        y = self.net(x)
+        # g = make_dot(y)
+        g = make_dot(y, params=dict(self.net.named_parameters()))
+        # g = make_dot(y, params=dict(list(model.named_parameters()) + [('x', x)]))
+
+        # 如果filename是None，就会生成一个 Digraph.gv.pdf 的PDF文件,用默认软件打开pdf文件
+        # 否则按照设定的文件名进行保存
+        g.view(file_name=file_name)
+
+    def get_parameter_number(net):
+        total_num = sum(p.numel() for p in net.parameters())
+        trainable_num = sum(p.numel() for p in net.parameters() if p.requires_grad)
+        return {'Total': total_num, 'Trainable': trainable_num}

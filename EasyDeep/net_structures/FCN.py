@@ -136,16 +136,10 @@ class FCN4Edge(nn.Module):
         decoder_4 = self.decoder_4(decoder_3 + out_2)
         out = self.decoder_5(decoder_4 + out_1)
         return out
-def get_parameter_number(net):
-    total_num = sum(p.numel() for p in net.parameters())
-    trainable_num = sum(p.numel() for p in net.parameters() if p.requires_grad)
-    return {'Total': total_num, 'Trainable': trainable_num}
+
 
 if __name__ == '__main__':
     # 测试数据能正常跑通
     x = torch.randn(1, 1, 224, 224)
     net = FCN()
-    out = net(x)
-    print(out.shape)
-    dic=get_parameter_number(net)
-    print(dic)
+    print(net)
