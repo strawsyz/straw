@@ -29,6 +29,18 @@ class BaseNet(BaseLogger):
     def get_net(self, target, is_use_gpu: bool):
         if self.net is None:
             self.logger.error("select a net_structure to be used")
+        self.set_loss_function()
+        self.set_optimizer()
+        if self.is_scheduler:
+            self.scheduler = optim.lr_scheduler.StepLR(self.optimizer, step_size=self.scheduler_step_size,
+                                                       gamma=self.scheduler_gamma)
+
+        if is_use_gpu:
+            self.net = self.net.cuda()
+            self.loss_function = self.loss_function.cuda()
+        self.copy_attr(target)
+
+    def set_loss_function(self):
         if self.loss_func_name == "BCEWithLogitsLoss":
             self.loss_function = nn.BCEWithLogitsLoss()
         elif self.loss_func_name == "MSE":
@@ -36,20 +48,21 @@ class BaseNet(BaseLogger):
         else:
             self.logger.error("please set a valid loss function's name")
             raise RuntimeError
-        if is_use_gpu:
-            self.net = self.net.cuda()
-            self.loss_function = self.loss_function.cuda()
+
+    def set_optimizer(self):
         if self.optim_name == "adam":
-            self.optimizer = optim.Adam(self.net.parameters(), lr=self.lr, weight_decay=self.weight_decay)
+            if self.weight_decay is None:
+                self.optimizer = optim.Adam(self.net.parameters(), lr=self.lr)
+            else:
+                self.optimizer = optim.Adam(self.net.parameters(), lr=self.lr, weight_decay=self.weight_decay)
         elif self.optim_name == "sgd":
-            self.optimizer = optim.SGD(self.net.parameters(), lr=self.lr, weight_decay=self.weight_decay)
+            if self.weight_decay is None:
+                self.optimizer = optim.Adam(self.net.parameters(), lr=self.lr)
+            else:
+                self.optimizer = optim.SGD(self.net.parameters(), lr=self.lr, weight_decay=self.weight_decay)
         else:
-            self.logger.error("please set a valid loss function's name")
+            self.logger.error("please set a optimizer's name")
             raise RuntimeError
-        if self.is_scheduler:
-            self.scheduler = optim.lr_scheduler.StepLR(self.optimizer, step_size=self.scheduler_step_size,
-                                                       gamma=self.scheduler_gamma)
-        self.copy_attr(target)
 
     def copy_attr(self, target):
         copy_attr(self, target)

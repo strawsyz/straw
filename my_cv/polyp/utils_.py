@@ -256,6 +256,7 @@ def copy_images(source_path, target_path):
         img = Image.open(file_path)
         save_path = os.path.join(target_path, file_name)
         img.save(save_path)
+        print(save_path)
 
 
 def convert2PNG(source_path, target_path, mask=False):

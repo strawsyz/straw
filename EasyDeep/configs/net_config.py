@@ -15,12 +15,15 @@ class NetConfig:
 class FCNNetConfig(NetConfig):
     def __init__(self):
         super(FCNNetConfig, self).__init__()
+        self.is_init = True
 
 
 class FCNNet4EdgeConfig(NetConfig):
     def __init__(self):
         super(FCNNet4EdgeConfig, self).__init__()
         self.is_init = True
+        self.weight_decay = None
+
 
 
 class FNNNetConfig(NetConfig):

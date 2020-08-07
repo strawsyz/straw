@@ -49,7 +49,7 @@ if __name__ == '__main__':
     # dir_paths = [MASK_PATH, EDGE_PATH, EDGE_PATH1]
     data_path = "/home/straw/Downloads/dataset/polyp/TMP/07/data"
     mask_path = "/home/straw/Downloads/dataset/polyp/TMP/07/mask"
-    predict_path = "/home/straw/Download\models\polyp\\result/2020-07-25/"
+    predict_path = "/home/straw/Download\models\polyp\\result/2020-08-06/"
     dir_paths = [data_path, mask_path, predict_path]
     for file_name in os.listdir(dir_paths[-1]):
         file_names.append(file_name)

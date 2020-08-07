@@ -206,7 +206,6 @@ class ImageDataSet4Edge(BaseDataSet):
         edge_path = self.edge_paths[index]
         mask_path = self.mask_paths[index]
         predict_path = self.predict_paths[index]
-        print(image_path, edge_path, mask_path, predict_path)
         image = Image.open(image_path)
         edge = Image.open(edge_path)
         mask = Image.open(mask_path)
@@ -221,7 +220,8 @@ class ImageDataSet4Edge(BaseDataSet):
             predict = self.predict_transforms(predict)
 
         # concate source image and edge image to create X data
-        image = torch.cat([image, edge, predict], dim=0)
+        # image = torch.cat([image, edge, predict], dim=0)
+        image = torch.cat([image, predict], dim=0)
         # if use few sample for test ,will not have test_model
         if getattr(self, "test_model", False):
             return image, mask, os.path.basename(self.image_paths[index])

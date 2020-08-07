@@ -15,6 +15,9 @@ class Experiment(DeepExperiment):
 
     def test(self, debug_mode=False, save_predict_result=False):
         super(Experiment, self).test(debug_mode)
+        if self.is_pretrain is False:
+            self.logger.warning("set pretrain is True!")
+            raise RuntimeError
         self.logger.info("=" * 10 + " test start " + "=" * 10)
         pps = 0
         loss = 0
@@ -24,9 +27,10 @@ class Experiment(DeepExperiment):
             loss += loss_batch
         pps /= len(self.test_loader)
         loss /= len(self.test_loader)
-        self.logger.info("average predict images per second is {}".format(pps))
+        self.logger.info("average predict {} images per second".format(pps))
         self.logger.info("average loss is {}".format(loss))
         self.logger.info("=" * 10 + " testing end " + "=" * 10)
+        return self.result_save_path
 
     def test_one_batch(self, image, mask, image_name, save_predict_result=False):
         image = self.prepare_data(image)
@@ -67,6 +71,7 @@ class Experiment(DeepExperiment):
             loss.backward()
             self.optimizer.step()
             train_loss += loss.data
+            # print(loss.data)
         train_loss = train_loss / len(self.train_loader)
         self.scheduler.step()
         self.logger.info("EPOCH:{}\t train_loss:{:.6f}".format(epoch, train_loss))
@@ -110,6 +115,7 @@ class Experiment(DeepExperiment):
                 save_path = os.path.join(self.result_save_path, image_names[index])
                 pred.save(save_path)
                 self.logger.info("================{}=================".format(save_path))
+
 
 if __name__ == '__main__':
     from configs.experiment_config import ImageSegmentationConfig

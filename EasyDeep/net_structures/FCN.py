@@ -104,7 +104,7 @@ class FCN4Edge(nn.Module):
         :param n_out: 输出结果的频道数。
         """
         super(FCN4Edge, self).__init__()
-        self.encoder_0 = ConvBnReLU(5, 3, is_init=is_init)
+        self.encoder_0 = ConvBnReLU(4, 3, is_init=is_init)
         # 在VGG的基础上建立，使用VGG的结构
         vgg = vgg16_bn(pretrained=False)
         # 编码器

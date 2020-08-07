@@ -59,6 +59,9 @@ class ImageDataSet4EdgeConfig:
             self.image_path = "/home/straw/Downloads/dataset/polyp/TMP/07/data"
             self.predict_path = "/home/straw/Downloads/dataset/polyp/TMP/07/predict_step_one/"
             self.mask_path = "/home/straw/Downloads/dataset/polyp/TMP/07/mask"
+
+            self.batch_size = 8
+
         self.shuffle = True
         self.image_transforms = transforms.Compose([
             transforms.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1, hue=0.1),
@@ -86,7 +89,6 @@ class ImageDataSet4EdgeConfig:
         ])
         # dataloader
         self.random_state = 0
-        self.batch_size = 2
         self.test_rate = 0.2
         import os
         num_samples = len(os.listdir(self.mask_path))

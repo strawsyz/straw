@@ -101,15 +101,19 @@ class ImageSegmentationConfig(BaseExperimentConfig):
             self.is_use_gpu = True
             self.is_pretrain = False
             self.history_save_dir = "/home/straw/Downloads/models/polyp/history"
+            # STEP 2
+            # self.history_save_path = '/home/straw/Downloads/models/polyp/history/history_1596504981.pth'
             # todo 覆盖保存历史记录的时候也许需要提醒一下
             # self.history_save_path = "/home/straw/Downloads/models/polyp/history/history1595211050.pth"
             # self.history_save_path = "/home/straw/Downloads/models/polyp/history/history_1596127749.pth"
             # self.pretrain_path = "/home/straw/Downloads/models/polyp/2020-07-18/ep212_20-10-46.pkl"
             # self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-07-18/ep331_22-49-39.pkl'
             # self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-07-23/ep638_16-46-04.pkl'
-            # best model
-            self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-08-01/ep410_00-30-36.pkl'
-
+            # best model in step one
+            # self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-08-01/ep410_00-30-36.pkl'
+            # step two
+            # self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-08-03/ep395_14-37-02.pkl'
+            self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-08-05/ep241_00-36-43.pkl'
             self.model_save_path = "/home/straw/Downloads/models/polyp/"
             self.result_save_path = "/home/straw/Download\models\polyp\\result"
         # remove some useless or wrong attribute
