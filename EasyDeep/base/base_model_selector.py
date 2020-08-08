@@ -46,9 +46,13 @@ class BaseSelector:
         self.best_num = best_num
         self.strict = False
         self.score_models = {}
+        self.bset_models_path = {}
+        from collections import namedtuple
         if score_models is not None:
             for score_model in score_models:
                 self.score_models[score_model.name] = score_model
+                # 每一项指标保留最高分
+                self.best_models_path[score_model.name] = None
 
     def _add_record(self, scores: dict, model_path: str):
 
@@ -57,12 +61,12 @@ class BaseSelector:
         else:
             need_save = False
 
-        need_reason = []
+        reason2need = []
         for name, score_value in scores.items():
             score_model = self.score_models[name]
             is_need_save = score_model.is_needed_add(score_value)
             if is_need_save:
-                need_reason.append(name)
+                reason2need.append(name)
             if self.strict:
                 need_save = need_save and is_need_save
                 if not need_save:
@@ -72,12 +76,14 @@ class BaseSelector:
         if need_save:
             for name, score_value in scores.items():
                 score_model = self.score_models[name]
+                # 给每个分数模型添加新的分数
                 score_model.add_score(score_value, model_path)
         else:
-            need_reason = []
-        return need_save, need_reason
+            # 重新设置为空列表。防止因为逻辑的问题，导致没有保存的必要，但是依然有保存的理由
+            reason2need = []
+        return need_save, reason2need
 
-    def add_score(self, name, bigger_better=True, best_num=1, desciption=None):
+    def regist_score_model(self, name, bigger_better=True, best_num=1, desciption=None):
         # 增加分数指标
         self.score_models[name] = ScoreModel(name, bigger_better, best_num, desciption)
 

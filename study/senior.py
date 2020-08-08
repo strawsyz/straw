@@ -96,3 +96,11 @@ class HelloMeta(type):
         # 设置默认参数必须指向一个不可变类型
 
         # 闭包是迟绑定，
+
+def hack_stdout():
+    # hack输出流
+    import sys
+    sys.stdout = open('output.txt','a')
+    print("test")
+    sys.stdout = sys.__stdout__
+    print("test")

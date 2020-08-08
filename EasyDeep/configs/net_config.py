@@ -11,6 +11,11 @@ class NetConfig:
         self.lr = 0.002
         self.weight_decay = 0.001
 
+    def init_attr(self):
+        # 处理所有不合理或者可能发生问题的参数
+        if self.scheduler_gamma is None:
+            self.scheduler_gamma = 0.1
+
 
 class FCNNetConfig(NetConfig):
     def __init__(self):
@@ -33,7 +38,6 @@ class FNNNetConfig(NetConfig):
         self.n_in = 887
         self.n_out = 1
         self.weight_decay = 0.005
-
 
 
 class CNN1DNetConfig(NetConfig):

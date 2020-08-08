@@ -49,7 +49,7 @@ class BaseNetStructure(BaseLogger):
         # 否则按照设定的文件名进行保存
         g.view(file_name=file_name)
 
-    def get_parameter_number(net):
+    def get_parameters_amount(net):
         total_num = sum(p.numel() for p in net.parameters())
         trainable_num = sum(p.numel() for p in net.parameters() if p.requires_grad)
         return {'Total': total_num, 'Trainable': trainable_num}

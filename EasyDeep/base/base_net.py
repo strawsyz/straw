@@ -30,15 +30,19 @@ class BaseNet(BaseLogger):
         if self.net is None:
             self.logger.error("select a net_structure to be used")
         self.set_loss_function()
-        self.set_optimizer()
-        if self.is_scheduler:
-            self.scheduler = optim.lr_scheduler.StepLR(self.optimizer, step_size=self.scheduler_step_size,
-                                                       gamma=self.scheduler_gamma)
-
         if is_use_gpu:
             self.net = self.net.cuda()
             self.loss_function = self.loss_function.cuda()
+        self.set_optimizer()
+        self.set_scheduler()
         self.copy_attr(target)
+
+    def copy_attr(self, target):
+        # todo 整理一下，减少复制的参数
+        copy_attr(self, target)
+
+    def unit_test(self):
+        self.get_net(self, is_use_gpu=False)
 
     def set_loss_function(self):
         if self.loss_func_name == "BCEWithLogitsLoss":
@@ -64,13 +68,19 @@ class BaseNet(BaseLogger):
             self.logger.error("please set a optimizer's name")
             raise RuntimeError
 
+    def set_scheduler(self):
+        if self.is_scheduler:
+            self.scheduler = optim.lr_scheduler.StepLR(self.optimizer, step_size=self.scheduler_step_size,
+                                                       # todo self.scheduler_gamma默认是0.1
+                                                       gamma=self.scheduler_gamma)
+    def view_net_structure(self, x, file_name=None):
+        return self.net.view_net_structure()
+
     def copy_attr(self, target):
         copy_attr(self, target)
 
-    def unit_test(self):
-        self.get_net(self, is_use_gpu=False)
-
-
+    def get_parameters_amount(self):
+        return self.net.getget_parameters_amount()
 
 if __name__ == '__main__':
     base_net = BaseNet()

@@ -15,6 +15,7 @@ class BaseCheckPoint:
         super(BaseCheckPoint, self).__init__()
         self.state_dict = None
         self.epoch = None
+        # 如果优化器是SGD的话，就不需要保存
         self.optimizer = None
 
     def __call__(self, data: dict):
@@ -45,16 +46,3 @@ from utils.utils_ import copy_attr
 
 def load(checkpoint, path):
     copy_attr(torch.load(path), checkpoint)
-
-
-if __name__ == '__main__':
-    data = {"asd": 123, "epoch": 123}
-    checkpoint = CustomCheckPoint(data.keys())(data)
-    # 初始化
-    # checkpoint = BaseCheckPoint.create_checkpoint(data)
-    print(checkpoint.asd)
-    # 保存
-    save(checkpoint, "1.pth")
-    # 读取
-    load(checkpoint, "1.pth")
-    print(checkpoint.asd)

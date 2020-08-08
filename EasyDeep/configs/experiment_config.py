@@ -1,7 +1,9 @@
 import platform
+from abc import abstractmethod
 
 from base.base_recorder import EpochRecord
 from nets import FCNNet
+from utils.time_utils import get_time4filename
 
 
 class BaseExperimentConfig:
@@ -11,12 +13,15 @@ class BaseExperimentConfig:
         self.dataset_config = None
         self.net_config = None
 
+    @abstractmethod
     def set_dataset(self):
         raise NotImplementedError
 
+    @abstractmethod
     def set_net(self):
         raise NotImplementedError
 
+    @abstractmethod
     def set_model_selector(self):
         raise NotImplementedError
 
@@ -55,9 +60,8 @@ class BaseExperimentConfig:
         if not hasattr(self, "history_save_path") or \
                 not isinstance(self.history_save_path, str) or \
                 not os.path.isfile(self.history_save_path):
-            import time
             self.history_save_path = \
-                os.path.join(self.history_save_dir, "history_{}.pth".format(int(time.time())))
+                os.path.join(self.history_save_dir, "history_{}.pth".format(get_time4filename()))
         from utils.time_utils import get_date
         if getattr(self, "history_save_path", None):
             self.result_save_path = os.path.join(self.result_save_path, get_date())
@@ -78,10 +82,11 @@ class ImageSegmentationConfig(BaseExperimentConfig):
         self.set_dataset()
         self.set_model_selector()
         self.recorder = EpochRecord
-
-        self.num_epoch = 500
+        from base.base_recorder import ExperimentRecord
+        self.experiment_record = ExperimentRecord
 
         if self._system == "Windows":
+            self.num_epoch = 500
             self.is_use_gpu = False
             self.is_pretrain = False
             self.model_save_path = "D:\Download\models\polyp"
@@ -165,7 +170,8 @@ class FNNConfig(BaseExperimentConfig):
         self.set_model_selector()
         self.num_epoch = 500
         self.recorder = EpochRecord
-
+        from base.base_recorder import ExperimentRecord
+        self.experiment_record = ExperimentRecord
         # self.history_save_dir = "D:\models\Ecg"
         # self.history_save_path = ""
         # self.model_save_path = "D:\models\Ecg"
@@ -173,13 +179,16 @@ class FNNConfig(BaseExperimentConfig):
 
         self.history_save_dir = "C:\data_analysis\models"
         # self.history_save_path = "C:\data_analysis\models\history1595256151.pth"
+        self.history_save_path = "C:\data_analysis\models\history_08-08_15-05-21.pth"
         self.model_save_path = "C:\data_analysis\models\deepeasy"
         self.result_save_path = "C:\data_analysis\models\deepeasy"
 
         # if None,then use all data
-        self.is_pretrain = False
-        # self.is_pretrain = True
-        self.pretrain_path = "C:\data_analysis\models\deepeasy\2020-07-27\ep0_15-02-58.pkl"
+        # self.is_pretrain = False
+        self.is_pretrain = True
+        # self.pretrain_path = "C:\data_analysis\models\deepeasy\2020-08-07\ep176_21-37-20.pkl"
+        self.pretrain_path = "C:\data_analysis\models\deepeasy\\2020-08-08\ep4_15-05-49.pkl"
+        # self.pretrain_path = "C:\data_analysis\models\history_2020-08-07_20-55-38.pth"
         # "D:\models\Ecg\2020-07-22\ep48_11-53-23.pkl"
 
         # is use prettytable
@@ -188,7 +197,7 @@ class FNNConfig(BaseExperimentConfig):
         self.init_attr()
 
     def set_net(self):
-        self.net_name = "cnn1d"
+        self.net_name = "fnn"
         # net
         if self.net_name == "cnn1d":
             from configs.net_config import CNN1DNetConfig
@@ -212,5 +221,5 @@ class FNNConfig(BaseExperimentConfig):
         # model selector
         from base.base_model_selector import BaseSelector
         self.model_selector = BaseSelector()
-        self.model_selector.add_score("train_loss", bigger_better=False)
-        self.model_selector.add_score("valid_loss", bigger_better=False)
+        self.model_selector.regist_score_model("train_loss", bigger_better=False)
+        self.model_selector.regist_score_model("valid_loss", bigger_better=False)

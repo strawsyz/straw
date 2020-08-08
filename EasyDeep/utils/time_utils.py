@@ -9,14 +9,17 @@ def get_time(format_='%Y-%m-%d %H:%M:%S'):
     """获得字符串类型的时间"""
     return now().strftime(format_)
 
+def get_time4filename(format_='%m-%d_%H-%M-%S'):
+    """获得字符串类型的时间"""
+    return now().strftime(format_)
 
 def get_date(format_='%Y-%m-%d'):
     return now().strftime(format_)
 
 
-def get_datetime(time: str, fmt):
+def str2datetime(time_str: str, fmt):
     """将格式化的时间字符串转成datetime类型"""
-    return now().strptime(time, fmt)
+    return now().strptime(time_str, fmt)
 
 
 def year():

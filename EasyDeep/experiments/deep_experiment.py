@@ -1,6 +1,7 @@
 import os
 import pickle
 import time
+from abc import abstractmethod
 
 from torch.autograd import Variable
 
@@ -17,7 +18,7 @@ class DeepExperiment(BaseExperiment):
     def __init__(self, config_instance=None):
         self.current_epoch = 0
 
-        self.history = {}
+        self.scores_history = {}
         self.recorder = None
         self.net = None
         self.dataset = None
@@ -55,6 +56,8 @@ class DeepExperiment(BaseExperiment):
         if self.is_pretrain:
             self.load()
 
+    # 和java一样，必须实现抽象方法定义，才可以通过编译
+    @abstractmethod
     def train_one_epoch(self, epoch):
         """一个epoch中训练集进行训练"""
         raise NotImplementedError
@@ -76,7 +79,7 @@ class DeepExperiment(BaseExperiment):
     def train(self, max_try_times=None, debug_mode=False):
         """
 
-        :param max_try_times: 数据没有优化后，重复训练的次数
+        :param max_try_times: 一定回数loss没有下降的话，就停止训练。
         :return:
         """
         if self.model_selector is None and max_try_times is not None:
@@ -90,7 +93,7 @@ class DeepExperiment(BaseExperiment):
             start_time = time.time()
             record = self.train_valid_one_epoch(epoch)
 
-            self.history[epoch] = record
+            self.scores_history[epoch] = record
             if not self.save(epoch, record):
                 try_times += 1
             else:
@@ -99,8 +102,13 @@ class DeepExperiment(BaseExperiment):
                 break
             self.logger.info("use {} seconds in the epoch".format(int(time.time() - start_time)))
         self.logger.info("================training is over=================")
+        # todo 返回训练获得的最佳模型的路径和历史保存路径
+        return self.history_save_path
 
     def test(self, debug_mode=False):
+        if self.is_pretrain is False:
+            self.logger.warning("need to set pretrain is True!")
+            raise RuntimeError
         if not debug_mode:
             self.prepare_dataset(testing=True)
             self.prepare_net()
@@ -109,13 +117,14 @@ class DeepExperiment(BaseExperiment):
         #     todo 提取为注解，分别设置，before_test, after_test两个，train也同理
 
     def create_checkpoint(self, epoch=None, create4load=False):
-        # 修改保存的数据之后，需要重新训练，否则无法读取之前的保存的模型
+        # todo 配置文件设置checkpoint保存的数据内容
         experiment_data = {"epoch": epoch,
                            "state_dict": self.net.state_dict(),
                            "optimizer": self.optimizer.state_dict(),
                            "history_path": self.history_save_path
                            }
         if create4load:
+            # 如果是为了加载数据
             return CustomCheckPoint(experiment_data.keys())
         else:
             return CustomCheckPoint(experiment_data.keys())(experiment_data)
@@ -163,51 +172,74 @@ class DeepExperiment(BaseExperiment):
         self.net.load_state_dict(check_point.state_dict)
         self.optimizer.load_state_dict(check_point.optimizer)
 
-    def save_history(self):
-        self.logger.info("=" * 10 + " saving history" + "=" * 10)
-        file_utils.make_directory(self.history_save_dir)
-        history = {}
-        # todo 应该在每次加载的时候去掉，多余的数据
-        for epoch_no in self.history:
-            if epoch_no < self.current_epoch:
-                history[epoch_no] = self.history[epoch_no]
-        with open(self.history_save_path, "wb") as f:
-            pickle.dump(self.history, f)
-        self.logger.info("=" * 10 + " saved history at {}".format(self.history_save_path) + "=" * 10)
+    def create_experiment_record(self):
+        experiment_record = self.experiment_record()
+        experiment_record.config_info = str(self.config_instance)
+        experiment_record.epoch_records = self.scores_history
+        return experiment_record
 
-    def load_history(self):
+    def save_history(self):
+        self.logger.info("=" * 10 + " saving experiment history " + "=" * 10)
+        file_utils.make_directory(self.history_save_dir)
+        # history = {}
+        # todo 应该在每次加载的时候去掉，多余的数据
+        # for epoch_no in self.scores_history:
+        #     if epoch_no > self.current_epoch:
+        #         self.scores_history.pop(epoch_no)
+                # history[epoch_no] = self.scores_history[epoch_no]
+        experiment_record = self.create_experiment_record()
+        experiment_record.save(self.history_save_path)
+        # with open(self.history_save_path, "wb") as f:
+        #     pickle.dump(self.scores_history, f)
+        self.logger.info("=" * 10 + " saved experiment history at {}".format(self.history_save_path) + "=" * 10)
+
+    def load_history(self,is4train=False):
+        """
+
+        :param is4train: 如果是为了训练数据的话
+        :return:
+        """
         if hasattr(self, "history_save_path") and self.history_save_path is not None and self.history_save_path != "":
             if os.path.isfile(self.history_save_path):
                 self.logger.info("=" * 10 + " loading history" + "=" * 10)
-                with open(self.history_save_path, mode="rb+") as f:
-                    self.history = pickle.load(f)
+                experiment_record = self.create_experiment_record()
+                experiment_record = experiment_record.load(self.history_save_path)
+                self.scores_history = experiment_record.epoch_records
+                if is4train:
+                    for epoch_no in experiment_record.epoch_records:
+                        if epoch_no <= self.current_epoch:
+                            self.scores_history[epoch_no] = experiment_record.epoch_records[epoch_no]
+                # with open(self.history_save_path, mode="rb+") as f:
+                #     self.scores_history = pickle.load(f)
                 self.logger.info("=" * 10 + " loaded history from {}".format(self.history_save_path) + "=" * 10)
             else:
                 self.logger.error("{} is not a file".format(self.history_save_path))
         else:
             self.logger.error("not set history_save_path")
+        return experiment_record
 
     def show_history(self, use_log10=False):
         self.logger.info("showing history")
-        record_attrs = self.history[list(self.history.keys())[0]].scores
-        epoches = [[epoch_no for epoch_no in self.history] for _ in range(len(record_attrs))]
+        record_attrs = self.scores_history[list(self.scores_history.keys())[0]].scores
+        epoches = [[epoch_no for epoch_no in self.scores_history] for _ in range(len(record_attrs))]
         import torch
         if use_log10:
             all_records = [
-                [torch.log10(getattr(self.history.get(epoch_no), attr_name)) for epoch_no in self.history]
+                [torch.log10(getattr(self.scores_history.get(epoch_no), attr_name)) for epoch_no in self.scores_history]
                 for attr_name in record_attrs]
             record_attrs = ["log10_{}".format(attr_name) for attr_name in record_attrs]
             lineplot(all_records, epoches, labels=record_attrs, title="history analysis with log10")
         else:
-            all_records = [[getattr(self.history.get(epoch_no), attr_name) for epoch_no in self.history]
+            all_records = [[getattr(self.scores_history.get(epoch_no), attr_name) for epoch_no in self.scores_history]
                            for attr_name in record_attrs]
             lineplot(all_records, epoches, record_attrs, "history analysis")
         from utils.matplotlib_utils import show
         show()
 
     def estimate(self, use_log10=False):
-        self.load_history()
-        if self.history == {}:
+        experiment_record = self.load_history()
+        print(experiment_record.config_info)
+        if self.scores_history == {}:
             self.logger.error("no history")
         else:
             self.show_history(use_log10)

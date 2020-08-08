@@ -15,9 +15,6 @@ class Experiment(DeepExperiment):
 
     def test(self, debug_mode=False, save_predict_result=False):
         super(Experiment, self).test(debug_mode)
-        if self.is_pretrain is False:
-            self.logger.warning("set pretrain is True!")
-            raise RuntimeError
         self.logger.info("=" * 10 + " test start " + "=" * 10)
         pps = 0
         loss = 0
