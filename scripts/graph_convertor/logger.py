@@ -18,7 +18,7 @@ class Log:
 
         # 保存日志的文件
         file_dir = os.getcwd() + '/Logs'
-        from demo.file_util import make_directory
+        from file_util import make_directory
         make_directory(file_dir)
         self.log_path = file_dir
         self.log_name = self.log_path + "/" + log_cate + "." + time.strftime("%Y_%m_%d") + '.log'
@@ -36,25 +36,6 @@ class Log:
         console.setFormatter(formatter)
         self.logger.addHandler(console)
 
-        # logging自带的保存文本日志文件的handler
-        # th = logging.handlers.TimedRotatingFileHandler(filename=filename, when=when, backupCount=backCount,
-        #                                        encoding='utf-8')  # 往文件里写入#指定间隔时间自动生成文件的处理器
-        # # 实例化TimedRotatingFileHandler
-        # # interval是时间间隔，backupCount是备份文件的个数，如果超过这个个数，就会自动删除，
-        # # when是间隔的时间单位，单位有以下几种：
-        # # S 秒
-        # # M 分
-        # # H 小时、
-        # # D 天、
-        # # W 每星期（interval==0时代表星期一）
-        # # midnight 每天凌晨
-        # th.setFormatter(formatter)  # 设置文件里写入的格式
-        # self.logger.addHandler(th)
-
-
-        #  添加下面一句，在记录日志之后移除句柄
-        # self.logger.removeHandler(ch)
-        # self.logger.removeHandler(fh)
         # 关闭打开的文件
         fh.close()
         console.close()

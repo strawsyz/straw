@@ -22,13 +22,13 @@ def main(path):
             os.rename(old_path, new_path)
 
 import argparse
-parser = argparse.ArgumentParser(description='delete filename which canont display in MangaMeeya')
+parser = argparse.ArgumentParser(description="delete filename which cann't display in MangaMeeya")
 # 默认是当前文件夹
 parser.add_argument('-p', type=str, default=os.getcwd())
 args = parser.parse_args()
 
 # 使用方法
-# # python temp2.py {}
+# # python deal_file_name.py {}
 # {} 填入路径名
 
 if __name__ == '__main__':

@@ -1,7 +1,7 @@
 import os
 from PIL import Image
 import zipfile
-from demo.logger import Log
+from logger import Log
 
 """对彩图进行图像模式转换然后按文件夹打包成zip文件
 传入的路径应该是一个文件夹，文件夹下有一个或多个子文件夹
@@ -75,30 +75,18 @@ def batch_image_convert(dir_path):
 
 def easy_get_path():
     import argparse
-    parser = argparse.ArgumentParser(description='convert images that cannot show in MangaMeeya')
+    parser = argparse.ArgumentParser()
     # 默认是当前文件夹
     parser.add_argument('-p', type=str, default=os.getcwd())
     args = parser.parse_args()
     return args.p
 
 
-# 使用方法
-# # python temp2.py {}
-# {} 填入路径名
-
-# YCbCr[H2:V1]: 1:1
-# Progressive
 
 if __name__ == '__main__':
     # import time
     # start_time = time.time()
-    # image_convert()
-    # zip_dir('C:\\temp\err\\1371037-COMIC BAVEL 2019年3月号 [DL版]', 'test.zip')
     path = easy_get_path()
-    # path = 'C:\\temp\eh0928'
     batch_image_convert(path)
     # end_time = time.time()
-    #
     # print('use time =====' + str(end_time - start_time))
-
-    # image_convert('C:\\Users\Administrator\PycharmProjects\my_cv\demo\\temp\\00000001.jpg', '1.jpg')
