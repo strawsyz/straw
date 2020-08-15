@@ -132,5 +132,5 @@ def iou_estimate(gt_dir, predict_dir, thresholds=range(1, 255), draw_every_iou=F
 
 if __name__ == '__main__':
     gt_dir = "/home/straw/Downloads/dataset/polyp/TMP/07/mask"
-    predict_dir = "/home/straw/Download\models\polyp\\result/2020-08-06/"
+    predict_dir = "/home/straw/Download\models\polyp\\result/2020-08-09/"
     iou_estimate(gt_dir, predict_dir)

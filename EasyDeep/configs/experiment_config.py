@@ -2,7 +2,6 @@ import platform
 from abc import abstractmethod
 
 from base.base_recorder import EpochRecord
-from nets import FCNNet
 from utils.time_utils import get_time4filename
 
 
@@ -108,6 +107,13 @@ class ImageSegmentationConfig(BaseExperimentConfig):
             self.history_save_dir = "/home/straw/Downloads/models/polyp/history"
             # STEP 2
             # self.history_save_path = '/home/straw/Downloads/models/polyp/history/history_1596504981.pth'
+            # not use edge
+            # self.history_save_path = '/home/straw/Downloads/models/polyp/history/history_1596727136.pth'
+            # use edge
+            # self.history_save_path = '/home/straw/Downloads/models/polyp/history/history_1596849406.pth'
+            # self.history_save_path = "/home/straw/Downloads/models/polyp/history/history_1596889557.pth"
+            self.history_save_path = "/home/straw/Downloads/models/polyp/history/history_08-14_09-24-44.pth"
+            # use new network two input one output
             # todo 覆盖保存历史记录的时候也许需要提醒一下
             # self.history_save_path = "/home/straw/Downloads/models/polyp/history/history1595211050.pth"
             # self.history_save_path = "/home/straw/Downloads/models/polyp/history/history_1596127749.pth"
@@ -119,6 +125,19 @@ class ImageSegmentationConfig(BaseExperimentConfig):
             # step two
             # self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-08-03/ep395_14-37-02.pkl'
             self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-08-05/ep241_00-36-43.pkl'
+            # not use edge
+            self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-08-07/ep68_03-13-11.pkl'
+            # use edge
+            self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-08-08/ep82_13-44-27.pkl'
+            self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-08-09/ep61_00-00-39.pkl'
+            # INFO]<2020-08-07 03:12:55,755> { EPOCH:68	 train_loss:0.284118 }
+            # [INFO]<2020-08-07 03:13:11,073> { Epoch:68	 valid_loss:0.345331 }
+            # [INFO]<2020-08-07 03:13:11,073> { ========== saving history========== }
+            # [INFO]<2020-08-07 03:13:11,080> { ========== saved history at /home/straw/Downloads/models/polyp/history/history_1596727136.pth========== }
+            # [INFO]<2020-08-07 03:13:11,081> { save this model for ['train_loss', 'valid_loss'] is better }
+            # [INFO]<2020-08-07 03:13:11,081> { ==============saving model data=============== }
+            # [INFO]<2020-08-07 03:13:11,256> { ==============saved at /home/straw/Downloads/models/polyp/2020-08-07/ep68_03-13-11.pkl=============== }
+            # [INFO]<2020-08-07 03:13:11,256> { use 159 seconds in the epoch }
             self.model_save_path = "/home/straw/Downloads/models/polyp/"
             self.result_save_path = "/home/straw/Download\models\polyp\\result"
         # remove some useless or wrong attribute

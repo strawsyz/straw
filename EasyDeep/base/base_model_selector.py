@@ -46,8 +46,7 @@ class BaseSelector:
         self.best_num = best_num
         self.strict = False
         self.score_models = {}
-        self.bset_models_path = {}
-        from collections import namedtuple
+        self.best_models_path = {}
         if score_models is not None:
             for score_model in score_models:
                 self.score_models[score_model.name] = score_model
