@@ -1,4 +1,3 @@
-from datasets.csv_dataset import CsvDataSet
 from datasets.image_dataset import ImageDataSet
 def get_dataset(dataset_name):
     if dataset_name == "csv":

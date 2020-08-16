@@ -181,21 +181,13 @@ class DeepExperiment(BaseExperiment):
     def save_history(self):
         self.logger.info("=" * 10 + " saving experiment history " + "=" * 10)
         file_utils.make_directory(self.history_save_dir)
-        # history = {}
-        # todo 应该在每次加载的时候去掉，多余的数据
-        # for epoch_no in self.scores_history:
-        #     if epoch_no > self.current_epoch:
-        #         self.scores_history.pop(epoch_no)
-                # history[epoch_no] = self.scores_history[epoch_no]
         experiment_record = self.create_experiment_record()
         experiment_record.save(self.history_save_path)
-        # with open(self.history_save_path, "wb") as f:
-        #     pickle.dump(self.scores_history, f)
         self.logger.info("=" * 10 + " saved experiment history at {}".format(self.history_save_path) + "=" * 10)
 
     def load_history(self,is4train=False):
         """
-
+        load history data
         :param is4train: 如果是为了训练数据的话
         :return:
         """
@@ -274,7 +266,6 @@ class FNNExperiment(DeepExperiment):
 
 
 if __name__ == '__main__':
-    # todo win7系统下调用loss.backward()会导致程序无法关闭
     experiment = DeepExperiment()
     # experiment.test()
     # experiment.estimate()

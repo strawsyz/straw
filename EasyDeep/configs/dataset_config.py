@@ -132,10 +132,8 @@ class BaseDataSetConfig:
 
 class CSVDataSetConfig:
     def __init__(self):
-        self.xls_path = "C:\data_analysis\datasets\ecgs\ecg_list_dummy.xlsx"
-        self.csv_dir = "C:\data_analysis\datasets\ecgs\csv"
-        # self.xls_path = "D:\dataset\ecgs\ecg_list.xlsx"
-        # self.csv_dir = "D:\dataset\ecgs\csv"
+        self.xls_path = ""
+        self.csv_dir = ""
         self.test_rate = 0.3
         self.valid_rate = 0.2
 

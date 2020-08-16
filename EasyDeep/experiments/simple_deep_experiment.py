@@ -165,7 +165,6 @@ class FNNExperiment(DeepExperiment):
 
 
 if __name__ == '__main__':
-    # todo win7系统下调用loss.backward()会导致程序无法关闭
     experiment = DeepExperiment()
     # experiment.test()
     experiment.estimate()

@@ -30,7 +30,6 @@ class BaseExperimentConfig:
             from prettytable import PrettyTable
             config_view = PrettyTable()
             config_view.field_names = ["name", "value"]
-            # todo 可能之后改为__slots__
             config_view.add_row(["dataset config", delimiter])
             for attr in sorted(self.dataset_config.__dict__):
                 config_view.add_row([attr, getattr(self.dataset_config, attr)])
@@ -191,24 +190,12 @@ class FNNConfig(BaseExperimentConfig):
         self.recorder = EpochRecord
         from base.base_recorder import ExperimentRecord
         self.experiment_record = ExperimentRecord
-        # self.history_save_dir = "D:\models\Ecg"
-        # self.history_save_path = ""
-        # self.model_save_path = "D:\models\Ecg"
-        # self.result_save_path = "D:\models\Ecg\results"
 
-        self.history_save_dir = "C:\data_analysis\models"
-        # self.history_save_path = "C:\data_analysis\models\history1595256151.pth"
-        self.history_save_path = "C:\data_analysis\models\history_08-08_15-05-21.pth"
-        self.model_save_path = "C:\data_analysis\models\deepeasy"
-        self.result_save_path = "C:\data_analysis\models\deepeasy"
+        self.history_save_dir = ""
+        self.model_save_path = ""
+        self.result_save_path = ""
 
-        # if None,then use all data
-        # self.is_pretrain = False
-        self.is_pretrain = True
-        # self.pretrain_path = "C:\data_analysis\models\deepeasy\2020-08-07\ep176_21-37-20.pkl"
-        self.pretrain_path = "C:\data_analysis\models\deepeasy\\2020-08-08\ep4_15-05-49.pkl"
-        # self.pretrain_path = "C:\data_analysis\models\history_2020-08-07_20-55-38.pth"
-        # "D:\models\Ecg\2020-07-22\ep48_11-53-23.pkl"
+        self.is_pretrain = False
 
         # is use prettytable
         self.use_prettytable = False

@@ -1,7 +1,6 @@
 import torch
 
 from configs.experiment_config import FNNConfig as experiment_config
-from experiments.deep_experiment import FNNExperiment
 from experiments.deep_experiment import DeepExperiment
 
 
