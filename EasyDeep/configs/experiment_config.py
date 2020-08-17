@@ -220,8 +220,8 @@ class FNNConfig(BaseExperimentConfig):
         # dataset
         from configs.dataset_config import CSVDataSetConfig
         self.dataset_config = CSVDataSetConfig()
-        from datasets import CsvDataSet
-        self.dataset = CsvDataSet(self.dataset_config)
+        # need set  a dataset
+
 
     def set_model_selector(self):
         # model selector
