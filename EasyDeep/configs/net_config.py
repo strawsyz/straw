@@ -35,7 +35,7 @@ class FNNNetConfig(NetConfig):
     def __init__(self):
         super(FNNNetConfig, self).__init__()
         self.loss_func_name = "MSE"
-        self.n_in = 1000
+        self.n_in = 5000
         self.n_out = 1
         self.weight_decay = 0.005
 

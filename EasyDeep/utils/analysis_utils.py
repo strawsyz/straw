@@ -1,4 +1,3 @@
-import numpy as np
 from matplotlib import pyplot as plt
 from PIL import Image
 
@@ -15,16 +14,18 @@ def img_hist(gray_img_array):
     plt.show()
 
 
-if __name__ == '__main__':
-    import os
-    dir = "D:\Download\datasets\polyp\\06\mask"
-    for file in os.listdir(dir):
-        path = os.path.join(dir,file)
-        img = Image.open(path)
-        img = np.array(img)
-        img_hist(img)
-        width, height = img.shape
-        # print(width * height)
-        num = np.sum(img == 0) + np.sum(img == 255)
-        print(width * height-num)
-        print( np.sum(img==254))
+def compare_image(image_paths):
+    """比较所有图片是否大小一致"""
+    """允许有两种大小的图片"""
+    size = Image.open(image_paths[0]).size
+    print("normal size is {}".format(size))
+    other_size = None
+    for image_path in image_paths[1:]:
+        image = Image.open(image_path)
+        if size != image.size:
+            if other_size is None:
+                other_size = image.size
+            elif other_size != image.size:
+                print("{} have different shape: {}".format(image_path, image.size))
+
+

@@ -19,7 +19,7 @@ class ConvBN(Conv):
 
 class ConvBNReLU(ConvBN):
     def __int__(self, in_n, out_n, kernel_size=3, stride=1, padding=1, groups=1, **kwargs):
-        super(ConvBNReLU, self).__init__(in_n, out_n, kernel_size, stride, padding, groups=groups ** kwargs)
+        super(ConvBNReLU, self).__init__(in_n, out_n, kernel_size, stride, padding, groups=groups, ** kwargs)
         self.add_module("ReLU", nn.ReLU(inplace=True))
 
 

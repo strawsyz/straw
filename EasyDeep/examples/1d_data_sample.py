@@ -59,6 +59,6 @@ class Experiment(DeepExperiment):
         return valid_loss
 if __name__ == '__main__':
     experiment = Experiment()
-    # experiment.train(max_try_times=3)
+    experiment.train(max_try_times=8)
     # experiment.test()
-    experiment.estimate(True)
+    # experiment.estimate(True)
