@@ -1,6 +1,6 @@
 from base.base_logger import BaseLogger
 from utils.config_utils import ConfigChecker
-from utils.utils_ import copy_attr
+from utils.common_utils import copy_attr
 
 
 class BaseExperiment(BaseLogger, ConfigChecker):

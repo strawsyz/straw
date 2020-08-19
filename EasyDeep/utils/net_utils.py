@@ -1,6 +1,6 @@
 import torch
 
-from utils.utils_ import copy_attr
+from utils.common_utils import copy_attr
 
 
 def save(checkpoint, path):

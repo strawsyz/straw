@@ -3,7 +3,7 @@ from torch import optim
 
 from base.base_logger import BaseLogger
 from configs.net_config import NetConfig
-from utils.utils_ import copy_attr
+from utils.common_utils import copy_attr
 
 
 class BaseNet(BaseLogger):

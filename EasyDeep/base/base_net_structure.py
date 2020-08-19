@@ -2,7 +2,7 @@ from base_logger import BaseLogger
 from torch import nn
 from torch import optim
 
-from utils.utils_ import copy_attr
+from utils.common_utils import copy_attr
 
 
 class BaseNetStructure(BaseLogger):

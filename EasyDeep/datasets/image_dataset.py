@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader
 
 from base.base_dataset import BaseDataSet
 from configs.dataset_config import ImageDataSetConfig
-from utils.utils_ import copy_attr
+from utils.common_utils import copy_attr
 
 """
 mask图像和原图像两个文件夹
@@ -76,7 +76,7 @@ class ImageDataSet(BaseDataSet):
                 self.num_test = len(self)
             self.test_loader = DataLoader(self, batch_size=self.batch_size4test, shuffle=True)
 
-        from utils.utils_ import copy_attr
+        from utils.common_utils import copy_attr
         copy_attr(self, target)
 
     def load_config(self):
@@ -195,7 +195,7 @@ class ImageDataSet4Edge(BaseDataSet):
                 self.num_test = len(self)
             self.test_loader = DataLoader(self, batch_size=self.batch_size4test, shuffle=True)
 
-        from utils.utils_ import copy_attr
+        from utils.common_utils import copy_attr
         copy_attr(self, target)
 
     def __len__(self):
