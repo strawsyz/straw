@@ -276,6 +276,44 @@ class DeepExperiment(BaseExperiment):
         assert self.is_pretrain == False
         self.train(max_try_times)
 
+    def grid_train(experiment, configs: dict):
+        best_score = None
+        best_config = None
+        all_configs = []
+        haved_key = []
+
+        def sort_config(configs, current_config=[]):
+            if len(current_config) == len(configs):
+                all_configs.append(current_config.copy())
+                return
+
+            def get_config_key():
+                for key in list(configs.keys()):
+                    if key not in haved_key:
+                        haved_key.append(key)
+                        return key
+
+            key = get_config_key()
+            for value in configs[key]:
+                current_config.append("{}:{}".format(key, value))
+                sort_config(configs, current_config)
+                current_config.remove("{}:{}".format(key, value))
+            haved_key.remove(key)
+
+        all_configs = sort_config(configs)
+        for config_pattern in all_configs:
+            for setting in config_pattern:
+                attr, value = setting.split(":")
+                setattr(experiment, attr, value)
+
+            best_score_experiment = experiment.train_new_network()
+            if best_score is None or best_score < best_score_experiment:
+                best_score = best_score_experiment
+                best_config = config_pattern
+
+        # todo 建立表格的显示形式
+        return best_config, best_score
+
 
 if __name__ == '__main__':
     experiment = DeepExperiment()

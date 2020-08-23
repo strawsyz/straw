@@ -13,8 +13,8 @@ class Experiment(DeepExperiment):
     def __init__(self, config_instance=ImageSegmentationConfig()):
         super(Experiment, self).__init__(config_instance)
 
-    def test(self, debug_mode=False, save_predict_result=False):
-        super(Experiment, self).test(debug_mode)
+    def test(self, prepare_dataset=True, prepare_net=True, save_predict_result=False):
+        super(Experiment, self).test(prepare_dataset, prepare_net)
         self.logger.info("=" * 10 + " test start " + "=" * 10)
         pps = 0
         loss = 0
@@ -114,6 +114,7 @@ class Experiment(DeepExperiment):
                 self.logger.info("================{}=================".format(save_path))
 
 
+
 if __name__ == '__main__':
     from configs.experiment_config import ImageSegmentationConfig
 
@@ -121,6 +122,9 @@ if __name__ == '__main__':
     # experiment.predict_all_data()
     # experiment.sample_test()
     experiment.train(max_try_times=8)
+
+    configs = {"lr": [0.01, 0.001, 0.0003]}
+
     # experiment.test(save_predict_result=True)
     # experiment.estimate(use_log10=True)
 # /home/straw/Downloads/models/polyp/history/history_1596127749.pth
