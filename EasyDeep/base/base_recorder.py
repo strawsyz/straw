@@ -1,3 +1,6 @@
+import torch
+
+
 class EpochRecord:
     """记录一个epoch的训练结果"""
 
@@ -29,26 +32,10 @@ class ExperimentRecord:
         self.epoch_records[epoch] = epoch_record
 
     def save(self, save_path):
-        import torch
         torch.save(self, save_path)
-        # print(self.__class__)
 
     def load(self, save_path):
-        import torch
         return torch.load(save_path)
-        # return torch.load(save_path)
-        # te = (te.__class__())
-        # print(te.epoch_records)
-
-        # print(te.__dict__)
-
-
-if __name__ == '__main__':
-    er = ExperimentRecord()
-    # er.save("1.pkl")
-    er = er.load("C:\data_analysis\models\history_08-08_15-05-21.pth")
-    print(er.config_info)
-    print(er.epoch_records)
 
 
 class CustomEpochRecord(EpochRecord):

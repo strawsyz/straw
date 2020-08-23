@@ -70,17 +70,3 @@ def _remove_margin(image_array, margin):
     return image_array[margin:-margin, margin:-margin, :]
 
 
-if __name__ == '__main__':
-    # image = cv2.imread("3.png", cv2.IMREAD_GRAYSCALE)
-    # print(image.shape)  # 获取图像的形状，返回值是一个包含行数、列数、通道数的元组。
-    # print(image.size)  # 获得图像的像素数目。
-    # print(image.dtype)  # 获得图像的数据类型。
-    # gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    # print(gray_image.shape)  # 获取图像的形状，返回值是一个包含行数、列数、通道数的元组。
-    # print(gray_image.size)  # 获得图像的像素数目。
-    # print(gray_image.dtype)  # 获得图像的数据类型。
-    # cv2.imwrite("3.png", gray_image)
-    image = find_contours("tmp_bi.png")
-
-    image = Image.fromarray(image)
-    image.show()

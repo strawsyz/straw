@@ -27,7 +27,7 @@ class DeepExperiment(BaseExperiment):
         self.is_use_gpu = None
         self.history_save_dir = None
         self.history_save_path = None
-        self.model_save_path = ""
+        self.model_save_path = None
         self.model_selector = None
         self.is_pretrain = None
         self.pretrain_path = None
@@ -76,7 +76,7 @@ class DeepExperiment(BaseExperiment):
             record = self.recorder(train_loss=train_loss)
         return record
 
-    def train(self, max_try_times=None, debug_mode=False):
+    def train(self, max_try_times=None, prepare_dataset=True, prepare_net=True):
         """
 
         :param max_try_times: 一定回数loss没有下降的话，就停止训练。
@@ -84,34 +84,47 @@ class DeepExperiment(BaseExperiment):
         """
         if self.model_selector is None and max_try_times is not None:
             self.logger.warning("you have not set a model_selector!")
-        if not debug_mode:
+        if not prepare_dataset:
             self.prepare_dataset()
+        if not prepare_net:
             self.prepare_net()
         self.logger.info("================training start=================")
         try_times = 1
+        # best_score_models = {}
+        self.best_score_models = None
         for epoch in range(self.current_epoch, self.current_epoch + self.num_epoch):
             start_time = time.time()
             record = self.train_valid_one_epoch(epoch)
 
             self.scores_history[epoch] = record
-            if not self.save(epoch, record):
+            need_save, best_score_models, model_save_path = self.save(epoch, record)
+            self.best_score_models = best_score_models
+            if best_score_models != {}:
+                for score_name in best_score_models.keys():
+                    score = best_score_models[score_name]
+                    self.logger.info("{} is best socre of {}, saved at {}".format(score.score, score_name,
+                                                                                  score.model_path))
+
+            if not need_save:
                 try_times += 1
             else:
                 try_times = 0
             if max_try_times is not None and max_try_times < try_times:
                 break
             self.logger.info("use {} seconds in the epoch".format(int(time.time() - start_time)))
-        self.logger.info("================training is over=================")
-        # todo 返回训练获得的最佳模型的路径和历史保存路径
-        return self.history_save_path
 
-    def test(self, debug_mode=False):
+        self.logger.info("================training is over=================")
+        return self.best_score_models["valid_loss"].score if self.best_score_models is not None else None
+
+    def test(self, prepare_dataset=True, prepare_net=True):
         if self.is_pretrain is False:
             self.logger.warning("need to set pretrain is True!")
             raise RuntimeError
-        if not debug_mode:
-            self.prepare_dataset(testing=True)
+        if prepare_dataset:
+            self.prepare_net(testing=True)
+        if prepare_net:
             self.prepare_net()
+
         self.net.eval()
         file_utils.make_directory(self.result_save_path)
         #     todo 提取为注解，分别设置，before_test, after_test两个，train也同理
@@ -140,14 +153,14 @@ class DeepExperiment(BaseExperiment):
             self._save_model(epoch, model_save_path)
             return True
         else:
-            is_need_save, need_reason = self.model_selector.add_record(record, model_save_path)
+            is_need_save, need_reason, best_socre_models = self.model_selector.add_record(record, model_save_path)
             if is_need_save:
                 self.logger.info("save this model for {} is better".format(need_reason))
                 self._save_model(epoch, model_save_path)
-                return True
+                return is_need_save, best_socre_models, model_save_path
             else:
                 self.logger.info("the eppoch's result is not good, not save")
-                return False
+                return is_need_save, best_socre_models, model_save_path
 
     def _save_model(self, epoch, model_save_path):
         self.logger.info("==============saving model data===============")
@@ -185,12 +198,13 @@ class DeepExperiment(BaseExperiment):
         experiment_record.save(self.history_save_path)
         self.logger.info("=" * 10 + " saved experiment history at {}".format(self.history_save_path) + "=" * 10)
 
-    def load_history(self,is4train=False):
+    def load_history(self, is4train=False):
         """
         load history data
         :param is4train: 如果是为了训练数据的话
         :return:
         """
+        experiment_record = None
         if hasattr(self, "history_save_path") and self.history_save_path is not None and self.history_save_path != "":
             if os.path.isfile(self.history_save_path):
                 self.logger.info("=" * 10 + " loading history" + "=" * 10)
@@ -239,10 +253,9 @@ class DeepExperiment(BaseExperiment):
     def sample_test(self, n_sample=3, epoch=3):
         cur_epoch = self.num_epoch
         self.dataset.get_samle_dataloader(num_samples=n_sample, target=self)
-        # self.dataset.get_dataloader(self)
         self.num_epoch = epoch
-        self.train(test=True)
-        self.test(test=True)
+        self.train(prepare_dataset=False)
+        self.test(prepare_dataset=False)
         self.estimate()
         self.num_epoch = cur_epoch
 
@@ -259,16 +272,15 @@ class DeepExperiment(BaseExperiment):
         else:
             return data
 
-
-class FNNExperiment(DeepExperiment):
-    def __init__(self, config):
-        super(FNNExperiment, self).__init__(config_instance=config)
+    def train_new_network(self, max_try_times=None):
+        assert self.is_pretrain == False
+        self.train(max_try_times)
 
 
 if __name__ == '__main__':
     experiment = DeepExperiment()
     # experiment.test()
     # experiment.estimate()
-    experiment.train()
+    best_score = experiment.train()
     # experiment.save_history()
     # print("end")

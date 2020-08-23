@@ -171,11 +171,11 @@ class ImageSegmentationConfig(BaseExperimentConfig):
         self.dataset = ImageDataSet4Edge(self.dataset_config)
 
     def set_model_selector(self):
-        from base.base_model_selector import BaseSelector, ScoreModel
+        from base.base_model_selector import BaseModelSelector, ScoreModel
         score_models = []
         score_models.append(ScoreModel("train_loss", bigger_better=False))
         score_models.append(ScoreModel("valid_loss", bigger_better=False))
-        self.model_selector = BaseSelector(score_models)
+        self.model_selector = BaseModelSelector(score_models)
 
 
 class FNNConfig(BaseExperimentConfig):
@@ -225,7 +225,7 @@ class FNNConfig(BaseExperimentConfig):
 
     def set_model_selector(self):
         # model selector
-        from base.base_model_selector import BaseSelector
-        self.model_selector = BaseSelector()
+        from base.base_model_selector import BaseModelSelector
+        self.model_selector = BaseModelSelector()
         self.model_selector.regist_score_model("train_loss", bigger_better=False)
         self.model_selector.regist_score_model("valid_loss", bigger_better=False)

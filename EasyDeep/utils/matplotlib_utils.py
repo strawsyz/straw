@@ -38,20 +38,3 @@ def boxplot(x_labels, data_list, base_color="#539caf", median_color="#297083", x
 def show():
     plt.show()
 
-
-if __name__ == '__main__':
-    from datasets.csv_dataset import CsvDataSet
-    from configs.dataset_config import CSVDataSetConfig
-
-    dataset = CsvDataSet(config_instance=CSVDataSetConfig())
-    dataset.get_dataloader(dataset)
-    lineplot([dataset.hm_delay, dataset.hm_early, dataset.wr / 10],
-             labels=["hm_delay", "hm_early", "wr"], title="analysis")
-
-    # boxplot(["hm_delay", "hm_early", "wr/10"],  [dataset.hm_delay.squeeze(), dataset.hm_early.squeeze(), dataset.wr.squeeze() / 10])
-
-    # x_data = [range(len(dataset.X[0]))]
-    # y_data = dataset.X[0].reshape(8, 5000)
-    # print(y_data[0], y_data[1])
-    # lineplot(y_data)
-    show()

@@ -141,7 +141,7 @@ def grid_usage():
                                        'max_iter': [10000]})
 
 
-def averageweight_usage():
+def average_weight_usage():
     X = np.random.randn(100, 10)
     Y = np.random.randn(100)
     # 制定每个算法的参数

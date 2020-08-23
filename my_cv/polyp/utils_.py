@@ -2,6 +2,8 @@ import os
 
 import h5py
 from matplotlib import pyplot as plt
+import numpy as np
+from PIL import Image
 
 
 def data_preprocess():
@@ -97,16 +99,6 @@ def split(data_path, train_rate=0.7):
     for path in data_paths[num_train:]:
         os.rename(path,
                   os.path.join(test_data_path, path.split("/")[-1]))
-
-
-def create_support_image(image_path, target_dir):
-    """
-    创建原图像的边缘图像
-    :param image_path:
-    :param target_dir:
-    :return:
-    """
-    pass
 
 
 def check_same(dir1, dir2):
