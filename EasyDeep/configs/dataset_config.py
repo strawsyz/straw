@@ -88,7 +88,7 @@ class ImageDataSet4EdgeConfig:
             transforms.ToTensor(),
         ])
         # dataloader
-        self.random_state = 0
+        self.random_state = 77
         self.test_rate = 0.2
         import os
         num_samples = len(os.listdir(self.mask_path))

@@ -100,7 +100,66 @@ class FCN(nn.Module):
         return out
 
 
-class FCN4Edge(nn.Module):
+class FCN4Edge_3(nn.Module):
+    def __init__(self, n_out=4, is_init=False):
+        """
+        网络初始化，特点输出结果的图像大小和输入图像的是一样的
+        :param n_out: 输出结果的频道数。
+        """
+        super(FCN4Edge_3, self).__init__()
+        self.encoder_0 = ConvBnReLU(2, 3, is_init=is_init)
+        # 在VGG的基础上建立，使用VGG的结构
+        vgg = vgg16_bn(pretrained=False)
+        # 编码器
+        self.encoder0_1 = vgg.features[:7]
+        self.encoder0_2 = vgg.features[7:14]
+        self.encoder0_3 = vgg.features[14:24]
+        self.encoder0_4 = vgg.features[24:34]
+        self.encoder0_5 = vgg.features[34:]
+
+        self.encoder1_1 = vgg.features[:7]
+        self.encoder1_2 = vgg.features[7:14]
+        self.encoder1_3 = vgg.features[14:24]
+        self.encoder1_4 = vgg.features[24:34]
+        self.encoder1_5 = vgg.features[34:]
+        # 解码器
+        self.decoder_1 = Deconv(512, 512, is_init)
+        self.decoder_2 = Deconv(512, 256, is_init)
+        self.decoder_3 = Deconv(256, 128, is_init)
+        self.decoder_4 = Deconv(128, 64, is_init)
+        self.decoder_5 = Deconv(64, n_out, is_init)
+
+    def forward(self, x):
+        image = x[:, :3]
+        other = x[:, 3:]
+
+        # print(id(self.encoder0_1) == id(self.encoder1_1))
+
+        # 编码器部分
+        out_0 = self.encoder_0(other)
+
+        out_1 = self.encoder0_1(out_0)
+        out_2 = self.encoder0_2(out_1)
+        out_3 = self.encoder0_3(out_2)
+        out_4 = self.encoder0_4(out_3)
+        out_5 = self.encoder0_5(out_4)
+
+        image_out_1 = self.encoder1_1(image)
+        image_out_2 = self.encoder1_2(image_out_1)
+        image_out_3 = self.encoder1_3(image_out_2)
+        image_out_4 = self.encoder1_4(image_out_3)
+        image_out_5 = self.encoder1_5(image_out_4)
+
+        # 解码器部分
+        decoder_1 = self.decoder_1(out_5 + image_out_5)
+        decoder_2 = self.decoder_2(decoder_1 + out_4 + image_out_4)
+        decoder_3 = self.decoder_3(decoder_2 + out_3 + image_out_3)
+        decoder_4 = self.decoder_4(decoder_3 + out_2 + image_out_2)
+        out = self.decoder_5(decoder_4 + out_1 + image_out_1)
+        return out
+
+
+class FCN4Edge_2(nn.Module):
     def __init__(self, n_out=4, is_init=False):
         """
         网络初始化，特点输出结果的图像大小和输入图像的是一样的
@@ -159,7 +218,7 @@ class FCN4Edge(nn.Module):
         return out
 
 
-class FCN4Edge_1(nn.Module):
+class FCN4Edge(nn.Module):
     def __init__(self, n_in=5, n_out=4, is_init=False):
         """
         网络初始化，特点输出结果的图像大小和输入图像的是一样的

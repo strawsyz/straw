@@ -102,7 +102,7 @@ class ImageSegmentationConfig(BaseExperimentConfig):
         elif self._system == "Linux":
             self.num_epoch = 1000
             self.is_use_gpu = True
-            self.is_pretrain = False
+            self.is_pretrain = True
             self.history_save_dir = "/home/straw/Downloads/models/polyp/history"
             # STEP 2
             # self.history_save_path = '/home/straw/Downloads/models/polyp/history/history_1596504981.pth'
@@ -111,7 +111,8 @@ class ImageSegmentationConfig(BaseExperimentConfig):
             # use edge
             # self.history_save_path = '/home/straw/Downloads/models/polyp/history/history_1596849406.pth'
             # self.history_save_path = "/home/straw/Downloads/models/polyp/history/history_1596889557.pth"
-            self.history_save_path = "/home/straw/Downloads/models/polyp/history/history_08-14_09-24-44.pth"
+            # self.history_save_path = "/home/straw/Downloads/models/polyp/history/history_08-14_09-24-44.pth"
+            self.history_save_path = '/home/straw/Downloads/models/polyp/history/history_1597107957.pth'
             # use new network two input one output
             # todo 覆盖保存历史记录的时候也许需要提醒一下
             # self.history_save_path = "/home/straw/Downloads/models/polyp/history/history1595211050.pth"
@@ -129,6 +130,9 @@ class ImageSegmentationConfig(BaseExperimentConfig):
             # use edge
             self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-08-08/ep82_13-44-27.pkl'
             self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-08-09/ep61_00-00-39.pkl'
+
+            # return old way
+            self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-08-11/ep77_13-22-08.pkl'
             # INFO]<2020-08-07 03:12:55,755> { EPOCH:68	 train_loss:0.284118 }
             # [INFO]<2020-08-07 03:13:11,073> { Epoch:68	 valid_loss:0.345331 }
             # [INFO]<2020-08-07 03:13:11,073> { ========== saving history========== }
@@ -221,7 +225,6 @@ class FNNConfig(BaseExperimentConfig):
         from configs.dataset_config import CSVDataSetConfig
         self.dataset_config = CSVDataSetConfig()
         # need set  a dataset
-
 
     def set_model_selector(self):
         # model selector

@@ -28,7 +28,7 @@ class FCNNet4EdgeConfig(NetConfig):
         super(FCNNet4EdgeConfig, self).__init__()
         self.is_init = True
         self.weight_decay = None
-
+        self.lr = 0.001
 
 
 class FNNNetConfig(NetConfig):
