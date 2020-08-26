@@ -1,13 +1,11 @@
 from base.base_net import BaseNet
-from net_structures.BaseFNN import MyFNN
+from net_structures.FNN import MyFNN
+from configs.net_config import FNNNetConfig
 
 
-class FNNNet(BaseNet):
-    def __init__(self, config_instance=None):
-        super(FNNNet, self).__init__(config_instance)
+class FNNNet(FNNNetConfig, BaseNet):
+    def __init__(self):
+        super(FNNNet, self).__init__()
         self.net = MyFNN(n_in=self.n_in, n_out=self.n_out)
 
 
-if __name__ == '__main__':
-    net = FNNNet()
-    net.unit_test()

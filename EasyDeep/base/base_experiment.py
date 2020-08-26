@@ -44,18 +44,16 @@ class BaseExperiment(BaseLogger, ConfigChecker):
         raise NotImplementedError
 
     def save(self):
-        # 保存模型
-        # 保存其他参数
-        pass
+        raise NotImplementedError
 
     def load(self):
-        pass
+        raise NotImplementedError
 
     def show_history(self):
         raise NotImplementedError
 
     def check(self):
-        # 检查输入图像的形状
+        # todo 检查输入图像的形状
         # 配置文件是否正确
         raise NotImplementedError
 

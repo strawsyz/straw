@@ -44,3 +44,11 @@ class CNN1DNetConfig(NetConfig):
     def __init__(self):
         super(CNN1DNetConfig, self).__init__()
         self.loss_func_name = "MSE"
+
+
+class MnistConfig(NetConfig):
+    def __init__(self):
+        super(MnistConfig, self).__init__()
+        self.n_in = 28 * 28
+        self.n_out = 10
+        self.loss_func_name = "MSE"

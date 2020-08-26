@@ -8,6 +8,7 @@ from torch.utils.data import DataLoader
 from base.base_dataset import BaseDataSet
 from configs.dataset_config import ImageDataSetConfig
 from utils.common_utils import copy_attr
+from utils.common_utils import copy_need_attr
 
 """
 mask图像和原图像两个文件夹
@@ -15,7 +16,7 @@ mask图像和原图像两个文件夹
 """
 
 
-class ImageDataSet(BaseDataSet):
+class ImageDataSet(BaseDataSet, ImageDataSetConfig):
 
     def __init__(self, config_instance=None):
         super(ImageDataSet, self).__init__(config_instance)
@@ -33,7 +34,7 @@ class ImageDataSet(BaseDataSet):
             self.image_paths.append(os.path.join(self.image_path, file_name))
             self.mask_paths.append(os.path.join(self.mask_path, file_name))
 
-    def get_samle_dataloader(self, num_samples, target):
+    def get_sample_dataloader(self, num_samples, target):
         self.image_paths, self.mask_paths = self.IMAGE_PATHS[:num_samples * 3], self.MASK_PATHS[:num_samples * 3]
         self.train_data, self.val_data, self.test_data = torch.utils.data.random_split(self,
                                                                                        [num_samples,
@@ -42,11 +43,10 @@ class ImageDataSet(BaseDataSet):
         self.train_loader = DataLoader(self.train_data, batch_size=self.batch_size, shuffle=True)
         self.val_loader = DataLoader(self.val_data, batch_size=self.batch_size, shuffle=True)
         self.test_loader = DataLoader(self.test_data, batch_size=self.batch_size4test, shuffle=True)
-        self.copy_attr(target, ["val_loader", "train_loader", "test_loader"])
+        copy_need_attr(target, ["val_loader", "train_loader", "test_loader"])
 
-    def copy_attr(self, target, attr_names):
-        for attr_name in attr_names:
-            setattr(target, attr_name, getattr(self, attr_name))
+    def train(self):
+        super().train()
 
     def get_dataloader(self, target):
         if not self.test_model:
@@ -57,6 +57,10 @@ class ImageDataSet(BaseDataSet):
                     self.num_train = len(self)
             else:
                 self.num_train = len(self.train_data)
+            if self.val_data is None or int(self.num_train * self.valid_rate) == 0:
+                self.num_train = 0
+            else:
+                self.num_train = int(self.num_train * self.valid_rate)
             if self.valid_rate is None:
                 self.train_loader = DataLoader(self, batch_size=self.batch_size, shuffle=True)
                 return self.train_loader
@@ -76,7 +80,6 @@ class ImageDataSet(BaseDataSet):
                 self.num_test = len(self)
             self.test_loader = DataLoader(self, batch_size=self.batch_size4test, shuffle=True)
 
-        from utils.common_utils import copy_attr
         copy_attr(self, target)
 
     def load_config(self):
@@ -106,7 +109,10 @@ class ImageDataSet(BaseDataSet):
             self.image_paths, self.mask_paths = self.IMAGE_PATHS[:num], self.MASK_PATHS[:num]
 
 
-class ImageDataSet4Test(BaseDataSet):
+from configs.dataset_config import ImageDataSet4TestConfig
+
+
+class ImageDataSet4Test(BaseDataSet, ImageDataSet4TestConfig):
 
     def __init__(self, config_instance=None):
         super(ImageDataSet4Test, self).__init__(config_instance)
@@ -137,7 +143,10 @@ class ImageDataSet4Test(BaseDataSet):
         return image, os.path.basename(self.image_paths[index])
 
 
-class ImageDataSet4Edge(BaseDataSet):
+from configs.dataset_config import ImageDataSet4EdgeConfig
+
+
+class ImageDataSet4Edge(BaseDataSet, ImageDataSet4EdgeConfig):
 
     def __init__(self, config_instance=None):
         super(ImageDataSet4Edge, self).__init__(config_instance)

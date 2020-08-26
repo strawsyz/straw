@@ -2,10 +2,9 @@ class ScoreModel:
     def __init__(self, name, bigger_better=True, best_num=1, desciption=None):
         self.name = name
         from collections import namedtuple
-        self.best_score_bean = namedtuple(["socre", "model_path"])
+        self.best_score_bean = namedtuple("BestModel",["socre", "model_path"])
         self.bigger_better = bigger_better
         self.best_num = best_num
-        # 目前排名前几的分数，根据情况有可能里面不存在最佳的训练结果
         self.best_scores = {}
         self.description = desciption
         self.best_score = None
@@ -54,7 +53,6 @@ class ScoreModel:
 class BaseModelSelector:
     def __init__(self, score_models: list = None, best_num=1):
         super(BaseModelSelector, self).__init__()
-        # 每个分数保留前5名的模型
         self.best_num = best_num
         self.strict = False
         self.score_models = {}

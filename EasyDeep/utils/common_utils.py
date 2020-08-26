@@ -1,4 +1,3 @@
-
 # 调用之后只执行一次
 class cached_property:
     def __init__(self, func):
@@ -10,8 +9,6 @@ class cached_property:
         val = self.func(instance)
         setattr(instance, self.func.__name__, val)
         return val
-        # value = instance.__dict__[self.func.__name__] = self.func(instance)
-        # return value
 
 
 def copy_attr(source, target):
@@ -29,4 +26,3 @@ def copy_attr(source, target):
 def copy_need_attr(self, target, attr_names):
     for attr_name in attr_names:
         setattr(target, attr_name, getattr(self, attr_name))
-

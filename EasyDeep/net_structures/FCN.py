@@ -4,7 +4,6 @@ from torchvision.models import vgg16_bn
 
 
 class Deconv(nn.Module):
-    # 上采样用的编码器
     def __init__(self, in_n, out_n, is_init=False):
         super(Deconv, self).__init__()
         self.model = nn.Sequential(nn.ConvTranspose2d(
@@ -13,7 +12,6 @@ class Deconv(nn.Module):
             nn.ReLU(inplace=True),
         )
         if is_init:
-            # 初始化网络的参数
             self.init_weight()
 
     def forward(self, x):

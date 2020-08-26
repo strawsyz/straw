@@ -53,6 +53,10 @@ class Logger:
         return cls.logger
 
 
+def get_logger():
+    return Logger.get_logger()
+
+
 if __name__ == '__main__':
     logger1 = Logger.get_logger()
     logger2 = Logger.get_logger()

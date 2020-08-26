@@ -144,6 +144,15 @@ class CSVDataSetConfig:
         self.batch_size4test = 1
 
 
+class MNISTDatasetConfig:
+    def __init__(self):
+        self.dataset_path = "C:\data_analysis\datasets\mnist"
+        self.shuffle = True
+        self.batch_size = 1
+        self.batch_size_4_test = 32
+        self.valid_rate = 0.2
+
+
 if __name__ == '__main__':
     a = ImageDataSetConfig()
     print(a)

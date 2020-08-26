@@ -1,8 +1,8 @@
 import os
-import pickle
 import time
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 
+import torch
 from torch.autograd import Variable
 
 from base.base_checkpoint import CustomCheckPoint
@@ -13,7 +13,7 @@ from utils.matplotlib_utils import lineplot
 from utils.net_utils import save, load
 
 
-class DeepExperiment(BaseExperiment):
+class DeepExperiment(ABC, BaseExperiment):
 
     def __init__(self, config_instance=None):
         self.current_epoch = 0
@@ -84,9 +84,9 @@ class DeepExperiment(BaseExperiment):
         """
         if self.model_selector is None and max_try_times is not None:
             self.logger.warning("you have not set a model_selector!")
-        if not prepare_dataset:
+        if prepare_dataset:
             self.prepare_dataset()
-        if not prepare_net:
+        if prepare_net:
             self.prepare_net()
         self.logger.info("================training start=================")
         try_times = 1
@@ -260,7 +260,6 @@ class DeepExperiment(BaseExperiment):
         self.num_epoch = cur_epoch
 
     def prepare_data(self, data, data_type=None):
-        import torch
         data = Variable(data)
         if data_type == "float":
             data = data.float()

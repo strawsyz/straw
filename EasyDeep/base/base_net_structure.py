@@ -36,7 +36,6 @@ class BaseNetStructure(BaseLogger):
             self.optimizer = optim.SGD(self.net.parameters(), lr=self.lr)
         self.scheduler = optim.lr_scheduler.StepLR(self.optimizer, step_size=self.scheduler_step_size,
                                                    gamma=self.scheduler_gamma)
-        return
 
     def view_net_structure(self, x, file_name=None):
         from torchviz import make_dot

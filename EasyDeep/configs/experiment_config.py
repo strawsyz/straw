@@ -1,11 +1,12 @@
 import platform
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 
 from base.base_recorder import EpochRecord
 from utils.time_utils import get_time4filename
+from base.base_logger import BaseLogger
 
 
-class BaseExperimentConfig:
+class BaseExperimentConfig(ABC, BaseLogger):
     def __init__(self):
         self.use_prettytable = False
         self._system = platform.system()
@@ -14,15 +15,15 @@ class BaseExperimentConfig:
 
     @abstractmethod
     def set_dataset(self):
-        raise NotImplementedError
+        pass
 
     @abstractmethod
     def set_net(self):
-        raise NotImplementedError
+        pass
 
     @abstractmethod
     def set_model_selector(self):
-        raise NotImplementedError
+        pass
 
     def __repr__(self):
         delimiter = "↓" * 50
@@ -225,6 +226,52 @@ class FNNConfig(BaseExperimentConfig):
         from configs.dataset_config import CSVDataSetConfig
         self.dataset_config = CSVDataSetConfig()
         # need set  a dataset
+
+    def set_model_selector(self):
+        # model selector
+        from base.base_model_selector import BaseModelSelector
+        self.model_selector = BaseModelSelector()
+        self.model_selector.regist_score_model("train_loss", bigger_better=False)
+        self.model_selector.regist_score_model("valid_loss", bigger_better=False)
+
+
+class MnistConfig(BaseExperimentConfig):
+
+    def __init__(self):
+        super(MnistConfig, self).__init__()
+        self.recorder = EpochRecord
+        self.set_net()
+        self.set_dataset()
+        self.set_model_selector()
+        self.current_epoch = 0
+        self.num_epoch = 500
+        self.recorder = EpochRecord
+        from base.base_recorder import ExperimentRecord
+        self.experiment_record = ExperimentRecord
+
+        self.history_save_dir = ""
+        self.model_save_path = ""
+        self.result_save_path = ""
+
+        self.is_pretrain = False
+        self.is_use_gpu = False
+        self.use_prettytable = False
+
+        self.init_attr()
+
+    def set_net(self):
+        from nets.MnistNet import MnistNet
+        from configs.net_config import MnistConfig
+        self.net_config = MnistConfig()
+        self.net = MnistNet()
+
+    def set_dataset(self):
+        # dataset
+        from configs.dataset_config import CSVDataSetConfig
+        self.dataset_config = CSVDataSetConfig()
+        # need set  a dataset
+        from datasets.mnist_dataset import MNISTDataset
+        self.dataset = MNISTDataset()
 
     def set_model_selector(self):
         # model selector

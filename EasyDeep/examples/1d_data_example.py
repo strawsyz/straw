@@ -4,7 +4,7 @@ from configs.experiment_config import FNNConfig as experiment_config
 from experiments.deep_experiment import DeepExperiment
 
 
-# 一维数据的回归任务
+# Regression task of one-dimensional data
 class Experiment(DeepExperiment):
     def __init__(self, config_instance=experiment_config()):
         super(Experiment, self).__init__(config_instance)

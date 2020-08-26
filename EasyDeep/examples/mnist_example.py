@@ -7,14 +7,17 @@ from torch.autograd import Variable
 
 from configs.experiment_config import ImageSegmentationConfig
 from experiments.deep_experiment import DeepExperiment
+from configs.experiment_config import MnistConfig
+from utils.log_utils import get_logger
 
 
-class ImageExperiment(DeepExperiment):
-    def __init__(self, config_instance=ImageSegmentationConfig()):
-        super(ImageExperiment, self).__init__(config_instance)
+class MnistExperiment(MnistConfig, DeepExperiment):
+    def __init__(self):
+        super(MnistExperiment, self).__init__()
+        self.logger = get_logger()
 
     def test(self, prepare_dataset=True, prepare_net=True, save_predict_result=False):
-        super(ImageExperiment, self).test(prepare_dataset, prepare_net)
+        super(MnistExperiment, self).test(prepare_dataset, prepare_net)
         self.logger.info("=" * 10 + " test start " + "=" * 10)
         pps = 0
         loss = 0
@@ -32,7 +35,6 @@ class ImageExperiment(DeepExperiment):
     def test_one_batch(self, image, mask, image_name, save_predict_result=False):
         image = self.prepare_data(image)
         mask = self.prepare_data(mask)
-        # self.optimizer.zero_grad()
         start_time = time.time()
         out = self.net(image)
         end_time = time.time()
@@ -56,19 +58,23 @@ class ImageExperiment(DeepExperiment):
     def train_one_epoch(self, epoch):
         self.net.train()
         train_loss = 0
-        for image, mask in self.train_loader:
-            if self.is_use_gpu:
-                image, mask = Variable(image.cuda()), Variable(mask.cuda())
-            else:
-                image, mask = Variable(image), Variable(mask)
-
+        num_iter = 300
+        for idx_iter, (image, label) in enumerate(self.train_loader):
+            ones = torch.sparse.torch.eye(10)
+            label = ones.index_select(0, label)
+            batch_size = len(image)
+            image = image.reshape(batch_size, -1)
+            image = self.prepare_data(image, "float")
+            label = self.prepare_data(label, "float")
             self.optimizer.zero_grad()
             out = self.net(image)
-            loss = self.loss_function(out, mask)
+            # out = torch.max(out, 1).indices
+            loss = self.loss_function(out, label)
             loss.backward()
             self.optimizer.step()
             train_loss += loss.data
-            # print(loss.data)
+            if idx_iter % num_iter == 0:
+                self.logger.info("loss is {:.6f}, num_iter is {}".format(train_loss / (idx_iter + 1), idx_iter))
         train_loss = train_loss / len(self.train_loader)
         self.scheduler.step()
         self.logger.info("EPOCH:{}\t train_loss:{:.6f}".format(epoch, train_loss))
@@ -114,11 +120,10 @@ class ImageExperiment(DeepExperiment):
                 self.logger.info("================{}=================".format(save_path))
 
 
-
 if __name__ == '__main__':
     from configs.experiment_config import ImageSegmentationConfig
 
-    experiment = ImageExperiment(ImageSegmentationConfig())
+    experiment = MnistExperiment()
     # experiment.predict_all_data()
     # experiment.sample_test()
     experiment.train(max_try_times=8)
