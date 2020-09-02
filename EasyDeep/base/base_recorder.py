@@ -35,6 +35,14 @@ class ExperimentRecord:
         torch.save(self, save_path)
 
     def load(self, save_path):
+        # import pickle
+        # with open(save_path, mode="rb+") as f:
+        #     obj = pickle.load(f)
+        #     print(dir(obj))
+        #     for key in obj:
+        #         print("{}:{}".format(key, obj[key]))
+        #     return obj
+
         return torch.load(save_path)
 
 

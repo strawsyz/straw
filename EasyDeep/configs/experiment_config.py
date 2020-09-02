@@ -113,7 +113,7 @@ class ImageSegmentationConfig(BaseExperimentConfig):
             # self.history_save_path = '/home/straw/Downloads/models/polyp/history/history_1596849406.pth'
             # self.history_save_path = "/home/straw/Downloads/models/polyp/history/history_1596889557.pth"
             # self.history_save_path = "/home/straw/Downloads/models/polyp/history/history_08-14_09-24-44.pth"
-            self.history_save_path = '/home/straw/Downloads/models/polyp/history/history_1597107957.pth'
+            # self.history_save_path = '/home/straw/Downloads/models/polyp/history/history_1597107957.pth'
             # use new network two input one output
             # todo 覆盖保存历史记录的时候也许需要提醒一下
             # self.history_save_path = "/home/straw/Downloads/models/polyp/history/history1595211050.pth"
@@ -125,15 +125,21 @@ class ImageSegmentationConfig(BaseExperimentConfig):
             # self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-08-01/ep410_00-30-36.pkl'
             # step two
             # self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-08-03/ep395_14-37-02.pkl'
-            self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-08-05/ep241_00-36-43.pkl'
-            # not use edge
-            self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-08-07/ep68_03-13-11.pkl'
-            # use edge
-            self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-08-08/ep82_13-44-27.pkl'
-            self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-08-09/ep61_00-00-39.pkl'
-
-            # return old way
-            self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-08-11/ep77_13-22-08.pkl'
+            # self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-08-05/ep241_00-36-43.pkl'
+            # # not use edge
+            # self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-08-07/ep68_03-13-11.pkl'
+            # # use edge
+            # self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-08-08/ep82_13-44-27.pkl'
+            # self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-08-09/ep61_00-00-39.pkl'
+            #
+            # # return old way
+            # self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-08-11/ep77_13-22-08.pkl'
+            #
+            #
+            # # step 1
+            # self.pretrain_path = r'/home/straw/Downloads/models/polyp/2020-08-01/ep410_00-30-36.pkl'
+            self.pretrain_path = "/home/straw/Downloads/models/polyp/2020-08-11/ep77_13-22-08.pkl"
+            # self.pretrain_path = r"/home/straw/Downloads/models/polyp/2020-08-07/ep68_03-13-11.pkl"
             # INFO]<2020-08-07 03:12:55,755> { EPOCH:68	 train_loss:0.284118 }
             # [INFO]<2020-08-07 03:13:11,073> { Epoch:68	 valid_loss:0.345331 }
             # [INFO]<2020-08-07 03:13:11,073> { ========== saving history========== }
@@ -149,18 +155,20 @@ class ImageSegmentationConfig(BaseExperimentConfig):
 
     def set_net(self):
         # STEP 1 use source image to predict mask image
+        # from nets.FCNNet import FCNNet
         # from configs.net_config import FCNNetConfig
         # self.net_config = FCNNetConfig()
-        # self.net = FCNNet(self.net_config)
+        # self.net = FCNNet()
 
         # STEP 2 USE predict result in step 1 and edge image to predict image
         from configs.net_config import FCNNet4EdgeConfig
         self.net_config = FCNNet4EdgeConfig()
         from nets import FCN4EdgeNet
-        self.net = FCN4EdgeNet(self.net_config)
+        self.net = FCN4EdgeNet()
 
     def set_dataset(self):
         # dataset setting
+        # from datasets.image_dataset import ImageDataSet
         # from configs.dataset_config import ImageDataSetConfig
         # self.dataset_config = ImageDataSetConfig()
         # self.dataset = ImageDataSet(self.dataset_config)

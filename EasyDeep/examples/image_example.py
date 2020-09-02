@@ -1,7 +1,6 @@
 import os
 import time
 
-import torch
 from PIL import Image
 from torch.autograd import Variable
 
@@ -114,16 +113,21 @@ class ImageExperiment(DeepExperiment):
                 self.logger.info("================{}=================".format(save_path))
 
 
-
 if __name__ == '__main__':
     from configs.experiment_config import ImageSegmentationConfig
 
     experiment = ImageExperiment(ImageSegmentationConfig())
+    import torch
+
+    obj = torch.load(experiment.pretrain_path)
+    print(dir(obj))
+    print(obj.history_path)
+    experiment.history_save_path = obj.history_path
+    history = experiment.load_history()
+    print(history)
     # experiment.predict_all_data()
     # experiment.sample_test()
-    experiment.train(max_try_times=8)
-
-    configs = {"lr": [0.01, 0.001, 0.0003]}
+    # experiment.train(max_try_times=8)
 
     # experiment.test(save_predict_result=True)
     # experiment.estimate(use_log10=True)

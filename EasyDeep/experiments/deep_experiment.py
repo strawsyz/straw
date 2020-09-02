@@ -121,7 +121,7 @@ class DeepExperiment(ABC, BaseExperiment):
             self.logger.warning("need to set pretrain is True!")
             raise RuntimeError
         if prepare_dataset:
-            self.prepare_net(testing=True)
+            self.prepare_dataset(testing=True)
         if prepare_net:
             self.prepare_net()
 
