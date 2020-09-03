@@ -109,40 +109,6 @@ class ImageDataSet(BaseDataSet, ImageDataSetConfig):
             self.image_paths, self.mask_paths = self.IMAGE_PATHS[:num], self.MASK_PATHS[:num]
 
 
-from configs.dataset_config import ImageDataSet4TestConfig
-
-
-class ImageDataSet4Test(BaseDataSet, ImageDataSet4TestConfig):
-
-    def __init__(self, config_instance=None):
-        super(ImageDataSet4Test, self).__init__(config_instance)
-        self.image_paths = []
-        self.IMAGE_PATHS = []
-        self.set_seed()
-        file_names = sorted(os.listdir(self.image_path))
-        if self.shuffle:
-            random.shuffle(file_names)
-        for file_name in file_names:
-            self.IMAGE_PATHS.append(os.path.join(self.image_path, file_name))
-            self.image_paths.append(os.path.join(self.image_path, file_name))
-
-    def copy_attr(self, target, attr_names: list):
-        for attr_name in attr_names:
-            setattr(target, attr_name, getattr(self, attr_name))
-
-    def get_dataloader(self, target):
-        self.all_dataloader = DataLoader(self, batch_size=self.batch_size, shuffle=self.shuffle)
-        self.copy_attr(target, ["all_dataloader"])
-
-    def __len__(self):
-        return len(self.image_paths)
-
-    def __getitem__(self, index):
-        image = Image.open(self.image_paths[index])
-        image = self.transforms(image)
-        return image, os.path.basename(self.image_paths[index])
-
-
 from configs.dataset_config import ImageDataSet4EdgeConfig
 
 

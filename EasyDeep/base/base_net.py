@@ -55,9 +55,9 @@ class BaseNet(BaseLogger):
                                                        # todo self.scheduler_gamma默认是0.1
                                                        gamma=self.scheduler_gamma)
 
-    def view_net_structure(self, file_name=None):
+    def view_net_structure(self, input_data, filename=None):
         """output the structure of net"""
-        return self.net.view_net_structure(file_name)
+        return self.net.view_net_structure(input_data, filename)
 
     def get_parameters_amount(self):
         return self.net.getget_parameters_amount()

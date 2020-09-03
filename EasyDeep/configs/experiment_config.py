@@ -1,3 +1,5 @@
+import os
+from utils.time_utils import get_date
 import platform
 from abc import ABC, abstractmethod
 
@@ -7,11 +9,14 @@ from base.base_logger import BaseLogger
 
 
 class BaseExperimentConfig(ABC, BaseLogger):
-    def __init__(self):
+    def __init__(self, tag=None):
         self.use_prettytable = False
         self._system = platform.system()
         self.dataset_config = None
         self.net_config = None
+        self.setter(tag=tag)
+        self.tag = tag
+        self.history_save_path = None
 
     @abstractmethod
     def set_dataset(self):
@@ -55,13 +60,10 @@ class BaseExperimentConfig(ABC, BaseLogger):
             return "\n".join(config_items)
 
     def init_attr(self):
-        import os
-        if not hasattr(self, "history_save_path") or \
-                not isinstance(self.history_save_path, str) or \
+        if not isinstance(self.history_save_path, str) or \
                 not os.path.isfile(self.history_save_path):
             self.history_save_path = \
-                os.path.join(self.history_save_dir, "history_{}.pth".format(get_time4filename()))
-        from utils.time_utils import get_date
+                os.path.join(self.history_save_dir, "{}_{}.pth".format(self.tag, get_time4filename()))
         if getattr(self, "history_save_path", None):
             self.result_save_path = os.path.join(self.result_save_path, get_date())
 
@@ -70,15 +72,23 @@ class BaseExperimentConfig(ABC, BaseLogger):
             if isinstance(attr_value, str) and attr_value.split() == "":
                 setattr(self, attr_name, None)
 
+    def setter(self, attr_names=["net", "dataset"], tag=None):
+        if tag is None:
+            for attr_name in attr_names:
+                getattr(self, "set_{}".format(attr_name))()
+        else:
+            for attr_name in attr_names:
+                set_attr = getattr(self, "set_{}_{}".format(attr_name, tag), None)
+                if set_attr is None:
+                    getattr(self, "set_{}".format(attr_name))()
+                else:
+                    set_attr()
+
 
 class ImageSegmentationConfig(BaseExperimentConfig):
-    def __init__(self):
-        super(ImageSegmentationConfig, self).__init__()
+    def __init__(self, tag=None):
+        super(ImageSegmentationConfig, self).__init__(tag)
         self.use_prettytable = True
-
-        self.set_net()
-
-        self.set_dataset()
         self.set_model_selector()
         self.recorder = EpochRecord
         from base.base_recorder import ExperimentRecord
@@ -86,80 +96,36 @@ class ImageSegmentationConfig(BaseExperimentConfig):
 
         if self._system == "Windows":
             self.num_epoch = 500
-            self.is_use_gpu = False
-            self.is_pretrain = False
-            self.model_save_path = "D:\Download\models\polyp"
-            self.history_save_dir = "D:\Download\models\polyp"
-            self.history_save_path = "D:\Download\models\polyp\hitory_1594448749.744286.pth"
-            self.pretrain_path = "D:\Download\models\polyp\ep825_07-17-43.pkl"
-            self.result_save_path = "D:\Download\models\polyp\\result"
-            # temp
-            self.history_save_dir = "C:\data_analysis\models"
-            self.history_save_path = "C:\data_analysis\models\history.pth"
-            self.model_save_path = "C:\data_analysis\models\images"
-            self.is_pretrain = False
-            self.pretrain_path = "C:\data_analysis\models\polyp\\2020-07-11\ep0_14-50-09.pkl"
-            self.result_save_path = "C:\data_analysis\models\images"
+            self.is_use_gpu = True
+            self.is_pretrain = True
+            self.model_save_path = "C:\(lab\models\polyp"
+            self.history_save_dir = "C:\(lab\models\polyp\hisotry"
+            self.history_save_path = None
+            # step 1
+            self.pretrain_path = "C:\(lab\models\polyp\ep410_00-30-36.pkl"
+            # step 2 not use edge
+            self.pretrain_path = "C:\(lab\models\polyp\ep68_03-13-11.pkl"
+            # step 2 use edge
+            self.pretrain_path = "C:\(lab\models\polyp\ep77_13-22-08.pkl"
+            self.result_save_path = "C:\(lab\models\polyp\\result"
         elif self._system == "Linux":
             self.num_epoch = 1000
             self.is_use_gpu = True
             self.is_pretrain = True
             self.history_save_dir = "/home/straw/Downloads/models/polyp/history"
-            # STEP 2
-            # self.history_save_path = '/home/straw/Downloads/models/polyp/history/history_1596504981.pth'
-            # not use edge
-            # self.history_save_path = '/home/straw/Downloads/models/polyp/history/history_1596727136.pth'
-            # use edge
-            # self.history_save_path = '/home/straw/Downloads/models/polyp/history/history_1596849406.pth'
-            # self.history_save_path = "/home/straw/Downloads/models/polyp/history/history_1596889557.pth"
-            # self.history_save_path = "/home/straw/Downloads/models/polyp/history/history_08-14_09-24-44.pth"
-            # self.history_save_path = '/home/straw/Downloads/models/polyp/history/history_1597107957.pth'
-            # use new network two input one output
-            # todo 覆盖保存历史记录的时候也许需要提醒一下
-            # self.history_save_path = "/home/straw/Downloads/models/polyp/history/history1595211050.pth"
-            # self.history_save_path = "/home/straw/Downloads/models/polyp/history/history_1596127749.pth"
-            # self.pretrain_path = "/home/straw/Downloads/models/polyp/2020-07-18/ep212_20-10-46.pkl"
-            # self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-07-18/ep331_22-49-39.pkl'
-            # self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-07-23/ep638_16-46-04.pkl'
-            # best model in step one
-            # self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-08-01/ep410_00-30-36.pkl'
-            # step two
-            # self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-08-03/ep395_14-37-02.pkl'
-            # self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-08-05/ep241_00-36-43.pkl'
-            # # not use edge
-            # self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-08-07/ep68_03-13-11.pkl'
-            # # use edge
-            # self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-08-08/ep82_13-44-27.pkl'
-            # self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-08-09/ep61_00-00-39.pkl'
-            #
-            # # return old way
-            # self.pretrain_path = '/home/straw/Downloads/models/polyp/2020-08-11/ep77_13-22-08.pkl'
-            #
-            #
-            # # step 1
-            # self.pretrain_path = r'/home/straw/Downloads/models/polyp/2020-08-01/ep410_00-30-36.pkl'
             self.pretrain_path = "/home/straw/Downloads/models/polyp/2020-08-11/ep77_13-22-08.pkl"
-            # self.pretrain_path = r"/home/straw/Downloads/models/polyp/2020-08-07/ep68_03-13-11.pkl"
-            # INFO]<2020-08-07 03:12:55,755> { EPOCH:68	 train_loss:0.284118 }
-            # [INFO]<2020-08-07 03:13:11,073> { Epoch:68	 valid_loss:0.345331 }
-            # [INFO]<2020-08-07 03:13:11,073> { ========== saving history========== }
-            # [INFO]<2020-08-07 03:13:11,080> { ========== saved history at /home/straw/Downloads/models/polyp/history/history_1596727136.pth========== }
-            # [INFO]<2020-08-07 03:13:11,081> { save this model for ['train_loss', 'valid_loss'] is better }
-            # [INFO]<2020-08-07 03:13:11,081> { ==============saving model data=============== }
-            # [INFO]<2020-08-07 03:13:11,256> { ==============saved at /home/straw/Downloads/models/polyp/2020-08-07/ep68_03-13-11.pkl=============== }
-            # [INFO]<2020-08-07 03:13:11,256> { use 159 seconds in the epoch }
             self.model_save_path = "/home/straw/Downloads/models/polyp/"
             self.result_save_path = "/home/straw/Download\models\polyp\\result"
-        # remove some useless or wrong attribute
         self.init_attr()
 
     def set_net(self):
         # STEP 1 use source image to predict mask image
-        # from nets.FCNNet import FCNNet
-        # from configs.net_config import FCNNetConfig
-        # self.net_config = FCNNetConfig()
-        # self.net = FCNNet()
+        from nets.FCNNet import FCNNet
+        from configs.net_config import FCNNetConfig
+        self.net_config = FCNNetConfig()
+        self.net = FCNNet()
 
+    def set_net_edge(self):
         # STEP 2 USE predict result in step 1 and edge image to predict image
         from configs.net_config import FCNNet4EdgeConfig
         self.net_config = FCNNet4EdgeConfig()
@@ -167,17 +133,12 @@ class ImageSegmentationConfig(BaseExperimentConfig):
         self.net = FCN4EdgeNet()
 
     def set_dataset(self):
-        # dataset setting
-        # from datasets.image_dataset import ImageDataSet
-        # from configs.dataset_config import ImageDataSetConfig
-        # self.dataset_config = ImageDataSetConfig()
-        # self.dataset = ImageDataSet(self.dataset_config)
+        from datasets.image_dataset import ImageDataSet
+        from configs.dataset_config import ImageDataSetConfig
+        self.dataset_config = ImageDataSetConfig()
+        self.dataset = ImageDataSet(self.dataset_config)
 
-        # from configs.dataset_config import ImageDataSet4TestConfig
-        # self.dataset_config = ImageDataSet4TestConfig()
-        # from datasets.image_dataset import ImageDataSet4Test
-        # self.dataset = ImageDataSet4Test(self.dataset_config)
-
+    def set_dataset_edge(self):
         from configs.dataset_config import ImageDataSet4EdgeConfig
         self.dataset_config = ImageDataSet4EdgeConfig()
         from datasets.image_dataset import ImageDataSet4Edge
@@ -209,8 +170,6 @@ class FNNConfig(BaseExperimentConfig):
         self.result_save_path = ""
 
         self.is_pretrain = False
-
-        # is use prettytable
         self.use_prettytable = False
 
         self.init_attr()
@@ -230,13 +189,11 @@ class FNNConfig(BaseExperimentConfig):
             self.net = FNNNet(self.net_config)
 
     def set_dataset(self):
-        # dataset
         from configs.dataset_config import CSVDataSetConfig
         self.dataset_config = CSVDataSetConfig()
-        # need set  a dataset
+        # todo need set  a dataset
 
     def set_model_selector(self):
-        # model selector
         from base.base_model_selector import BaseModelSelector
         self.model_selector = BaseModelSelector()
         self.model_selector.regist_score_model("train_loss", bigger_better=False)
@@ -274,15 +231,12 @@ class MnistConfig(BaseExperimentConfig):
         self.net = MnistNet()
 
     def set_dataset(self):
-        # dataset
         from configs.dataset_config import CSVDataSetConfig
         self.dataset_config = CSVDataSetConfig()
-        # need set  a dataset
         from datasets.mnist_dataset import MNISTDataset
         self.dataset = MNISTDataset()
 
     def set_model_selector(self):
-        # model selector
         from base.base_model_selector import BaseModelSelector
         self.model_selector = BaseModelSelector()
         self.model_selector.regist_score_model("train_loss", bigger_better=False)

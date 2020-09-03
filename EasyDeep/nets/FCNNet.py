@@ -14,7 +14,3 @@ class FCN4EdgeNet(BaseNet, FCNNet4EdgeConfig):
         super(FCN4EdgeNet, self).__init__()
         self.net = FCN4Edge(n_out=self.n_out, is_init=self.is_init)
 
-
-if __name__ == '__main__':
-    net = FCNNet()
-    net.unit_test()

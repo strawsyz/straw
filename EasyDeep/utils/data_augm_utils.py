@@ -70,3 +70,6 @@ def _remove_margin(image_array, margin):
     return image_array[margin:-margin, margin:-margin, :]
 
 
+def binary_image(image_array, threshold=127, max_value=255):
+    ret, thresh1 = cv2.threshold(image_array, threshold, max_value, cv2.THRESH_BINARY)
+    return thresh1

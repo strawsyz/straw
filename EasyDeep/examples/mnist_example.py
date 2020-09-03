@@ -5,9 +5,8 @@ import torch
 from PIL import Image
 from torch.autograd import Variable
 
-from configs.experiment_config import ImageSegmentationConfig
-from experiments.deep_experiment import DeepExperiment
 from configs.experiment_config import MnistConfig
+from experiments.deep_experiment import DeepExperiment
 from utils.log_utils import get_logger
 
 
@@ -58,7 +57,7 @@ class MnistExperiment(MnistConfig, DeepExperiment):
     def train_one_epoch(self, epoch):
         self.net.train()
         train_loss = 0
-        num_iter = 300
+        num_iter = 3000
         for idx_iter, (image, label) in enumerate(self.train_loader):
             ones = torch.sparse.torch.eye(10)
             label = ones.index_select(0, label)
@@ -89,7 +88,6 @@ class MnistExperiment(MnistConfig, DeepExperiment):
                     image, mask = Variable(image.cuda()), Variable(mask.cuda())
                 else:
                     image, mask = Variable(image), Variable(mask)
-
                 self.net.zero_grad()
                 predict = self.net(image)
                 valid_loss += self.loss_function(predict, mask)
@@ -97,32 +95,8 @@ class MnistExperiment(MnistConfig, DeepExperiment):
             self.logger.info("Epoch:{}\t valid_loss:{:.6f}".format(epoch, valid_loss))
         return valid_loss
 
-    def predict_all_data(self):
-        self.prepare_net()
-        # self.prepare_dataset()
-        self.dataset.get_dataloader(self)
-        self.net.eval()
-
-        from utils.file_utils import make_directory
-        make_directory(self.result_save_path)
-        for image, image_names in self.all_dataloader:
-            image = self.prepare_data(image)
-            self.optimizer.zero_grad()
-            out = self.net(image)
-            predict = out.squeeze().cpu().data.numpy()
-            for index, pred in enumerate(predict):
-                pred = pred * 255
-                pred = pred.astype('uint8')
-                pred = Image.fromarray(pred)
-                pred = pred.resize((224, 224))
-                save_path = os.path.join(self.result_save_path, image_names[index])
-                pred.save(save_path)
-                self.logger.info("================{}=================".format(save_path))
-
 
 if __name__ == '__main__':
-    from configs.experiment_config import ImageSegmentationConfig
-
     experiment = MnistExperiment()
     # experiment.predict_all_data()
     # experiment.sample_test()

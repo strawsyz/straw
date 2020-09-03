@@ -37,12 +37,9 @@ from utils.net_modules_utils import Conv
 class ConvBnReLU(Conv):
     def __init__(self, in_n, out_n, is_init=False, kernel_size=3, stride=1, padding=1, bias=False):
         super(ConvBnReLU, self).__init__(in_n, out_n, kernel_size, stride, padding, bias)
-        # 添加BN层
         self.add_module("BN", nn.BatchNorm2d(out_n, eps=1e-5, momentum=0.999))
-        # 如果需要使用relu就添加relu层
         self.add_module("ReLU", nn.ReLU(inplace=True))
         if is_init:
-            # 初始化网络的参数
             self.init_weight()
 
     def init_weight(self):
@@ -66,15 +63,12 @@ class FCN(nn.Module):
         :param n_out: 输出结果的频道数。
         """
         super(FCN, self).__init__()
-        # 在VGG的基础上建立，使用VGG的结构
         vgg = vgg16_bn(pretrained=False)
-        # 编码器
         self.encoder_1 = vgg.features[:7]
         self.encoder_2 = vgg.features[7:14]
         self.encoder_3 = vgg.features[14:24]
         self.encoder_4 = vgg.features[24:34]
         self.encoder_5 = vgg.features[34:]
-        # 解码器
         self.decoder_1 = Deconv(512, 512, is_init)
         self.decoder_2 = Deconv(512, 256, is_init)
         self.decoder_3 = Deconv(256, 128, is_init)
@@ -82,19 +76,26 @@ class FCN(nn.Module):
         self.decoder_5 = Deconv(64, n_out, is_init)
 
     def forward(self, x):
-        # 编码器部分
         out_1 = self.encoder_1(x)
+        print(out_1.shape)
         out_2 = self.encoder_2(out_1)
+        print(out_2.shape)
         out_3 = self.encoder_3(out_2)
+        print(out_3.shape)
         out_4 = self.encoder_4(out_3)
+        print(out_4.shape)
         out_5 = self.encoder_5(out_4)
+        print(out_5.shape)
 
-        # 解码器部分
         decoder_1 = self.decoder_1(out_5)
+        print(decoder_1.shape)
         decoder_2 = self.decoder_2(decoder_1 + out_4)
+        print(decoder_2.shape)
         decoder_3 = self.decoder_3(decoder_2 + out_3)
+        print(decoder_3.shape)
         decoder_4 = self.decoder_4(decoder_3 + out_2)
         out = self.decoder_5(decoder_4 + out_1)
+        print(out.shape)
         return out
 
 
@@ -106,9 +107,9 @@ class FCN4Edge_3(nn.Module):
         """
         super(FCN4Edge_3, self).__init__()
         self.encoder_0 = ConvBnReLU(2, 3, is_init=is_init)
-        # 在VGG的基础上建立，使用VGG的结构
+
         vgg = vgg16_bn(pretrained=False)
-        # 编码器
+
         self.encoder0_1 = vgg.features[:7]
         self.encoder0_2 = vgg.features[7:14]
         self.encoder0_3 = vgg.features[14:24]
@@ -120,7 +121,7 @@ class FCN4Edge_3(nn.Module):
         self.encoder1_3 = vgg.features[14:24]
         self.encoder1_4 = vgg.features[24:34]
         self.encoder1_5 = vgg.features[34:]
-        # 解码器
+
         self.decoder_1 = Deconv(512, 512, is_init)
         self.decoder_2 = Deconv(512, 256, is_init)
         self.decoder_3 = Deconv(256, 128, is_init)
@@ -131,9 +132,7 @@ class FCN4Edge_3(nn.Module):
         image = x[:, :3]
         other = x[:, 3:]
 
-        # print(id(self.encoder0_1) == id(self.encoder1_1))
 
-        # 编码器部分
         out_0 = self.encoder_0(other)
 
         out_1 = self.encoder0_1(out_0)
@@ -148,7 +147,6 @@ class FCN4Edge_3(nn.Module):
         image_out_4 = self.encoder1_4(image_out_3)
         image_out_5 = self.encoder1_5(image_out_4)
 
-        # 解码器部分
         decoder_1 = self.decoder_1(out_5 + image_out_5)
         decoder_2 = self.decoder_2(decoder_1 + out_4 + image_out_4)
         decoder_3 = self.decoder_3(decoder_2 + out_3 + image_out_3)
@@ -163,11 +161,11 @@ class FCN4Edge_2(nn.Module):
         网络初始化，特点输出结果的图像大小和输入图像的是一样的
         :param n_out: 输出结果的频道数。
         """
-        super(FCN4Edge, self).__init__()
+        super(FCN4Edge_2, self).__init__()
         self.encoder_0 = ConvBnReLU(2, 3, is_init=is_init)
-        # 在VGG的基础上建立，使用VGG的结构
+
         vgg = vgg16_bn(pretrained=False)
-        # 编码器
+
         self.encoder0_1 = vgg.features[:7]
         self.encoder0_2 = vgg.features[7:14]
         self.encoder0_3 = vgg.features[14:24]
@@ -179,7 +177,7 @@ class FCN4Edge_2(nn.Module):
         self.encoder1_3 = vgg.features[14:24]
         self.encoder1_4 = vgg.features[24:34]
         self.encoder1_5 = vgg.features[34:]
-        # 解码器
+
         self.decoder_1 = Deconv(1024, 512, is_init)
         self.decoder_2 = Deconv(1536, 256, is_init)
         self.decoder_3 = Deconv(768, 128, is_init)
@@ -216,7 +214,10 @@ class FCN4Edge_2(nn.Module):
         return out
 
 
-class FCN4Edge(nn.Module):
+from base.base_net_structure import BaseNetStructure
+
+
+class FCN4Edge(nn.Module, BaseNetStructure):
     def __init__(self, n_in=5, n_out=4, is_init=False):
         """
         网络初始化，特点输出结果的图像大小和输入图像的是一样的
@@ -224,15 +225,15 @@ class FCN4Edge(nn.Module):
         """
         super(FCN4Edge, self).__init__()
         self.encoder_0 = ConvBnReLU(n_in, 3, is_init=is_init)
-        # 在VGG的基础上建立，使用VGG的结构
+
         vgg = vgg16_bn(pretrained=False)
-        # 编码器
+
         self.encoder_1 = vgg.features[:7]
         self.encoder_2 = vgg.features[7:14]
         self.encoder_3 = vgg.features[14:24]
         self.encoder_4 = vgg.features[24:34]
         self.encoder_5 = vgg.features[34:]
-        # 解码器
+
         self.decoder_1 = Deconv(512, 512, is_init)
         self.decoder_2 = Deconv(512, 256, is_init)
         self.decoder_3 = Deconv(256, 128, is_init)
@@ -240,7 +241,6 @@ class FCN4Edge(nn.Module):
         self.decoder_5 = Deconv(64, n_out, is_init)
 
     def forward(self, x):
-        # 编码器部分
         out_0 = self.encoder_0(x)
         out_1 = self.encoder_1(out_0)
         out_2 = self.encoder_2(out_1)
@@ -248,7 +248,6 @@ class FCN4Edge(nn.Module):
         out_4 = self.encoder_4(out_3)
         out_5 = self.encoder_5(out_4)
 
-        # 解码器部分
         decoder_1 = self.decoder_1(out_5)
         decoder_2 = self.decoder_2(decoder_1 + out_4)
         decoder_3 = self.decoder_3(decoder_2 + out_3)
@@ -259,6 +258,11 @@ class FCN4Edge(nn.Module):
 
 if __name__ == '__main__':
     # 测试数据能正常跑通
-    x = torch.randn(1, 1, 224, 224)
-    net = FCN()
-    print(net)
+    # x = torch.randn(1, 5, 224, 224)
+    # net = FCN4Edge()
+    net = FCN(n_out=1)
+    # print(net)
+    # print(net)
+    data = torch.randn(1, 3, 224, 224)
+    net(data)
+    # net.view_net_structure(x,"refine_network")

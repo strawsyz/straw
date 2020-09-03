@@ -57,8 +57,3 @@ class Experiment(DeepExperiment):
             self.logger.info("Epoch:{}\t valid_loss:{:.6f}".format(epoch, valid_loss))
 
         return valid_loss
-if __name__ == '__main__':
-    experiment = Experiment()
-    experiment.train(max_try_times=8)
-    # experiment.test()
-    # experiment.estimate(True)
