@@ -2,6 +2,7 @@ import os
 
 from PIL import Image
 from matplotlib import pyplot as plt
+import numpy as np
 
 
 def read_img(file_name):
@@ -29,12 +30,24 @@ def on_key_release(event):
 def show_images(file_name):
     fig.suptitle(file_name)
     for dir_path, ax in zip(dir_paths, axs):
-        image_path = os.path.join(dir_path, file_name)
-        ax.imshow(read_img(image_path), cmap='gray')
-        ax.set_title(file_name)
-        ax.imshow(read_img(image_path))
-        plt.axis("off")
-
+        if dir_path == r"C:\(lab\datasets\polyp\TMP\07\predict_step_one":
+            image_path = os.path.join(dir_path, file_name)
+            ax.imshow(read_img(image_path), cmap='gray')
+            ax.set_title(file_name)
+            image = read_img(image_path)
+            image_array = np.asarray(image)
+            image_array = np.where(image_array > 0, 255, 0)
+            # np.transpose()
+            image_array = image_array.astype(np.uint8)
+            image = Image.fromarray(image_array)
+            ax.imshow(image)
+            plt.axis("off")
+        else:
+            image_path = os.path.join(dir_path, file_name)
+            ax.imshow(read_img(image_path), cmap='gray')
+            ax.set_title(file_name)
+            ax.imshow(read_img(image_path))
+            plt.axis("off")
     # ubuntu上调用两次的plt.show()的话会报错，要用下面的函数
     fig.canvas.draw()
 
@@ -42,12 +55,10 @@ def show_images(file_name):
 if __name__ == '__main__':
     """比较不同文件下的同名图像"""
     file_names = []
-    MASK_PATH = "D:\Download\datasets\polyp\\06\mask"
-    RESULT_PATH = "D:\Download\models\polyp\\result\\2020-07-19"
-    # EDGE_PATH = 'D:\Download\datasets\polyp\\06\edge'
-    # EDGE_PATH1 = "D:\Download\datasets\polyp\\06\edge1"
-
-    dir_paths = [MASK_PATH, RESULT_PATH]
+    DATA_PATH = r"C:\(lab\datasets\polyp\TMP\07\data"
+    MASK_PATH = r"C:\(lab\datasets\polyp\TMP\07\mask"
+    RESULT_PATH = r"C:\(lab\datasets\polyp\TMP\07\predict_step_one"
+    dir_paths = [DATA_PATH, MASK_PATH, RESULT_PATH]
     num_files_pre_dir = [len(os.listdir(dir_path)) for dir_path in dir_paths]
     min_index = num_files_pre_dir.index(min(num_files_pre_dir))
     for file_name in os.listdir(dir_paths[min_index]):
