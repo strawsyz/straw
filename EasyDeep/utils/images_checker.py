@@ -63,6 +63,8 @@ if __name__ == '__main__':
     min_index = num_files_pre_dir.index(min(num_files_pre_dir))
     for file_name in os.listdir(dir_paths[min_index]):
         file_names.append(file_name)
+    import random
+    random.shuffle(file_names)
     fig, (axs) = plt.subplots(1, len(dir_paths))
 
     fig.canvas.mpl_connect("key_release_event", on_key_release)
