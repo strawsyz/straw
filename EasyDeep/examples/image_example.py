@@ -189,11 +189,11 @@ if __name__ == '__main__':
     # experiment.history_save_path = obj.history_path
     # history = experiment.load_history()
 
-    experiment.test_file(image_path, mask_path, edge_path, predict_path)
+    # experiment.test_file(image_path, mask_path, edge_path, predict_path)
     # print(history)
     # experiment.predict_all_data()
     # experiment.sample_test()
-    # experiment.train(max_try_times=8)
+    experiment.train(max_try_times=8)
 
     # experiment.test(save_predict_result=True)
     # experiment.estimate(use_log10=True)

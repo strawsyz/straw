@@ -2,6 +2,7 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 from torchvision.models import vgg16_bn
+from torchvision import models
 
 
 class Deconv(nn.Module):
@@ -256,14 +257,14 @@ class FCN4Edge(nn.Module, BaseNetStructure):
         return out
 
 
-class FCNResNet(nn.Module):
+class FCNRes(nn.Module):
 
     def __init__(self, n_out=1, is_init=False):
-        super(FCNResNet, self).__init__()
+        super(FCNRes, self).__init__()
         # vgg = vgg16_bn(pretrained=False)
 
         self.encoder = models.resnet34(pretrained=False)
-        self.conv_bn_relu0 = ConvBnReLU(512, 512, 11, 10)
+        self.conv_bn_relu0 = ConvBnReLU(512, 512, kernel_size=3, stride=2)
 
         self.decoder_1 = Deconv(512, 512, is_init)
         self.decoder_2 = Deconv(512, 256, is_init)
@@ -280,17 +281,6 @@ class FCNResNet(nn.Module):
         out_3 = self.encoder.layer3(out_2)
         out_4 = self.encoder.layer4(out_3)
         out_5 = self.conv_bn_relu0(out_4)
-
-        # out_1 = self.encoder_1(x)
-        # print(out_1.shape)
-        # out_2 = self.encoder_2(out_1)
-        # print(out_2.shape)
-        # out_3 = self.encoder_3(out_2)
-        # print(out_3.shape)
-        # out_4 = self.encoder_4(out_3)
-        # print(out_4.shape)
-        # out_5 = self.encoder_5(out_4)
-        # print(out_5.shape)
 
         decoder_1 = self.decoder_1(out_5)
         print(decoder_1.shape)
@@ -381,6 +371,6 @@ if __name__ == '__main__':
     #     print(output.shape)
     # # print(extract_result(data)[4])
     data = torch.randn(3, 3, 224, 224)
-    net = FCNResNet()
+    net = FCNRes()
     output = net(data)
     print(output.shape)
