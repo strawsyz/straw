@@ -2,7 +2,7 @@ class ScoreModel:
     def __init__(self, name, bigger_better=True, best_num=1, desciption=None):
         self.name = name
         from collections import namedtuple
-        self.best_score_bean = namedtuple("BestModel",["socre", "model_path"])
+        self.best_score_bean = namedtuple("BestModel", ["score", "model_path"])
         self.bigger_better = bigger_better
         self.best_num = best_num
         self.best_scores = {}

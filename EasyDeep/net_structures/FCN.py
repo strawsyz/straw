@@ -283,14 +283,10 @@ class FCNRes(nn.Module):
         out_5 = self.conv_bn_relu0(out_4)
 
         decoder_1 = self.decoder_1(out_5)
-        print(decoder_1.shape)
         decoder_2 = self.decoder_2(decoder_1 + out_4)
-        print(decoder_2.shape)
         decoder_3 = self.decoder_3(decoder_2 + out_3)
-        print(decoder_3.shape)
         decoder_4 = self.decoder_4(decoder_3 + out_2)
         out = self.decoder_5(decoder_4 + out_1)
-        print(out.shape)
         return out
 
 

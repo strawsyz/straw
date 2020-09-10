@@ -40,8 +40,12 @@ class BaseExperimentConfig(ABC, BaseLogger):
             for attr in sorted(self.dataset_config.__dict__):
                 config_view.add_row([attr, getattr(self.dataset_config, attr)])
             config_view.add_row(["network config", delimiter])
-            for attr in sorted(self.net_config.__dict__):
-                config_view.add_row([attr, getattr(self.net_config, attr)])
+            if hasattr(self, "net_config") and self.net_config is not None:
+                net_config = self.net_config
+            else:
+                net_config = self.net
+            for attr in sorted(net_config.__dict__):
+                config_view.add_row([attr, getattr(net_config, attr)])
             config_view.add_row(["experiment config", delimiter])
             for attr in sorted(self.__dict__):
                 config_view.add_row([attr, getattr(self, attr)])
@@ -97,7 +101,7 @@ class ImageSegmentationConfig(BaseExperimentConfig):
         if self._system == "Windows":
             self.num_epoch = 500
             self.is_use_gpu = True
-            self.is_pretrain = True
+            self.is_pretrain = False
             self.model_save_path = "C:\(lab\models\polyp"
             self.history_save_dir = "C:\(lab\models\polyp\hisotry"
             self.history_save_path = None

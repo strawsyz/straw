@@ -169,7 +169,7 @@ class ImageExperiment(DeepExperiment):
 if __name__ == '__main__':
     from configs.experiment_config import ImageSegmentationConfig
 
-    experiment_config = ImageSegmentationConfig(tag="edge")
+    experiment_config = ImageSegmentationConfig()
     experiment = ImageExperiment(experiment_config)
     from torchvision import transforms
 
@@ -193,8 +193,5 @@ if __name__ == '__main__':
     # print(history)
     # experiment.predict_all_data()
     # experiment.sample_test()
-    experiment.train(max_try_times=8)
-
-    # experiment.test(save_predict_result=True)
-    # experiment.estimate(use_log10=True)
-# /home/straw/Downloads/models/polyp/history/history_1596127749.pth
+    # experiment.train(max_try_times=8)
+    experiment.train_new_network(max_try_times=8)

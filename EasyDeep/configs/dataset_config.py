@@ -27,7 +27,6 @@ class ImageDataSetConfig:
             transforms.ToTensor(),
         ])
         self.image_transforms_4_test = transforms.Compose([
-            transforms.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1, hue=0.1),
             transforms.Resize((224, 224)),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
@@ -88,7 +87,7 @@ class ImageDataSet4EdgeConfig:
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         ])
-        self.random_state = 77
+        self.random_state = 7
         self.test_rate = 0.2
         num_samples = len(os.listdir(self.mask_path))
         self.num_test = int(num_samples * self.test_rate)
