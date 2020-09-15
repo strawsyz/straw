@@ -35,7 +35,7 @@ class MnistExperiment(MnistConfig, DeepExperiment):
         image = self.prepare_data(image)
         mask = self.prepare_data(mask)
         start_time = time.time()
-        out = self.net(image)
+        out = self.net_structure(image)
         end_time = time.time()
         pps = len(image) / (end_time - start_time)
         _, _, width, height = mask.size()
@@ -55,7 +55,7 @@ class MnistExperiment(MnistConfig, DeepExperiment):
         return pps, loss.data
 
     def train_one_epoch(self, epoch):
-        self.net.train()
+        self.net_structure.train()
         train_loss = 0
         num_iter = 3000
         for idx_iter, (image, label) in enumerate(self.train_loader):
@@ -66,7 +66,7 @@ class MnistExperiment(MnistConfig, DeepExperiment):
             image = self.prepare_data(image, "float")
             label = self.prepare_data(label, "float")
             self.optimizer.zero_grad()
-            out = self.net(image)
+            out = self.net_structure(image)
             # out = torch.max(out, 1).indices
             loss = self.loss_function(out, label)
             loss.backward()
@@ -80,7 +80,7 @@ class MnistExperiment(MnistConfig, DeepExperiment):
         return train_loss
 
     def valid_one_epoch(self, epoch):
-        self.net.eval()
+        self.net_structure.eval()
         with torch.no_grad():
             valid_loss = 0
             for image, mask in self.valid_loader:
@@ -88,8 +88,8 @@ class MnistExperiment(MnistConfig, DeepExperiment):
                     image, mask = Variable(image.cuda()), Variable(mask.cuda())
                 else:
                     image, mask = Variable(image), Variable(mask)
-                self.net.zero_grad()
-                predict = self.net(image)
+                self.net_structure.zero_grad()
+                predict = self.net_structure(image)
                 valid_loss += self.loss_function(predict, mask)
             valid_loss /= len(self.valid_loader)
             self.logger.info("Epoch:{}\t valid_loss:{:.6f}".format(epoch, valid_loss))
@@ -100,10 +100,10 @@ if __name__ == '__main__':
     experiment = MnistExperiment()
     # experiment.predict_all_data()
     # experiment.sample_test()
-    experiment.train(max_try_times=8)
+    # experiment.train(max_try_times=8)
 
-    configs = {"lr": [0.01, 0.001, 0.0003]}
-
+    configs = {"lr": [0.01, 0.001, 0.0003], "random_seed": [1, 2, 3]}
+    experiment.grid_train(configs)
     # experiment.test(save_predict_result=True)
     # experiment.estimate(use_log10=True)
 # /home/straw/Downloads/models/polyp/history/history_1596127749.pth

@@ -1,12 +1,12 @@
 class ScoreModel:
-    def __init__(self, name, bigger_better=True, best_num=1, desciption=None):
+    def __init__(self, name, bigger_better=True, best_num=1, description=None):
         self.name = name
         from collections import namedtuple
         self.best_score_bean = namedtuple("BestModel", ["score", "model_path"])
         self.bigger_better = bigger_better
         self.best_num = best_num
         self.best_scores = {}
-        self.description = desciption
+        self.description = description
         self.best_score = None
 
     def get_best_score(self, score, score_true, model_path):
@@ -16,7 +16,7 @@ class ScoreModel:
 
     def is_needed_add(self, score, model_path):
         if score is None:
-            raise RuntimeWarning("this socre is None")
+            raise RuntimeWarning("this socre is None, model_path : {}".format(model_path))
 
         if not self.bigger_better:
             score = -score
@@ -56,13 +56,11 @@ class BaseModelSelector:
         self.best_num = best_num
         self.strict = False
         self.score_models = {}
-        # self.best_models_path = {}
         if score_models is not None:
             for score_model in score_models:
                 self.score_models[score_model.name] = score_model
-                # self.best_models_path[score_model.name] = None
 
-    def _add_record(self, scores: dict, model_path: str):
+    def __add_record(self, scores: dict, model_path: str):
         # every score_model has a best model
         best_models = {}
 
@@ -75,7 +73,6 @@ class BaseModelSelector:
         for name, score_value in scores.items():
             score_model = self.score_models[name]
             need_save_4_socre_model, best_score = score_model.is_needed_add(score_value, model_path)
-            # if is_best_socre:
             best_models[name] = best_score
             if need_save_4_socre_model:
                 reason_2_need.append(name)
@@ -96,13 +93,12 @@ class BaseModelSelector:
 
         return need_save_4_epoch, reason_2_need, best_models
 
-    def regist_score_model(self, name, bigger_better=True, best_num=1, desciption=None):
-        # 增加分数指标
-        self.score_models[name] = ScoreModel(name, bigger_better, best_num, desciption)
+    def register_score_model(self, name, bigger_better=True, best_num=1, description=None):
+        self.score_models[name] = ScoreModel(name, bigger_better, best_num, description)
 
     def add_record(self, recoder, model_path):
-        recoder_dict = recoder.get_record_dict()
-        return self._add_record(recoder_dict, model_path)
+        recoder_dict = recoder.record_2_dict()
+        return self.__add_record(recoder_dict, model_path)
 
     def __str__(self):
         return str([score_model_name for score_model_name in self.score_models])

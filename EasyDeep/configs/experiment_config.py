@@ -203,8 +203,8 @@ class FNNConfig(BaseExperimentConfig):
     def set_model_selector(self):
         from base.base_model_selector import BaseModelSelector
         self.model_selector = BaseModelSelector()
-        self.model_selector.regist_score_model("train_loss", bigger_better=False)
-        self.model_selector.regist_score_model("valid_loss", bigger_better=False)
+        self.model_selector.register_score_model("train_loss", bigger_better=False)
+        self.model_selector.register_score_model("valid_loss", bigger_better=False)
 
 
 class MnistConfig(BaseExperimentConfig):
@@ -246,5 +246,5 @@ class MnistConfig(BaseExperimentConfig):
     def set_model_selector(self):
         from base.base_model_selector import BaseModelSelector
         self.model_selector = BaseModelSelector()
-        self.model_selector.regist_score_model("train_loss", bigger_better=False)
-        self.model_selector.regist_score_model("valid_loss", bigger_better=False)
+        self.model_selector.register_score_model("train_loss", bigger_better=False)
+        self.model_selector.register_score_model("valid_loss", bigger_better=False)

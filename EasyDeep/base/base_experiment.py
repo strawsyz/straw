@@ -17,25 +17,24 @@ class BaseExperiment(BaseLogger, ConfigChecker):
             self.logger.error("need a eperiment config file!")
             raise NotImplementedError
 
-    def list_config(self):
-        """list all config on this experiment"""
-        if not hasattr(self, "config_instance") or self.config_instance is None:
-            self.logger.warning("not set a configure file for the experiment")
-            raise RuntimeError
-        else:
-            self.logger.info(str(self.config_instance))
+    def show_config(self):
+        """list all configure in a experiment"""
+        # if self.config_instance is None:
+        #     self.logger.warning("please set a configure file for the experiment")
+        #     raise RuntimeError("please set a configure file for the experiment")
+        # else:
+        config_instance_str = str(self.config_instance)
+        self.logger.info(config_instance_str)
+        return config_instance_str
 
     def prepare_net(self):
-        pass
+        raise NotImplementedError
 
     def prepare_dataset(self):
-        pass
+        raise NotImplementedError
 
     def train(self):
         raise NotImplementedError
-
-    def train_one_epoch(self, epoch):
-        pass
 
     def test(self):
         raise NotImplementedError
@@ -53,8 +52,7 @@ class BaseExperiment(BaseLogger, ConfigChecker):
         raise NotImplementedError
 
     def check(self):
-        # todo 检查输入图像的形状
-        # 配置文件是否正确
+        # used to check config file and something else
         raise NotImplementedError
 
 

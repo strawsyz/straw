@@ -3,7 +3,8 @@ import platform
 
 _system = platform.system()
 if _system == "Windows":
-    log_path = "C:\\Log"
+    # log_path = "C:\\Log"
+    log_path = "Log"
 elif _system == "Linux":
     log_path = "/home/straw/PycharmProjects/straw/EasyDeep/Logs"
 

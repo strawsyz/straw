@@ -6,6 +6,6 @@ from configs.net_config import FNNNetConfig
 class FNNNet(FNNNetConfig, BaseNet):
     def __init__(self):
         super(FNNNet, self).__init__()
-        self.net = MyFNN(n_in=self.n_in, n_out=self.n_out)
+        self.net_structure = MyFNN(n_in=self.n_in, n_out=self.n_out)
 
 

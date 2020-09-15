@@ -2,7 +2,7 @@ class ConfigChecker:
     def __init__(self):
         super(ConfigChecker, self).__init__()
 
-    def list_config(self):
+    def show_config(self):
         from prettytable import PrettyTable
         config_view = PrettyTable()
         config_view.field_names = ["name", "value"]

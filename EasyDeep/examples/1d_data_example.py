@@ -20,20 +20,20 @@ class Experiment(DeepExperiment):
         data = self.prepare_data(data, data_type)
         gt = self.prepare_data(gt, data_type)
         self.optimizer.zero_grad()
-        out = self.net(data)
+        out = self.net_structure(data)
         loss = self.loss_function(out, gt)
         self.logger.info("One Batch:test_loss is {}".format(loss))
 
     def train_one_epoch(self, epoch):
         train_loss = 0
-        self.net.train()
+        self.net_structure.train()
 
         for sample, label in self.train_loader:
             sample = self.prepare_data(sample, 'float')
             label = self.prepare_data(label, 'float')
 
             self.optimizer.zero_grad()
-            out = self.net(sample)
+            out = self.net_structure(sample)
             loss = self.loss_function(out, label)
             loss.backward()
             self.optimizer.step()
@@ -44,14 +44,14 @@ class Experiment(DeepExperiment):
         return train_loss
 
     def valid_one_epoch(self, epoch):
-        self.net.eval()
+        self.net_structure.eval()
         with torch.no_grad():
             valid_loss = 0
             for data, label in self.valid_loader:
                 data = self.prepare_data(data, 'float')
                 label = self.prepare_data(label, 'float')
-                self.net.zero_grad()
-                predict = self.net(data)
+                self.net_structure.zero_grad()
+                predict = self.net_structure(data)
                 valid_loss += self.loss_function(predict, label)
             valid_loss /= len(self.valid_loader)
             self.logger.info("Epoch:{}\t valid_loss:{:.6f}".format(epoch, valid_loss))

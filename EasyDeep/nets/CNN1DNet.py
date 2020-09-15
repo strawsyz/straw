@@ -13,7 +13,7 @@ class CNN1DNet(BaseNet,CNN1DNetConfig):
     def __init__(self, config_instance=None):
         super(CNN1DNet, self).__init__(config_instance)
         # init network
-        self.net = MyCNN1D()
+        self.net_structure = MyCNN1D()
 
 
 if __name__ == '__main__':

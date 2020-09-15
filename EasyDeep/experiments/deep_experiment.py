@@ -1,3 +1,4 @@
+from base.base_recorder import EpochRecord
 import os
 import time
 from abc import ABC, abstractmethod
@@ -20,7 +21,7 @@ class DeepExperiment(ABC, BaseExperiment):
 
         self.scores_history = {}
         self.recorder = None
-        self.net = None
+        self.net_structure = None
         self.dataset = None
 
         self.num_epoch = None
@@ -42,7 +43,7 @@ class DeepExperiment(ABC, BaseExperiment):
         self.scheduler = None
         super(DeepExperiment, self).__init__(config_instance)
 
-        self.list_config()
+        self.show_config()
 
     def prepare_dataset(self, testing=False):
         if testing:
@@ -56,7 +57,6 @@ class DeepExperiment(ABC, BaseExperiment):
         if self.is_pretrain:
             self.load()
 
-    # 和java一样，必须实现抽象方法定义，才可以通过编译
     @abstractmethod
     def train_one_epoch(self, epoch):
         """一个epoch中训练集进行训练"""
@@ -79,7 +79,7 @@ class DeepExperiment(ABC, BaseExperiment):
     def train(self, max_try_times=None, prepare_dataset=True, prepare_net=True):
         """
 
-        :param max_try_times: 一定回数loss没有下降的话，就停止训练。
+        :param max_try_times: if loss don't decrease for some times, then stop training
         :return:
         """
         if self.model_selector is None and max_try_times is not None:
@@ -90,7 +90,6 @@ class DeepExperiment(ABC, BaseExperiment):
             self.prepare_net()
         self.logger.info("================training start=================")
         try_times = 1
-        # best_score_models = {}
         self.best_score_models = None
         for epoch in range(self.current_epoch, self.current_epoch + self.num_epoch):
             start_time = time.time()
@@ -98,6 +97,7 @@ class DeepExperiment(ABC, BaseExperiment):
 
             self.scores_history[epoch] = record
             need_save, best_score_models, model_save_path = self.save(epoch, record)
+            # best socre models for now
             self.best_score_models = best_score_models
             if best_score_models != {}:
                 for score_name in best_score_models.keys():
@@ -125,24 +125,22 @@ class DeepExperiment(ABC, BaseExperiment):
         if prepare_net:
             self.prepare_net()
 
-        self.net.eval()
+        self.net_structure.eval()
         file_utils.make_directory(self.result_save_path)
-        #     todo 提取为注解，分别设置，before_test, after_test两个，train也同理
 
     def create_checkpoint(self, epoch=None, create4load=False):
-        # todo 配置文件设置checkpoint保存的数据内容
+        # todo set content of experiment_data in configure file
         experiment_data = {"epoch": epoch,
-                           "state_dict": self.net.state_dict(),
+                           "state_dict": self.net_structure.state_dict(),
                            "optimizer": self.optimizer.state_dict(),
                            "history_path": self.history_save_path
                            }
         if create4load:
-            # 如果是为了加载数据
+            # for load data only need a structure, don't need data
             return CustomCheckPoint(experiment_data.keys())
         else:
             return CustomCheckPoint(experiment_data.keys())(experiment_data)
 
-    from base.base_recorder import EpochRecord
     def save(self, epoch, record: EpochRecord):
         self.save_history()
         model_save_path = os.path.join(self.model_save_path, time_utils.get_date())
@@ -150,19 +148,19 @@ class DeepExperiment(ABC, BaseExperiment):
         file_name = 'ep{}_{}.pkl'.format(epoch, time_utils.get_time("%H-%M-%S"))
         model_save_path = os.path.join(model_save_path, file_name)
         if self.model_selector is None:
-            self._save_model(epoch, model_save_path)
+            self.__save_model(epoch, model_save_path)
             return True
         else:
             is_need_save, need_reason, best_socre_models = self.model_selector.add_record(record, model_save_path)
             if is_need_save:
                 self.logger.info("save this model for {} is better".format(need_reason))
-                self._save_model(epoch, model_save_path)
+                self.__save_model(epoch, model_save_path)
                 return is_need_save, best_socre_models, model_save_path
             else:
                 self.logger.info("the eppoch's result is not good, not save")
                 return is_need_save, best_socre_models, model_save_path
 
-    def _save_model(self, epoch, model_save_path):
+    def __save_model(self, epoch, model_save_path):
         self.logger.info("==============saving model data===============")
         checkpoint = self.create_checkpoint(epoch)
         save(checkpoint, model_save_path)
@@ -172,17 +170,17 @@ class DeepExperiment(ABC, BaseExperiment):
         model_save_path = self.pretrain_path
         if os.path.isfile(model_save_path):
             self.logger.info("==============loading model data===============")
-            self._load_model(model_save_path)
+            self.__load_model(model_save_path)
             self.logger.info("=> loaded checkpoint from '{}' ".format(model_save_path))
             self.load_history()
         else:
             self.logger.error("=> no checkpoint found at '{}'".format(model_save_path))
 
-    def _load_model(self, model_save_path):
+    def __load_model(self, model_save_path):
         check_point = self.create_checkpoint(create4load=True)
         load(check_point, model_save_path)
         self.current_epoch = check_point.epoch + 1
-        self.net.load_state_dict(check_point.state_dict)
+        self.net_structure.load_state_dict(check_point.state_dict)
         self.optimizer.load_state_dict(check_point.optimizer)
 
     def create_experiment_record(self):
@@ -201,23 +199,22 @@ class DeepExperiment(ABC, BaseExperiment):
     def load_history(self, is4train=False):
         """
         load history data
-        :param is4train: 如果是为了训练数据的话
+        :param is4train:
         :return:
         """
         experiment_record = None
         if hasattr(self, "history_save_path") and self.history_save_path is not None and self.history_save_path != "":
             if os.path.isfile(self.history_save_path):
-                self.logger.info("=" * 10 + " loading history" + "=" * 10)
+                self.logger.info("loading history")
                 experiment_record = self.create_experiment_record()
                 experiment_record = experiment_record.load(self.history_save_path)
                 self.scores_history = experiment_record.epoch_records
                 if is4train:
+                    # delete history after current_epoch
                     for epoch_no in experiment_record.epoch_records:
                         if epoch_no <= self.current_epoch:
                             self.scores_history[epoch_no] = experiment_record.epoch_records[epoch_no]
-                # with open(self.history_save_path, mode="rb+") as f:
-                #     self.scores_history = pickle.load(f)
-                self.logger.info("=" * 10 + " loaded history from {}".format(self.history_save_path) + "=" * 10)
+                self.logger.info("loaded history from {}".format(self.history_save_path))
             else:
                 self.logger.error("{} is not a file".format(self.history_save_path))
         else:
@@ -272,10 +269,18 @@ class DeepExperiment(ABC, BaseExperiment):
             return data
 
     def train_new_network(self, max_try_times=None):
-        assert self.is_pretrain == False
+        assert self.is_pretrain is False
         self.train(max_try_times)
 
     def grid_train(experiment, configs: dict):
+        """
+        use different configs to train, get the best result.
+        Args:
+            configs:
+
+        Returns:
+
+        """
         best_score = None
         best_config = None
         all_configs = []
@@ -299,7 +304,9 @@ class DeepExperiment(ABC, BaseExperiment):
                 current_config.remove("{}:{}".format(key, value))
             haved_key.remove(key)
 
-        all_configs = sort_config(configs)
+        sort_config(configs)
+        experiment.logger.info("test\n:{}".format(all_configs))
+        print(all_configs)
         for config_pattern in all_configs:
             for setting in config_pattern:
                 attr, value = setting.split(":")
@@ -310,14 +317,5 @@ class DeepExperiment(ABC, BaseExperiment):
                 best_score = best_score_experiment
                 best_config = config_pattern
 
-        # todo 建立表格的显示形式
+        # todo improve the data format to return
         return best_config, best_score
-
-
-if __name__ == '__main__':
-    experiment = DeepExperiment()
-    # experiment.test()
-    # experiment.estimate()
-    best_score = experiment.train()
-    # experiment.save_history()
-    # print("end")

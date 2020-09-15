@@ -113,6 +113,10 @@ class MNISTDatasetConfig:
     def __init__(self):
         self.dataset_path = r"C:\(lab\datasets\mnist"
         self.shuffle = True
-        self.batch_size = 1
+        self.batch_size = 8
         self.batch_size_4_test = 32
         self.valid_rate = 0.2
+        self.train_num = 100
+        self.valid_num = 20
+        self.test_num = 20
+        self.set_dataset_num = True
