@@ -104,3 +104,6 @@ class BaseNet(BaseLogger):
     def copy_attr(self, target):
         # todo decrease amount of parameters to copy
         copy_attr(self, target)
+
+    def __str__(self):
+        return __class__.__name__

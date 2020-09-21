@@ -1,34 +1,45 @@
 import os
-from utils.time_utils import get_date
-import platform
-from abc import ABC, abstractmethod
 
+from base.base_config import BaseExperimentConfig
 from base.base_recorder import EpochRecord
-from utils.time_utils import get_time4filename
-from base.base_logger import BaseLogger
+from utils.time_utils import get_date
+from utils.time_utils import get_time_4_filename
 
 
-class BaseExperimentConfig(ABC, BaseLogger):
-    def __init__(self, tag=None):
-        self.use_prettytable = False
-        self._system = platform.system()
-        self.dataset_config = None
-        self.net_config = None
-        self.setter(tag=tag)
-        self.tag = tag
+class DeepExperimentConfig(BaseExperimentConfig):
+    def __init__(self):
+        super(DeepExperimentConfig, self).__init__()
+        self.other_param_4_batch = None
+
+        self.current_epoch = 0
+        self.scores_history = {}
+        self.recorder = None
+
+        self.num_epoch = None
+        self.is_use_gpu = None
+        self.history_save_dir = None
         self.history_save_path = None
+        self.model_save_path = None
+        self.model_selector = None
+        self.is_pretrain = None
+        self.pretrain_path = None
+        self.result_save_path = None
+        self.selector = None
+        self.is_bigger_better = False
+        self.num_iter = 50
 
-    @abstractmethod
-    def set_dataset(self):
-        pass
+        self.dataset = None
+        self.train_loader = None
+        self.valid_loader = None
+        self.test_loader = None
 
-    @abstractmethod
-    def set_net(self):
-        pass
+        self.net = None
+        self.net_structure = None
+        self.optimizer = None
+        self.loss_function = None
+        self.scheduler = None
 
-    @abstractmethod
-    def set_model_selector(self):
-        pass
+        self.setter_by_tag(tag=self.tag)
 
     def __repr__(self):
         delimiter = "↓" * 50
@@ -67,7 +78,7 @@ class BaseExperimentConfig(ABC, BaseLogger):
         if not isinstance(self.history_save_path, str) or \
                 not os.path.isfile(self.history_save_path):
             self.history_save_path = \
-                os.path.join(self.history_save_dir, "{}_{}.pth".format(self.tag, get_time4filename()))
+                os.path.join(self.history_save_dir, "{}_{}.pth".format(self.tag, get_time_4_filename()))
         if getattr(self, "history_save_path", None):
             self.result_save_path = os.path.join(self.result_save_path, get_date())
 
@@ -76,7 +87,7 @@ class BaseExperimentConfig(ABC, BaseLogger):
             if isinstance(attr_value, str) and attr_value.split() == "":
                 setattr(self, attr_name, None)
 
-    def setter(self, attr_names=["net", "dataset"], tag=None):
+    def setter_by_tag(self, attr_names=["net", "dataset"], tag=None):
         if tag is None:
             for attr_name in attr_names:
                 getattr(self, "set_{}".format(attr_name))()
@@ -89,7 +100,7 @@ class BaseExperimentConfig(ABC, BaseLogger):
                     set_attr()
 
 
-class ImageSegmentationConfig(BaseExperimentConfig):
+class ImageSegmentationConfig(DeepExperimentConfig):
     def __init__(self, tag=None):
         super(ImageSegmentationConfig, self).__init__(tag)
         self.use_prettytable = True
@@ -134,8 +145,8 @@ class ImageSegmentationConfig(BaseExperimentConfig):
 
     def set_net_edge(self):
         # STEP 2 USE predict result in step 1 and edge image to predict image
-        from configs.net_config import FCNNet4EdgeConfig
-        self.net_config = FCNNet4EdgeConfig()
+        from configs.net_config import FCNBaseNet4EdgeConfig
+        self.net_config = FCNBaseNet4EdgeConfig()
         from nets import FCN4EdgeNet
         self.net = FCN4EdgeNet()
 
@@ -159,11 +170,10 @@ class ImageSegmentationConfig(BaseExperimentConfig):
         self.model_selector = BaseModelSelector(score_models)
 
 
-class FNNConfig(BaseExperimentConfig):
+class FNNConfig(DeepExperimentConfig):
 
     def __init__(self):
         super(FNNConfig, self).__init__()
-        self.recorder = EpochRecord
         self.set_net()
         self.set_dataset()
         self.set_model_selector()
@@ -185,15 +195,15 @@ class FNNConfig(BaseExperimentConfig):
         self.net_name = "fnn"
         # net
         if self.net_name == "cnn1d":
-            from configs.net_config import CNN1DNetConfig
-            self.net_config = CNN1DNetConfig()
+            from configs.net_config import CNN1DBaseNetConfig
+            self.net_config = CNN1DBaseNetConfig()
             from nets.CNN1DNet import CNN1DNet
             self.net = CNN1DNet(self.net_config)
         elif self.net_name == "fnn":
-            from configs.net_config import FNNNetConfig
-            self.net_config = FNNNetConfig()
+            from configs.net_config import FNNBaseNetConfig
+            self.net_config = FNNBaseNetConfig()
             from nets import FNNNet
-            self.net = FNNNet(self.net_config)
+            self.net = FNNNet()
 
     def set_dataset(self):
         from configs.dataset_config import CSVDataSetConfig
@@ -207,7 +217,9 @@ class FNNConfig(BaseExperimentConfig):
         self.model_selector.register_score_model("valid_loss", bigger_better=False)
 
 
-class MnistConfig(BaseExperimentConfig):
+class MnistConfig(DeepExperimentConfig):
+    name = "mnist"
+    tag = None
 
     def __init__(self):
         super(MnistConfig, self).__init__()
@@ -216,25 +228,27 @@ class MnistConfig(BaseExperimentConfig):
         self.set_dataset()
         self.set_model_selector()
         self.current_epoch = 0
-        self.num_epoch = 500
+        self.num_epoch = 5
         self.recorder = EpochRecord
         from base.base_recorder import ExperimentRecord
         self.experiment_record = ExperimentRecord
+        self.num_iter = 2
 
-        self.history_save_dir = ""
-        self.model_save_path = ""
-        self.result_save_path = ""
+        self.root_path = os.path.join(r"C:\(lab\models\mnist", self.create_experiment_name(MnistConfig.name))
+        self.history_save_dir = os.path.join(self.root_path, "history")
+        self.model_save_path = os.path.join(self.root_path, "model")
+        self.result_save_path = os.path.join(self.root_path, "result")
 
         self.is_pretrain = False
-        self.is_use_gpu = False
-        self.use_prettytable = False
+        self.is_use_gpu = True
+        self.use_prettytable = True
 
         self.init_attr()
 
     def set_net(self):
         from nets.MnistNet import MnistNet
-        from configs.net_config import MnistConfig
-        self.net_config = MnistConfig()
+        from configs.net_config import MnistConfigBase
+        self.net_config = MnistConfigBase()
         self.net = MnistNet()
 
     def set_dataset(self):

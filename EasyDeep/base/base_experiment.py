@@ -1,31 +1,30 @@
-from base.base_logger import BaseLogger
+from configs.experiment_config import BaseExperimentConfig
 from utils.config_utils import ConfigChecker
-from utils.common_utils import copy_attr
 
 
-class BaseExperiment(BaseLogger, ConfigChecker):
+class BaseExperiment(BaseExperimentConfig):
 
-    def __init__(self, config_instance=None):
+    def __init__(self):
         super(BaseExperiment, self).__init__()
-        self.config_instance = config_instance
-        self.load_config()
+        # self.config_instance = config_instance
+        # self.load_config()
 
-    def load_config(self):
-        if self.config_instance is not None:
-            copy_attr(self.config_instance, self)
-        else:
-            self.logger.error("need a eperiment config file!")
-            raise NotImplementedError
+    # def load_config(self):
+    #     if self.config_instance is not None:
+    #         copy_attr(self.config_instance, self)
+    #     else:
+    #         self.logger.error("need a eperiment config file!")
+    #         raise NotImplementedError
 
-    def show_config(self):
-        """list all configure in a experiment"""
-        # if self.config_instance is None:
-        #     self.logger.warning("please set a configure file for the experiment")
-        #     raise RuntimeError("please set a configure file for the experiment")
-        # else:
-        config_instance_str = str(self.config_instance)
-        self.logger.info(config_instance_str)
-        return config_instance_str
+    # def show_config(self):
+    #     """list all configure in a experiment"""
+    #     # if self.config_instance is None:
+    #     #     self.logger.warning("please set a configure file for the experiment")
+    #     #     raise RuntimeError("please set a configure file for the experiment")
+    #     # else:
+    #     config_instance_str = str(self.config_instance)
+    #     self.logger.info(config_instance_str)
+    #     return config_instance_str
 
     def prepare_net(self):
         raise NotImplementedError

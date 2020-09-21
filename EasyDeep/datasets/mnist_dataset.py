@@ -10,8 +10,8 @@ from utils.log_utils import get_logger
 
 
 class MNISTDataset(BaseDataSet, MNISTDatasetConfig):
-    def __init__(self, config_instance=None):
-        super(MNISTDataset, self).__init__(config_instance)
+    def __init__(self):
+        super(MNISTDataset, self).__init__()
         self.logger = get_logger()
         self.train_dataset = datasets.MNIST(root=self.dataset_path,
                                             train=True,

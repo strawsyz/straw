@@ -12,38 +12,13 @@ from utils import file_utils
 from utils import time_utils
 from utils.matplotlib_utils import lineplot
 from utils.net_utils import save, load
+from configs.experiment_config import DeepExperimentConfig
 
 
-class DeepExperiment(ABC, BaseExperiment):
+class DeepExperiment(DeepExperimentConfig, BaseExperiment):
 
-    def __init__(self, config_instance=None):
-        self.other_param_4_batch = None
-        self.current_epoch = 0
-
-        self.scores_history = {}
-        self.recorder = None
-        self.net_structure = None
-        self.dataset = None
-
-        self.num_epoch = None
-        self.is_use_gpu = None
-        self.history_save_dir = None
-        self.history_save_path = None
-        self.model_save_path = None
-        self.model_selector = None
-        self.is_pretrain = None
-        self.pretrain_path = None
-        self.result_save_path = None
-        self.selector = None
-
-        self.optimizer = None
-        self.loss_function = None
-        self.train_loader = None
-        self.valid_loader = None
-        self.test_loader = None
-        self.scheduler = None
-        super(DeepExperiment, self).__init__(config_instance)
-
+    def __init__(self):
+        super(DeepExperiment, self).__init__()
         self.show_config()
 
     def prepare_dataset(self, testing=False):
@@ -58,15 +33,13 @@ class DeepExperiment(ABC, BaseExperiment):
         if self.is_pretrain:
             self.load()
 
-    @abstractmethod
     def train_one_epoch(self, epoch):
         """train one epoch"""
         train_loss = 0
         self.net_structure.train()
-        self.num_iter = 50
         other_param = self.other_param_4_batch
         for idx, (sample, label) in enumerate(self.train_loader, start=1):
-            other_param = self.train_one_batch(sample, label,other_param)
+            other_param = self.train_one_batch(sample, label, other_param)
             loss = other_param[0]
             train_loss += loss
             if idx % self.num_iter == 0:
@@ -75,7 +48,7 @@ class DeepExperiment(ABC, BaseExperiment):
         self.logger.info("EPOCH : {}\t train_loss : {:.6f}\t".format(epoch, train_loss))
         if self.scheduler is not None:
             self.scheduler.step()
-            lr = self.net_structure.optimizer.state_dict()['param_groups'][0]['lr']
+            lr = self.optimizer.state_dict()['param_groups'][0]['lr']
             self.logger.info("learning rate is {:.6f}".format(lr))
         return train_loss
 
@@ -85,28 +58,28 @@ class DeepExperiment(ABC, BaseExperiment):
         with torch.no_grad():
             valid_loss = 0
             for x, y in self.valid_loader:
-                valid_loss += self.valid_one_batch(x,y)
+                valid_loss += self.valid_one_batch(x, y)
             valid_loss /= len(self.valid_loader)
             self.logger.info("Epoch:{}\t valid_loss:{:.6f}".format(epoch, valid_loss))
         return valid_loss
 
-    def train_one_batch(self,*args,**kwargs):
+    @staticmethod
+    def train_one_batch(self, *args, **kwargs) -> list:
         """
         train one batch
+        return a list, first element of list is loss
         """
         raise NotImplementedError
 
-    def valid_one_batch(self,*args,**kwargs):
+    def valid_one_batch(self, *args, **kwargs):
         """
         train one batch
-        :param epoch:
-        :return:
         """
         raise NotImplementedError
 
     def train_valid_one_epoch(self, epoch):
         train_loss = self.train_one_epoch(epoch)
-        if self.valid_loader is not None and len(self.valid_loader)>0:
+        if self.valid_loader is not None and len(self.valid_loader) > 0:
             valid_loss = self.valid_one_epoch(epoch)
             record = self.recorder(train_loss=train_loss, valid_loss=valid_loss)
         else:
@@ -126,7 +99,7 @@ class DeepExperiment(ABC, BaseExperiment):
         if prepare_net:
             self.prepare_net()
         self.logger.info("================training start=================")
-        try_times = 1
+        try_times = 0
         self.best_score_models = None
         for epoch in range(self.current_epoch, self.current_epoch + self.num_epoch):
             start_time = time.time()
@@ -138,10 +111,9 @@ class DeepExperiment(ABC, BaseExperiment):
             self.best_score_models = best_score_models
             if best_score_models != {}:
                 for score_name in best_score_models.keys():
-                    score = best_score_models[score_name]
-                    self.logger.info("{} is best socre of {}, saved at {}".format(score.score, score_name,
-                                                                                  score.model_path))
-
+                    best_score_model = best_score_models[score_name]
+                    self.logger.info("{} is best socre of {}, saved at {}".format(best_score_model.score, score_name,
+                                                                                  best_score_model.model_path))
             if not need_save:
                 try_times += 1
             else:
@@ -150,9 +122,12 @@ class DeepExperiment(ABC, BaseExperiment):
                 break
             self.logger.info("use {} seconds in the epoch".format(int(time.time() - start_time)))
             if self.use_db:
-                #todo save result in database
+                # todo save result in database
                 pass
         self.logger.info("================training is over=================")
+        self.logger.info(
+            "best valid_loss is\t{}\nbest_model_path is\t{}".format(self.best_score_models["valid_loss"].score,
+                                                                    best_score_models["valid_loss"].model_path))
         return self.best_score_models["valid_loss"].score if self.best_score_models is not None else None
 
     def test(self, prepare_dataset=True, prepare_net=True):
@@ -280,7 +255,7 @@ class DeepExperiment(ABC, BaseExperiment):
 
     def estimate(self, use_log10=False):
         experiment_record = self.load_history()
-        print(experiment_record.config_info)
+        self.logger.info("config is :\n{}".format(experiment_record.config_info))
         if self.scores_history == {}:
             self.logger.error("no history")
         else:
@@ -311,7 +286,7 @@ class DeepExperiment(ABC, BaseExperiment):
         assert self.is_pretrain is False
         self.train(max_try_times)
 
-    def grid_train(experiment, configs: dict):
+    def grid_train(experiment, configs: dict, max_try_times=4):
         """
         use different configs to train, get the best result.
         Args:
@@ -344,17 +319,22 @@ class DeepExperiment(ABC, BaseExperiment):
             haved_key.remove(key)
 
         sort_config(configs)
-        experiment.logger.info("test\n:{}".format(all_configs))
-        print(all_configs)
+        experiment.logger.info("all configs \n:{}".format(all_configs))
+        # todo change net or dataset
+        experiment.prepare_dataset()
+        experiment.prepare_net()
         for config_pattern in all_configs:
             for setting in config_pattern:
                 attr, value = setting.split(":")
                 setattr(experiment, attr, value)
-
-            best_score_experiment = experiment.train_new_network()
-            if best_score is None or best_score < best_score_experiment:
+            best_score_experiment = experiment.train(max_try_times=max_try_times, prepare_net=False,
+                                                     prepare_dataset=False)
+            experiment.logger.info("config is {}:valid_loss is {}".format(config_pattern, best_score_experiment))
+            if best_score is None or (experiment.is_bigger_better and best_score < best_score_experiment) or (
+                    not experiment.is_bigger_better and best_score > best_score_experiment):
                 best_score = best_score_experiment
                 best_config = config_pattern
+        experiment.logger.info("best result :\n{}:{}".format(best_config, best_score))
 
         # todo improve the data format to return
         return best_config, best_score

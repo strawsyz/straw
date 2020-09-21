@@ -15,6 +15,13 @@ class EpochRecord:
             record_dict[attr] = getattr(self, attr, None)
         return record_dict
 
+    def __str__(self):
+        return "EpochRecord"
+
+    @classmethod
+    def get_class_name(cls):
+        return __class__.__name__
+
 
 class ExperimentRecord:
 
@@ -35,12 +42,20 @@ class ExperimentRecord:
     def load(self, save_path):
         return torch.load(save_path)
 
+    def __str__(self):
+        return "ExperimentRecord"
+
+    @classmethod
+    def get_class_name(cls):
+        return __class__.__name__
+
 
 class CustomEpochRecord(EpochRecord):
 
     def __init__(self, attr_names: list):
         for attr_name in attr_names:
             setattr(self, attr_name, None)
+        self.attr_names = attr_names
 
     def __call__(self, *args, **kwargs):
         for attr_name in kwargs:
@@ -69,3 +84,10 @@ class CustomEpochRecord(EpochRecord):
             setattr(self, attr_name, attr_value)
         else:
             raise RuntimeError("can't set a attribute which is not exist")
+
+    def __str__(self):
+        return "ExperimentRecord[{}]".format(",".join(self.attr_names))
+
+    @classmethod
+    def get_class_name(cls):
+        return "ExperimentRecord[{}]".format(",".join(self.attr_names))

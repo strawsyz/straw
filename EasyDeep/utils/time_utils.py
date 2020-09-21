@@ -9,7 +9,7 @@ def get_time(format_='%Y-%m-%d %H:%M:%S'):
     """获得字符串类型的时间"""
     return now().strftime(format_)
 
-def get_time4filename(format_='%m-%d_%H-%M-%S'):
+def get_time_4_filename(format_='%m-%d_%H-%M-%S'):
     """获得字符串类型的时间"""
     return now().strftime(format_)
 

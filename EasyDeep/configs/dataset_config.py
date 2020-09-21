@@ -2,10 +2,14 @@ import os
 import platform
 
 from torchvision import transforms
+from base.base_config import BaseDataSetConfig
 
 
-class ImageDataSetConfig:
+
+
+class ImageDataSetConfig(BaseDataSetConfig):
     def __init__(self):
+        super(ImageDataSetConfig, self).__init__()
         __system = platform.system()
         if __system == "Windows":
             self.image_path = r"C:\(lab\datasets\polyp\TMP\07\data"
@@ -42,7 +46,7 @@ class ImageDataSetConfig:
         self.batch_size4test = 8
 
 
-class ImageDataSet4EdgeConfig:
+class ImageDataSet4EdgeConfig(BaseDataSetConfig):
     def __init__(self):
         __system = platform.system()
         if __system == "Windows":
@@ -96,7 +100,7 @@ class ImageDataSet4EdgeConfig:
         self.batch_size4test = 8
 
 
-class CSVDataSetConfig:
+class CSVDataSetConfig(BaseDataSetConfig):
     def __init__(self):
         self.xls_path = ""
         self.csv_dir = ""
@@ -109,7 +113,7 @@ class CSVDataSetConfig:
         self.batch_size4test = 1
 
 
-class MNISTDatasetConfig:
+class MNISTDatasetConfig(BaseDataSetConfig):
     def __init__(self):
         self.dataset_path = r"C:\(lab\datasets\mnist"
         self.shuffle = True

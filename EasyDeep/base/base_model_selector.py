@@ -1,18 +1,29 @@
+class BestModelBean():
+    def __init__(self, score, model_path):
+        self.score = score
+        self.model_path = model_path
+
+
 class ScoreModel:
     def __init__(self, name, bigger_better=True, best_num=1, description=None):
         self.name = name
         from collections import namedtuple
-        self.best_score_bean = namedtuple("BestModel", ["score", "model_path"])
+        # self.best_score_bean = namedtuple("BestModel", ["score", "model_path"])
+        self.best_score_bean = BestModelBean
         self.bigger_better = bigger_better
         self.best_num = best_num
         self.best_scores = {}
         self.description = description
         self.best_score = None
 
-    def get_best_score(self, score, score_true, model_path):
+    def get_best_score(self, score, model_path):
         if self.best_score is None or self.best_score.score < score:
-            self.best_score = self.best_score_bean(score_true, model_path)
-        return self.best_score
+            self.best_score = self.best_score_bean(score, model_path)
+
+        if not self.bigger_better:
+            return self.best_score_bean(-self.best_score.score, model_path)
+        else:
+            return self.best_score
 
     def is_needed_add(self, score, model_path):
         if score is None:
@@ -20,9 +31,7 @@ class ScoreModel:
 
         if not self.bigger_better:
             score = -score
-            best_score = self.get_best_score(score, -score, model_path)
-        else:
-            best_score = self.get_best_score(score, score, model_path)
+        best_score = self.get_best_score(score, model_path)
 
         if len(self.best_scores) < self.best_num:
             return True, best_score

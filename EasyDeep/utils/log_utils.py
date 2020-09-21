@@ -13,8 +13,7 @@ class Logger:
     @classmethod
     def init_logger(cls, logger_name=None):
         """
-            指定保存日志的文件路径，日志级别，以及调用文件
-            将日志存入到指定的文件中
+            initialize logger class
         """
         cls.logger = logging.getLogger(logger_name)
         cls.logger.setLevel(config.level)
@@ -55,13 +54,3 @@ class Logger:
 
 def get_logger():
     return Logger.get_logger()
-
-
-if __name__ == '__main__':
-    logger1 = Logger.get_logger()
-    logger2 = Logger.get_logger()
-    if logger1 == logger2:
-        if id(logger2) == id(logger2):
-            print(1)
-            logger1.error(111)
-            logger2.debug(222)
