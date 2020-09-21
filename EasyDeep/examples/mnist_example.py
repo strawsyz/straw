@@ -68,29 +68,6 @@ class MnistExperiment(MnistConfig, DeepExperiment):
                 self.logger.info("================{}=================".format(save_path))
         return pps, loss.data
 
-    # def train_one_epoch(self, epoch):
-    #     self.net_structure.train()
-    #     train_loss = 0
-    #     for idx_iter, (image, label) in enumerate(self.train_loader,start=1):
-    #         ones = torch.sparse.torch.eye(10)
-    #         label = ones.index_select(0, label)
-    #         batch_size = len(image)
-    #         image = image.reshape(batch_size, -1)
-    #         image = self.prepare_data(image, "float")
-    #         label = self.prepare_data(label, "float")
-    #         self.optimizer.zero_grad()
-    #         out = self.net_structure(image)
-    #         loss = self.loss_function(out, label)
-    #         loss.backward()
-    #         self.optimizer.step()
-    #         train_loss += loss.data
-    #         if idx_iter % self.num_iter == 0:
-    #             self.logger.info("loss is {:.6f}, num_iter is {}".format(train_loss / (idx_iter + 1), idx_iter))
-    #     train_loss = train_loss / len(self.train_loader)
-    #     self.scheduler.step()
-    #     self.logger.info("EPOCH:{}\t train_loss:{:.6f}".format(epoch, train_loss))
-    #     return train_loss
-
     def train_one_batch(self, *args, **kwargs):
         X, Y = args[0], args[1]
         ones = torch.sparse.torch.eye(10)
@@ -106,53 +83,20 @@ class MnistExperiment(MnistConfig, DeepExperiment):
         self.optimizer.step()
         return [loss.data]
 
-    # def valid_one_epoch(self, epoch):
-    #     self.net_structure.eval()
-    #     with torch.no_grad():
-    #         valid_loss = 0
-    #         for image, mask in self.valid_loader:
-    #             if self.is_use_gpu:
-    #                 image, mask = Variable(image.cuda()), Variable(mask.cuda())
-    #             else:
-    #                 image, mask = Variable(image), Variable(mask)
-    #             self.net_structure.zero_grad()
-    #             predict = self.net_structure(image)
-    #             valid_loss += self.loss_function(predict, mask)
-    #         valid_loss /= len(self.valid_loader)
-    #         self.logger.info("Epoch:{}\t valid_loss:{:.6f}".format(epoch, valid_loss))
-    #     return valid_loss
-
     def valid_one_batch(self, *args, **kwargs):
-        x, y = args
+        X, Y = args[0], args[1]
         # self.valid_one_batch(x, y)
+        ones = torch.sparse.torch.eye(10)
+        Y = ones.index_select(0, Y)
+        batch_size = len(X)
+        X = X.reshape(batch_size, -1)
         if self.is_use_gpu:
-            x, y = Variable(x.cuda()), Variable(y.cuda())
+            X, Y = Variable(X.cuda()), Variable(Y.cuda())
         else:
-            x, y = Variable(x), Variable(y)
+            X, Y = Variable(X), Variable(Y)
         self.net_structure.zero_grad()
-        predict = self.net_structure(x)
-        return self.loss_function(predict, y)
-
-    def valid_one_epoch(self, epoch):
-        self.net_structure.eval()
-        with torch.no_grad():
-            valid_loss = 0
-            for image, label in self.valid_loader:
-                ones = torch.sparse.torch.eye(10)
-                label = ones.index_select(0, label)
-                batch_size = len(image)
-                image = image.reshape(batch_size, -1)
-                if self.is_use_gpu:
-                    image, label = Variable(image.cuda()), Variable(label.cuda())
-                else:
-                    image, label = Variable(image), Variable(label)
-                self.net_structure.zero_grad()
-                predict = self.net_structure(image)
-                loss = self.loss_function(predict, label)
-                valid_loss += loss.data
-            valid_loss /= len(self.valid_loader)
-            self.logger.info("Epoch:{}\t valid_loss:{:.6f}".format(epoch, valid_loss))
-        return valid_loss
+        predict = self.net_structure(X)
+        return self.loss_function(predict, Y).data
 
 
 if __name__ == '__main__':
@@ -162,6 +106,6 @@ if __name__ == '__main__':
     experiment = MnistExperiment()
     # experiment.predict_all_data()
     # experiment.sample_test()
-    experiment.train(max_try_times=8)
-    # configs = {"lr": [0.01, 0.001, 0.0003], "random_seed": [1, 2, 3]}
-    # experiment.grid_train(configs)
+    # experiment.train(max_try_times=8)
+    configs = {"lr": [0.01, 0.001, 0.0003], "random_seed": [1, 2, 3]}
+    experiment.grid_train(configs)
