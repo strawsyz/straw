@@ -78,32 +78,57 @@ class MnistExperiment(MnistConfig, DeepExperiment):
         self.scheduler.step()
         self.logger.info("EPOCH:{}\t train_loss:{:.6f}".format(epoch, train_loss))
         return train_loss
+    def train_one_batch(self,*args,**kwargs):
+        X,Y = args
+        ones = torch.sparse.torch.eye(10)
+        label = ones.index_select(0, Y)
+        batch_size = len(X)
+        image = X.reshape(batch_size, -1)
+        image = self.prepare_data(image, "float")
+        label = self.prepare_data(label, "float")
+        self.optimizer.zero_grad()
+        out = self.net_structure(image)
+        # out = torch.max(out, 1).indices
+        loss = self.loss_function(out, label)
+        loss.backward()
+        self.optimizer.step()
+        return loss.data
 
-    def valid_one_epoch(self, epoch):
-        self.net_structure.eval()
-        with torch.no_grad():
-            valid_loss = 0
-            for image, mask in self.valid_loader:
-                if self.is_use_gpu:
-                    image, mask = Variable(image.cuda()), Variable(mask.cuda())
-                else:
-                    image, mask = Variable(image), Variable(mask)
-                self.net_structure.zero_grad()
-                predict = self.net_structure(image)
-                valid_loss += self.loss_function(predict, mask)
-            valid_loss /= len(self.valid_loader)
-            self.logger.info("Epoch:{}\t valid_loss:{:.6f}".format(epoch, valid_loss))
-        return valid_loss
+    # def valid_one_epoch(self, epoch):
+    #     self.net_structure.eval()
+    #     with torch.no_grad():
+    #         valid_loss = 0
+    #         for image, mask in self.valid_loader:
+    #             if self.is_use_gpu:
+    #                 image, mask = Variable(image.cuda()), Variable(mask.cuda())
+    #             else:
+    #                 image, mask = Variable(image), Variable(mask)
+    #             self.net_structure.zero_grad()
+    #             predict = self.net_structure(image)
+    #             valid_loss += self.loss_function(predict, mask)
+    #         valid_loss /= len(self.valid_loader)
+    #         self.logger.info("Epoch:{}\t valid_loss:{:.6f}".format(epoch, valid_loss))
+    #     return valid_loss
 
+    def valid_one_batch(self,*args,**kwargs):
+        x,y = args
+        # self.valid_one_batch(x, y)
+        if self.is_use_gpu:
+            x, y = Variable(x.cuda()), Variable(y.cuda())
+        else:
+            x, y = Variable(x), Variable(y)
+        self.net_structure.zero_grad()
+        predict = self.net_structure(x)
+        return self.loss_function(predict, y)
 
 if __name__ == '__main__':
     experiment = MnistExperiment()
     # experiment.predict_all_data()
     # experiment.sample_test()
-    # experiment.train(max_try_times=8)
+    experiment.train(max_try_times=8)
 
-    configs = {"lr": [0.01, 0.001, 0.0003], "random_seed": [1, 2, 3]}
-    experiment.grid_train(configs)
+    # configs = {"lr": [0.01, 0.001, 0.0003], "random_seed": [1, 2, 3]}
+    # experiment.grid_train(configs)
     # experiment.test(save_predict_result=True)
     # experiment.estimate(use_log10=True)
 # /home/straw/Downloads/models/polyp/history/history_1596127749.pth

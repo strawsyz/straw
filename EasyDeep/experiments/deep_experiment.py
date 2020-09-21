@@ -17,6 +17,7 @@ from utils.net_utils import save, load
 class DeepExperiment(ABC, BaseExperiment):
 
     def __init__(self, config_instance=None):
+        self.other_param_4_batch = None
         self.current_epoch = 0
 
         self.scores_history = {}
@@ -59,17 +60,53 @@ class DeepExperiment(ABC, BaseExperiment):
 
     @abstractmethod
     def train_one_epoch(self, epoch):
-        """一个epoch中训练集进行训练"""
-        raise NotImplementedError
+        """train one epoch"""
+        train_loss = 0
+        self.net_structure.train()
+        self.num_iter = 50
+        other_param = self.other_param_4_batch
+        for idx, (sample, label) in enumerate(self.train_loader, start=1):
+            other_param = self.train_one_batch(sample, label,other_param)
+            loss = other_param[0]
+            train_loss += loss
+            if idx % self.num_iter == 0:
+                self.logger.info("EPOCH : {}\t iter：{}, loss_data : {:.6f}".format(epoch, idx, loss))
+        train_loss = train_loss / len(self.train_loader)
+        self.logger.info("EPOCH : {}\t train_loss : {:.6f}\t".format(epoch, train_loss))
+        if self.scheduler is not None:
+            self.scheduler.step()
+            lr = self.net_structure.optimizer.state_dict()['param_groups'][0]['lr']
+            self.logger.info("learning rate is {:.6f}".format(lr))
+        return train_loss
 
     def valid_one_epoch(self, epoch):
-        """一个epoch训练之后使用验证集数据进行验证"""
+        """validate one epoch"""
+        self.net_structure.eval()
+        with torch.no_grad():
+            valid_loss = 0
+            for x, y in self.valid_loader:
+                valid_loss += self.valid_one_batch(x,y)
+            valid_loss /= len(self.valid_loader)
+            self.logger.info("Epoch:{}\t valid_loss:{:.6f}".format(epoch, valid_loss))
+        return valid_loss
+
+    def train_one_batch(self,*args,**kwargs):
+        """
+        train one batch
+        """
+        raise NotImplementedError
+
+    def valid_one_batch(self,*args,**kwargs):
+        """
+        train one batch
+        :param epoch:
+        :return:
+        """
         raise NotImplementedError
 
     def train_valid_one_epoch(self, epoch):
         train_loss = self.train_one_epoch(epoch)
-
-        if self.valid_loader is not None:
+        if self.valid_loader is not None and len(self.valid_loader)>0:
             valid_loss = self.valid_one_epoch(epoch)
             record = self.recorder(train_loss=train_loss, valid_loss=valid_loss)
         else:
@@ -112,7 +149,9 @@ class DeepExperiment(ABC, BaseExperiment):
             if max_try_times is not None and max_try_times < try_times:
                 break
             self.logger.info("use {} seconds in the epoch".format(int(time.time() - start_time)))
-
+            if self.use_db:
+                #todo save result in database
+                pass
         self.logger.info("================training is over=================")
         return self.best_score_models["valid_loss"].score if self.best_score_models is not None else None
 
