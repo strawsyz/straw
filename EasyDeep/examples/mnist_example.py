@@ -13,17 +13,11 @@ from utils.log_utils import get_logger
 class MnistExperiment(MnistConfig, DeepExperiment):
     def __init__(self):
         super(MnistExperiment, self).__init__()
-        # print(self.config_instance)
-        # super(MnistExperiment, self).__init__()
         self.logger = get_logger()
         self.is_bigger_better = False
 
     def show_config(self):
         """list all configure in a experiment"""
-        # if self.config_instance is None:
-        #     self.logger.warning("please set a configure file for the experiment")
-        #     raise RuntimeError("please set a configure file for the experiment")
-        # else:
         self.config_instance = MnistConfig()
         config_instance_str = str(self.config_instance)
         self.logger.info(config_instance_str)

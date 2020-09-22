@@ -19,8 +19,8 @@ class MysqlUtil(object):
 
     def get_one(self, sql, param=()):
         """
-        返回元组的格式
-        如果没有找到数据就会返回None
+        return a tuple
+        if can't get data, then return None
         """
         try:
             cursor, conn = self.execute(sql, param)
@@ -44,6 +44,8 @@ class MysqlUtil(object):
             self.close(cursor, conn)
 
     def insert(self, sql='', param=()):
+        conn = None
+        cursor =None
         try:
             cursor, conn = self.execute(sql, param)
             _id = cursor.lastrowid
@@ -54,7 +56,8 @@ class MysqlUtil(object):
         except Exception as e:
             self.logger.debug(sql)
             self.logger.debug('insert except  {}'.format(e.args))
-            conn.rollback()
+            if conn is not None:
+                conn.rollback()
             raise e
         finally:
             self.close(cursor, conn)
@@ -147,6 +150,3 @@ def get_info_from_sql():
     res = mysql.get_all('select name from theme WHERE  state = 0')
     print(res)
 
-if __name__ == '__main__':
-    # get_info_from_sql()
-    pass

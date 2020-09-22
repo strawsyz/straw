@@ -1,3 +1,4 @@
+from base.base_recorder import ExperimentRecord
 import os
 
 from base.base_config import BaseExperimentConfig
@@ -223,14 +224,12 @@ class MnistConfig(DeepExperimentConfig):
 
     def __init__(self):
         super(MnistConfig, self).__init__()
-        self.recorder = EpochRecord
         self.set_net()
         self.set_dataset()
         self.set_model_selector()
         self.current_epoch = 0
         self.num_epoch = 5
         self.recorder = EpochRecord
-        from base.base_recorder import ExperimentRecord
         self.experiment_record = ExperimentRecord
         self.num_iter = 2
 
@@ -240,7 +239,7 @@ class MnistConfig(DeepExperimentConfig):
         self.result_save_path = os.path.join(self.root_path, "result")
 
         self.is_pretrain = False
-        self.is_use_gpu = True
+        self.is_use_gpu = False
         self.use_prettytable = True
 
         self.init_attr()
