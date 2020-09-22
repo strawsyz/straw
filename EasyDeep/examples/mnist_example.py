@@ -99,13 +99,3 @@ class MnistExperiment(MnistConfig, DeepExperiment):
         return self.loss_function(predict, Y).data
 
 
-if __name__ == '__main__':
-    # def create_experiment_cls():
-    #     return MnistExperiment
-
-    experiment = MnistExperiment()
-    # experiment.predict_all_data()
-    # experiment.sample_test()
-    # experiment.train(max_try_times=8)
-    configs = {"lr": [0.01, 0.001, 0.0003], "random_seed": [1, 2, 3]}
-    experiment.grid_train(configs)
