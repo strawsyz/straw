@@ -37,35 +37,53 @@ class Application_ui(Frame):
 
 
 class ConfigGUI(Application_ui):
-    def __init__(self, init_window_name, config, config_save_path):
+    def __init__(self, experiment_config_save_path, dataset_config_save_path=None,
+                 net_config_save_path=None, experiment_config=None, net_config=None, data_config=None):
         super(ConfigGUI, self).__init__()
         self.init_window_name = self.experiment_tab
-        self.config_save_path = config_save_path
-        if os.path.exists(config_save_path) and os.path.isfile(config_save_path):
-            self.load_config()
-        else:
-            self.config = config
+        self.experiment_config_save_path = experiment_config_save_path
+        self.dataset_config_save_path = dataset_config_save_path
+        self.net_config_save_path = net_config_save_path
+        self.set_config("experiment", experiment_config_save_path, experiment_config)
+        self.set_config("dataset", dataset_config_save_path, data_config)
+        self.set_config("net", net_config_save_path, net_config)
+
         self.read_only_attr_names = ["experiment_record", "recorder", "_system"]
 
-    def get_value_by_attr_name(self, attr_name):
-        value = getattr(self.config, attr_name)
+    def set_config(self, config_type, config_save_path: str, config_instance=None):
+        save_path_name = "{}_config_save_path".format(config_type)
+        config_name = "{}_config".format(config_type)
+        setattr(self, save_path_name, config_save_path)
+        if config_save_path is not None and os.path.exists(config_save_path) and os.path.isfile(config_save_path):
+            setattr(self, config_name, self.load_config(config_save_path))
+        else:
+            if config_instance is not None:
+                setattr(self, config_name, config_instance)
+            else:
+                print("can't find config file for {}".format(config_type))
+
+    def get_value_by_attr_name(self, config, attr_name):
+        value = getattr(config, attr_name)
         if "record" in attr_name:
             value = value.get_class_name()
         return value
 
-    def set_init_window(self):
-        # self.init_window_name["bg"] = "gray"
-        # self.init_window_name.attributes("-alpha",0.9)
-        for idx, attr in enumerate(self.config.__dict__):
-            value = self.get_value_by_attr_name(attr)
+    def init_window(self, tab_type):
+        config_name = "{}_config".format(tab_type)
+        config = getattr(self, config_name)
+        tab_window_name = "{}_tab".format(tab_type)
+        tab_window = getattr(self, tab_window_name)
+
+        for idx, attr in enumerate(config.__dict__):
+            value = self.get_value_by_attr_name(config, attr)
 
             label_name = attr + "_label"
-            label = Label(self.init_window_name, text=attr)
+            label = Label(tab_window, text=attr, width=50)
             input_name = attr + "_text"
             setattr(self, label_name, label)
             label.grid(row=idx, column=0)
             if attr in self.read_only_attr_names:
-                input = Label(self.init_window_name, text=value)
+                input = Label(tab_window, text=value)
             else:
                 if isinstance(value, bool):
                     if value is True:
@@ -75,52 +93,56 @@ class ConfigGUI(Application_ui):
                     options_name = attr + "_option"
                     options = StringVar()
                     setattr(self, options_name, options)
-                    input = ttk.Combobox(self.init_window_name, width=15, textvariable=options)
+                    input = ttk.Combobox(tab_window, width=15, textvariable=options)
                     input['values'] = ("はい", "いいえ")
                     input.current(combobox_idx)
                 else:
                     var = StringVar()
                     text_name = attr + "_text"
                     setattr(self, text_name, var)
-                    input = Entry(self.init_window_name, textvariable=var, width=max(20, len(str(value))))
+                    input = Entry(tab_window, textvariable=var, width=max(20, len(str(value))))
                     var.set(value)
                     print(value)
 
             setattr(self, input_name, input)
             input.grid(row=idx, column=1)
 
-        self.save_button = Button(self.init_window_name, text="保存", bg="lightblue", width=10,
+        self.save_button = Button(tab_window, text="保存", bg="lightblue", width=10,
                                   command=self.save_config)
         self.save_button.grid(row=idx + 1, column=1)
 
+    def set_init_window(self):
+        # self.init_window_name["bg"] = "gray"
+        # self.init_window_name.attributes("-alpha",0.9)
+        self.init_window("experiment")
+        self.init_window("dataset")
+        self.init_window("net")
+
     def save_config(self):
-        for attr in self.config.__dict__:
+        for attr in self.experiment_config.__dict__:
             input_name = attr + "_text"
             input = getattr(self, input_name)
             if isinstance(input, Entry):
                 new_value = input.get().strip()
-                setattr(self.config, attr, new_value)
+                setattr(self.experiment_config, attr, new_value)
         import torch
-        torch.save(self.config, self.config_save_path)
-
-        # with open(self.config_save_path, 'wb') as f:
-        #     pickle.dump(self.config, f)
+        torch.save(self.experiment_config, self.experiment_config_save_path)
         messagebox.showinfo("message", 'save successfully')
 
-    def load_config(self):
+    def load_config(self, config_save_path: str):
         import torch
-        self.config = torch.load(self.config_save_path)
-        # with open(self.config_save_path, 'rb') as f:
-        #     print(self.config_save_path)
-        #     unpickler = pickle.Unpickler(f)
-        #     self.config = unpickler.load()
+        return torch.load(config_save_path)
 
 
 def main():
     from configs.experiment_config import MnistConfig
     config = MnistConfig()
+    net_config = config.net_config
+    dataset_config = config.dataset_config
     init_window = Tk()
-    ZMJ_PORTAL = ConfigGUI(init_window, config, GUI_config.experiment_config_path)
+    ZMJ_PORTAL = ConfigGUI(GUI_config.experiment_config_path, GUI_config.dataset_config_path,
+                           GUI_config.net_config_path, experiment_config=config, net_config=net_config,
+                           data_config=dataset_config)
     ZMJ_PORTAL.set_init_window()
     init_window.mainloop()
 
