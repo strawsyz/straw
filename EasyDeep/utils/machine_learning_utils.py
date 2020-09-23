@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2020/7/14 19:24
 # @Author  : Shi
-# @FileName: model_utils.py
+# @FileName: machine_learning_utils.py
 # @Description：
 
 from sklearn.model_selection import cross_val_score, GridSearchCV, KFold
@@ -29,7 +29,7 @@ def rmse_cv(model, x, y):
 
 
 def models_compare(X, Y):
-    """比较多个模型，分别对每个模型进行计算"""
+    """compare different models to train"""
     models = [LinearRegression(), Ridge(), Lasso(alpha=0.01, max_iter=10000), RandomForestRegressor(),
               GradientBoostingRegressor(), SVR(), LinearSVR(),
               ElasticNet(alpha=0.001, max_iter=10000), SGDRegressor(max_iter=1000, tol=1e-3), BayesianRidge(),
@@ -43,13 +43,13 @@ def models_compare(X, Y):
 
 
 class GridSearch():
-    """根据设定好的模型和模型参数，进行比较"""
-
-    def __init__(self, model):
+    """use model to compare different parameters"""
+    def __init__(self, model,cv=5):
         self.model = model
+        self.cv = cv
 
     def grid_get(self, X, Y, param_grid):
-        grid_search = GridSearchCV(self.model, param_grid, cv=5, scoring="neg_mean_squared_error")
+        grid_search = GridSearchCV(self.model, param_grid, cv=self.cv, scoring="neg_mean_squared_error")
         grid_search.fit(X, Y)
         print(grid_search.best_estimator_, np.sqrt(-grid_search.best_score_))
         grid_search.cv_results_['mean_test_score'] = np.sqrt(-grid_search.cv_results_['mean_test_score'])
@@ -58,9 +58,8 @@ class GridSearch():
             'mean_test_score'))
 
 
-# 自定义加权平均值
 class AverageWeight(BaseEstimator, RegressorMixin):
-    """"预先设置好多个模型，最后根据每个模型的权重，输出结果"""
+    """use different models with weights to train"""
 
     def __init__(self, models, weights):
         self.models = models
@@ -108,7 +107,6 @@ class stacking(BaseEstimator, RegressorMixin, TransformerMixin):
         return self.meta_model.predict(whole_test)
 
     def get_oof(self, X, Y, test_X):
-        # 存储所有的答案
         oof = np.zeros((X.shape[0], len(self.models)))
         test_single = np.zeros((test_X.shape[0], 5))
 
@@ -144,14 +142,14 @@ def grid_usage():
 def average_weight_usage():
     X = np.random.randn(100, 10)
     Y = np.random.randn(100)
-    # 制定每个算法的参数
+    # initialize models
     lasso = Lasso(alpha=0.0005, max_iter=10000)
     ridge = Ridge(alpha=60)
     svr = SVR(gamma=0.0004, kernel='rbf', C=13, epsilon=0.009)
     ker = KernelRidge(alpha=0.2, kernel='polynomial', degree=3, coef0=0.8)
     ela = ElasticNet(alpha=0.005, l1_ratio=0.08, max_iter=10000)
     bay = BayesianRidge()
-
+    # initialize weights
     w1 = 0.02
     w2 = 0.2
     w3 = 0.25
@@ -161,9 +159,9 @@ def average_weight_usage():
 
     weight_avg = AverageWeight(models=[lasso, ridge, svr, ker, ela, bay], weights=[w1, w2, w3, w4, w5, w6])
     res = rmse_cv(weight_avg, X, Y)
-    # 计算交叉验证的平均值
-    print(res.mean())
 
+    result = res.mean()
+    return result
 
 def stacking_usage():
     X = np.random.randn(100, 10)
@@ -179,7 +177,7 @@ def stacking_usage():
     result = rmse_cv(stack_model, X, Y)
     print(result)
     print(result.mean())
-    # 不同的模型堆叠起来，然后输出每个模型对所有数据的预测结果
+
     X_train_stack, X_test_stack = stack_model.get_oof(X, Y, test_X)
     x_train_add = np.hstack((X, X_train_stack))
 
@@ -187,11 +185,3 @@ def stacking_usage():
     print(rmse_cv(stack_model, x_train_add, Y).mean())
 
 
-if __name__ == '__main__':
-    # 显示所有列
-    pd.set_option('display.max_columns', None)
-    # 显示所有行
-    pd.set_option('display.max_rows', None)
-    # 0.981960602339317
-    # averageweight_usage()
-    stacking_usage()

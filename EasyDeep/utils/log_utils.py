@@ -9,7 +9,7 @@ from utils.file_utils import make_directory
 
 class Logger:
     logger = None
-
+    tag_loggers = {}
     @classmethod
     def init_logger(cls, logger_name=None):
         """
@@ -17,16 +17,12 @@ class Logger:
         """
         cls.logger = logging.getLogger(logger_name)
         cls.logger.setLevel(config.level)
-
+        if logger_name is not None:
+            cls.log_path = os.path.join(cls.log_path, logger_name)
         cls.log_path = config.log_path
         make_directory(cls.log_path)
         cls.log_filename = os.path.join(cls.log_path, '{}.log'.format(time.strftime("%Y_%m_%d")))
-        # fh = logging.FileHandler(self.log_name, 'a', encoding='utf-8')  # 这个是python3的
-        # fh.setLevel(logging.DEBUG)
-        # # 定义handler的输出格式
-        # fh.setFormatter(formatter)
-        # # 给logger添加handler
-        # self.logger.addHandler(fh)
+
         if config.console_output:
             console = logging.StreamHandler()
             formatter = logging.Formatter(fmt=config.console_format, datefmt=config.console_datefmt)
@@ -38,7 +34,7 @@ class Logger:
             th = handlers.TimedRotatingFileHandler(filename=cls.log_filename,
                                                    when="midnight",
                                                    backupCount=0,
-                                                   encoding='utf-8')  # 往文件里写入#指定间隔时间自动生成文件的处理器
+                                                   encoding='utf-8')
             formatter = logging.Formatter(fmt=config.file_format, datefmt=config.file_datefmt)
             th.setFormatter(formatter)
             cls.logger.addHandler(th)
@@ -46,11 +42,20 @@ class Logger:
             th.close()
 
     @classmethod
-    def get_logger(cls):
-        if cls.logger is None:
-            cls.init_logger()
-        return cls.logger
+    def get_logger(cls,tag=None):
+        if tag is None:
+            if cls.logger is None:
+                cls.init_logger()
+            return cls.logger
+        else:
+            tage_logger = cls.tag_loggers.get(tag,None)
+            if tage_logger is None:
+                tage_logger = cls.init_logger(tag=tag)
+                cls.tag_loggers[tag] = tage_logger
+
+            return tage_logger
 
 
-def get_logger():
-    return Logger.get_logger()
+
+def get_logger(tag=None):
+    return Logger.get_logger(tag)

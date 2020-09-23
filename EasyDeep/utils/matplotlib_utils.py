@@ -38,3 +38,5 @@ def boxplot(x_labels, data_list, base_color="#539caf", median_color="#297083", x
 def show():
     plt.show()
 
+def save(save_path):
+    plt.savefig(save_path)
