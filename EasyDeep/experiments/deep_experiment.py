@@ -19,11 +19,10 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
 
     def __init__(self):
         super(DeepExperiment, self).__init__()
-        self.show_config()
 
     def prepare_dataset(self, testing=False):
         if testing:
-            self.dataset.test()
+            self.dataset.before_test()
         else:
             self.dataset.train()
         self.dataset.get_dataloader(self)
@@ -101,6 +100,17 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
         self.logger.info("================training start=================")
         try_times = 0
         self.best_score_models = None
+        # create one record on database
+        now = int(time.time())
+        time_struct = time.localtime(now)
+        time_str = time.strftime("%Y-%m-%d %H:%M:%S", time_struct)
+        experiment_insert = "insert into experiment(theme_id,`name`,start_time,`desc`,tag,is_delete) value({},{},{},{}})".format(
+            1,
+            self.experiment_name,
+            time_str,
+            self.description,
+            self.tag, 0)
+        self.experiment_id = self.db_utils.insert(experiment_insert)
         for epoch in range(self.current_epoch, self.current_epoch + self.num_epoch):
             start_time = time.time()
             record = self.train_valid_one_epoch(epoch)
@@ -122,7 +132,11 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
                 break
             self.logger.info("use {} seconds in the epoch".format(int(time.time() - start_time)))
             if self.use_db:
-                # todo save result in database
+                # experiment_info
+
+                # experiment_results
+                self.save()
+                # updata results on database
                 pass
         self.logger.info("================training is over=================")
         self.logger.info(
@@ -130,7 +144,7 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
                                                                     best_score_models["valid_loss"].model_path))
         return self.best_score_models["valid_loss"].score if self.best_score_models is not None else None
 
-    def test(self, prepare_dataset=True, prepare_net=True):
+    def before_test(self, prepare_dataset=True, prepare_net=True):
         if self.is_pretrain is False:
             self.logger.warning("need to set pretrain is True!")
             raise RuntimeError
@@ -141,6 +155,22 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
 
         self.net_structure.eval()
         file_utils.make_directory(self.result_save_path)
+
+    def test(self, prepare_dataset=True, prepare_net=True, save_predict_result=False):
+        self.before_test(prepare_dataset, prepare_net)
+        self.logger.info("=" * 10 + " test start " + "=" * 10)
+        pps = 0
+        loss = 0
+        for i, (image, mask, image_name) in enumerate(self.test_loader):
+            pps_batch, loss_batch = self.test_one_batch(image, mask, image_name, save_predict_result)
+            pps += pps_batch
+            loss += loss_batch
+        pps /= len(self.test_loader)
+        loss /= len(self.test_loader)
+        self.logger.info("average predict {} images per second".format(pps))
+        self.logger.info("average loss is {}".format(loss))
+        self.logger.info("=" * 10 + " testing end " + "=" * 10)
+        return self.result_save_path
 
     def create_checkpoint(self, epoch=None, create4load=False):
         # todo set content of experiment_data in configure file
@@ -199,7 +229,7 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
 
     def create_experiment_record(self):
         experiment_record = self.experiment_record()
-        experiment_record.config_info = str(self.config_instance)
+        experiment_record.config_info = self.config_info
         experiment_record.epoch_records = self.scores_history
         return experiment_record
 

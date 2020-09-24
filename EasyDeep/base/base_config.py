@@ -12,10 +12,13 @@ import torch
 from utils.config_utils import ConfigChecker
 from abc import ABC, abstractmethod
 from utils.time_utils import get_date
+from mixins.mysql_mixin import MySQLMixin
 
-class BaseConfig(BaseLogger, ConfigChecker):
+
+class BaseConfig(BaseLogger, MySQLMixin, ConfigChecker):
     def __init__(self):
         super(BaseConfig, self).__init__()
+        MySQLMixin.__init__(self)
         self._system = platform.system()
 
 
@@ -61,6 +64,7 @@ class BaseExperimentConfig(BaseConfig, ABC):
         if tag is not None:
             experiment_name += tag
         experiment_name = "{}-{}-{}".format(experiment_name, get_date(format_="%m-%d"), self.create_random_str())
+        self.experiment_name = experiment_name
         return experiment_name
 
 

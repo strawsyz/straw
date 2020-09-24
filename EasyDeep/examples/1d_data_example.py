@@ -9,8 +9,8 @@ class Experiment(DeepExperiment):
     def __init__(self, config_instance=experiment_config()):
         super(Experiment, self).__init__(config_instance)
 
-    def test(self):
-        super(Experiment, self).test()
+    def before_test(self):
+        super(Experiment, self).before_test()
         self.logger.info("=" * 10 + "test start" + "=" * 10)
         for i, (data, gt) in enumerate(self.test_loader):
             self.test_one_batch(data, gt, "float")

@@ -82,7 +82,7 @@ class SimpleDeepExperiment(DeepExperiment):
         train_loss = train_loss / len(self.train_data)
         print("train loss \t {}".format(train_loss))
 
-    def test(self):
+    def before_test(self):
         all_loss = 0
         for i, (data, gt) in enumerate(self.test_data):
             data = Variable(torch.from_numpy(data)).double()
@@ -141,7 +141,7 @@ class SimpleDeepExperiment(DeepExperiment):
         # self.dataset.get_dataloader(self)
         self.num_epoch = epoch
         self.train(test=True)
-        self.test(test=True)
+        self.before_test(test=True)
         self.estimate()
         self.num_epoch = cur_epoch
 

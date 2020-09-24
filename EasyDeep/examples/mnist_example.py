@@ -16,29 +16,6 @@ class MnistExperiment(MnistConfig, DeepExperiment):
         self.logger = get_logger()
         self.is_bigger_better = False
 
-    def show_config(self):
-        """list all configure in a experiment"""
-        self.config_instance = MnistConfig()
-        config_instance_str = str(self.config_instance)
-        self.logger.info(config_instance_str)
-        return config_instance_str
-
-    def test(self, prepare_dataset=True, prepare_net=True, save_predict_result=False):
-        super(MnistExperiment, self).test(prepare_dataset, prepare_net)
-        self.logger.info("=" * 10 + " test start " + "=" * 10)
-        pps = 0
-        loss = 0
-        for i, (image, mask, image_name) in enumerate(self.test_loader):
-            pps_batch, loss_batch = self.test_one_batch(image, mask, image_name, save_predict_result)
-            pps += pps_batch
-            loss += loss_batch
-        pps /= len(self.test_loader)
-        loss /= len(self.test_loader)
-        self.logger.info("average predict {} images per second".format(pps))
-        self.logger.info("average loss is {}".format(loss))
-        self.logger.info("=" * 10 + " testing end " + "=" * 10)
-        return self.result_save_path
-
     def test_one_batch(self, image, mask, image_name, save_predict_result=False):
         image = self.prepare_data(image)
         mask = self.prepare_data(mask)
@@ -62,8 +39,7 @@ class MnistExperiment(MnistConfig, DeepExperiment):
                 self.logger.info("================{}=================".format(save_path))
         return pps, loss.data
 
-    def train_one_batch(self, *args, **kwargs):
-        X, Y = args[0], args[1]
+    def train_one_batch(self, X, Y, *args, **kwargs):
         ones = torch.sparse.torch.eye(10)
         label = ones.index_select(0, Y)
         batch_size = len(X)
@@ -77,9 +53,7 @@ class MnistExperiment(MnistConfig, DeepExperiment):
         self.optimizer.step()
         return [loss.data]
 
-    def valid_one_batch(self, *args, **kwargs):
-        X, Y = args[0], args[1]
-        # self.valid_one_batch(x, y)
+    def valid_one_batch(self,X,Y, *args, **kwargs):
         ones = torch.sparse.torch.eye(10)
         Y = ones.index_select(0, Y)
         batch_size = len(X)
@@ -91,5 +65,3 @@ class MnistExperiment(MnistConfig, DeepExperiment):
         self.net_structure.zero_grad()
         predict = self.net_structure(X)
         return self.loss_function(predict, Y).data
-
-

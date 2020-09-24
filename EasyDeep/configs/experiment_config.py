@@ -100,6 +100,12 @@ class DeepExperimentConfig(BaseExperimentConfig):
                 else:
                     set_attr()
 
+    def show_config(self):
+        """list all configure in a experiment"""
+        self.config_info = str(self)
+        self.logger.info(self.config_info)
+        return self.config_info
+
 
 class ImageSegmentationConfig(DeepExperimentConfig):
     def __init__(self, tag=None):
@@ -114,24 +120,24 @@ class ImageSegmentationConfig(DeepExperimentConfig):
             self.num_epoch = 500
             self.is_use_gpu = True
             self.is_pretrain = False
-            self.model_save_path = "C:\(lab\models\polyp"
-            self.history_save_dir = "C:\(lab\models\polyp\hisotry"
+            self.model_save_path = r"C:\(lab\models\polyp"
+            self.history_save_dir = r"C:\(lab\models\polyp\hisotry"
             self.history_save_path = None
             # step 1
-            self.pretrain_path = "C:\(lab\models\polyp\ep410_00-30-36.pkl"
+            self.pretrain_path = r"C:\(lab\models\polyp\ep410_00-30-36.pkl"
             # step 2 not use edge
-            self.pretrain_path = "C:\(lab\models\polyp\ep68_03-13-11.pkl"
+            self.pretrain_path = r"C:\(lab\models\polyp\ep68_03-13-11.pkl"
             # step 2 use edge
-            self.pretrain_path = "C:\(lab\models\polyp\ep77_13-22-08.pkl"
-            self.result_save_path = "C:\(lab\models\polyp\\result"
+            self.pretrain_path = r"C:\(lab\models\polyp\ep77_13-22-08.pkl"
+            self.result_save_path = r"C:\(lab\models\polyp\\result"
         elif self._system == "Linux":
             self.num_epoch = 1000
             self.is_use_gpu = True
             self.is_pretrain = True
-            self.history_save_dir = "/home/straw/Downloads/models/polyp/history"
-            self.pretrain_path = "/home/straw/Downloads/models/polyp/2020-08-11/ep77_13-22-08.pkl"
-            self.model_save_path = "/home/straw/Downloads/models/polyp/"
-            self.result_save_path = "/home/straw/Download\models\polyp\\result"
+            self.history_save_dir = r"/home/straw/Downloads/models/polyp/history"
+            self.pretrain_path = r"/home/straw/Downloads/models/polyp/2020-08-11/ep77_13-22-08.pkl"
+            self.model_save_path = r"/home/straw/Downloads/models/polyp/"
+            self.result_save_path = r"/home/straw/Download\models\polyp/result"
         self.init_attr()
 
     def set_net(self):
@@ -243,6 +249,7 @@ class MnistConfig(DeepExperimentConfig):
         self.use_prettytable = True
 
         self.init_attr()
+        self.show_config()
 
     def set_net(self):
         from nets.MnistNet import MnistNet

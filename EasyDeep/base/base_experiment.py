@@ -35,7 +35,7 @@ class BaseExperiment(BaseExperimentConfig):
     def train(self):
         raise NotImplementedError
 
-    def test(self):
+    def before_test(self):
         raise NotImplementedError
 
     def estimate(self):

@@ -12,8 +12,8 @@ class ImageExperiment(DeepExperiment):
     def __init__(self, config_instance=ImageSegmentationConfig()):
         super(ImageExperiment, self).__init__(config_instance)
 
-    def test(self, prepare_dataset=True, prepare_net=True, save_predict_result=False):
-        super(ImageExperiment, self).test(prepare_dataset, prepare_net)
+    def before_test(self, prepare_dataset=True, prepare_net=True, save_predict_result=False):
+        super(ImageExperiment, self).before_test(prepare_dataset, prepare_net)
         self.logger.info("=" * 10 + " test start " + "=" * 10)
         pps = 0
         loss = 0

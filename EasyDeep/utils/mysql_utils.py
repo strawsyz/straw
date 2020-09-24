@@ -3,13 +3,15 @@ from utils.log_utils import get_logger
 
 
 class MysqlUtil(object):
+    db_utils = None
+    tag_2_db_uilts = {}
 
     def __init__(self):
         self.db = get_connection()
         self.logger = get_logger()
 
     def __new__(cls, *args, **kwargs):
-        if not hasattr(cls, 'inst'):
+        if not hasattr(cls, 'instance'):
             cls.instance = super(MysqlUtil, cls).__new__(cls, *args, **kwargs)
         return cls.instance
 
@@ -45,7 +47,7 @@ class MysqlUtil(object):
 
     def insert(self, sql='', param=()):
         conn = None
-        cursor =None
+        cursor = None
         try:
             cursor, conn = self.execute(sql, param)
             _id = cursor.lastrowid
@@ -143,6 +145,11 @@ class MysqlUtil(object):
             raise e
         finally:
             self.close(cursor, conn)
+
+
+
+def get_db_utils():
+    return MysqlUtil()
 
 
 def get_info_from_sql():

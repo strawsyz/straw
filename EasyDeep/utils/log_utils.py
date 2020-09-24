@@ -10,6 +10,7 @@ from utils.file_utils import make_directory
 class Logger:
     logger = None
     tag_loggers = {}
+
     @classmethod
     def init_logger(cls, logger_name=None):
         """
@@ -42,19 +43,17 @@ class Logger:
             th.close()
 
     @classmethod
-    def get_logger(cls,tag=None):
+    def get_logger(cls, tag=None):
         if tag is None:
             if cls.logger is None:
                 cls.init_logger()
             return cls.logger
         else:
-            tage_logger = cls.tag_loggers.get(tag,None)
+            tage_logger = cls.tag_loggers.get(tag, None)
             if tage_logger is None:
                 tage_logger = cls.init_logger(tag=tag)
                 cls.tag_loggers[tag] = tage_logger
-
             return tage_logger
-
 
 
 def get_logger(tag=None):
