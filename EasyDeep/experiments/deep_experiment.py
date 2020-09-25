@@ -1,24 +1,26 @@
-from base.base_recorder import EpochRecord
 import os
 import time
-from abc import ABC, abstractmethod
 
 import torch
 from torch.autograd import Variable
 
 from base.base_checkpoint import CustomCheckPoint
 from base.base_experiment import BaseExperiment
+from base.base_recorder import EpochRecord
+from configs.experiment_config import DeepExperimentConfig
 from utils import file_utils
 from utils import time_utils
 from utils.matplotlib_utils import lineplot
+from utils.matplotlib_utils import show
 from utils.net_utils import save, load
-from configs.experiment_config import DeepExperimentConfig
 
 
 class DeepExperiment(DeepExperimentConfig, BaseExperiment):
 
     def __init__(self):
         super(DeepExperiment, self).__init__()
+        self.description = "A experiment"
+        self.tag = "A tag"
 
     def prepare_dataset(self, testing=False):
         if testing:
@@ -101,16 +103,18 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
         try_times = 0
         self.best_score_models = None
         # create one record on database
-        now = int(time.time())
-        time_struct = time.localtime(now)
-        time_str = time.strftime("%Y-%m-%d %H:%M:%S", time_struct)
-        experiment_insert = "insert into experiment(theme_id,`name`,start_time,`desc`,tag,is_delete) value({},{},{},{}})".format(
-            1,
-            self.experiment_name,
-            time_str,
-            self.description,
-            self.tag, 0)
-        self.experiment_id = self.db_utils.insert(experiment_insert)
+        if True:
+            now = int(time.time())
+            time_struct = time.localtime(now)
+            time_str = time.strftime("%Y-%m-%d %H:%M:%S", time_struct)
+            experiment_insert = 'insert into experiment(theme_id,`name`,state_time,`desc`,tag,is_delete) value({},"{}","{}","{}","{}",{})'.format(
+                1,
+                self.experiment_name,
+                time_str,
+                self.description,
+                self.tag,
+                0)
+            self.experiment_id = self.db_utils.insert(experiment_insert)
         for epoch in range(self.current_epoch, self.current_epoch + self.num_epoch):
             start_time = time.time()
             record = self.train_valid_one_epoch(epoch)
@@ -131,13 +135,17 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
             if max_try_times is not None and max_try_times < try_times:
                 break
             self.logger.info("use {} seconds in the epoch".format(int(time.time() - start_time)))
-            if self.use_db:
-                # experiment_info
-
+            if True:
                 # experiment_results
-                self.save()
-                # updata results on database
-                pass
+                record_attrs = self.scores_history[list(self.scores_history.keys())[0]].scores
+                results_4_db = {}
+                for attr_name in record_attrs:
+                    results_4_db[attr_name] = [float(getattr(self.scores_history.get(epoch_no), attr_name)) for epoch_no
+                                               in
+                                               self.scores_history]
+                experiment_update = 'update experiment set result = "{}" where id = {}'.format(results_4_db,
+                                                                                             self.experiment_id)
+                self.db_utils.update(experiment_update)
         self.logger.info("================training is over=================")
         self.logger.info(
             "best valid_loss is\t{}\nbest_model_path is\t{}".format(self.best_score_models["valid_loss"].score,
@@ -269,7 +277,6 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
         self.logger.info("showing history")
         record_attrs = self.scores_history[list(self.scores_history.keys())[0]].scores
         epoches = [[epoch_no for epoch_no in self.scores_history] for _ in range(len(record_attrs))]
-        import torch
         if use_log10:
             all_records = [
                 [torch.log10(getattr(self.scores_history.get(epoch_no), attr_name)) for epoch_no in self.scores_history]
@@ -280,7 +287,6 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
             all_records = [[getattr(self.scores_history.get(epoch_no), attr_name) for epoch_no in self.scores_history]
                            for attr_name in record_attrs]
             lineplot(all_records, epoches, record_attrs, "history analysis")
-        from utils.matplotlib_utils import show
         show()
 
     def estimate(self, use_log10=False):

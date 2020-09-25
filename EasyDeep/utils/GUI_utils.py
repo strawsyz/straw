@@ -72,7 +72,7 @@ class ConfigGUI(Application_ui):
         tab_window_name = "{}_tab".format(tab_type)
         tab_window = getattr(self, tab_window_name)
         idx = 0
-        for idx, attr in enumerate(config.__dict__):
+        for idx, (attr, value) in enumerate(config.get_attrs_4_gui()):
             if idx % 2 == 0:
                 label_bg = "#48D1CC"
                 input_bg = ""
@@ -81,7 +81,7 @@ class ConfigGUI(Application_ui):
                 input_bg = ""
             if attr in self.hidden_attr_names:
                 continue
-            value = self.get_value_by_attr_name(config, attr)
+            # value = self.get_value_by_attr_name(config, attr)
 
             label_name = attr + "_label"
             label = Label(tab_window, text=attr, width=50, bg=label_bg)

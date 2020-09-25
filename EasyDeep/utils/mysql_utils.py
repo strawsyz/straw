@@ -46,6 +46,7 @@ class MysqlUtil(object):
             self.close(cursor, conn)
 
     def insert(self, sql='', param=()):
+        print(sql)
         conn = None
         cursor = None
         try:

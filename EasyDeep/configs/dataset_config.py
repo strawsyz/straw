@@ -10,11 +10,11 @@ from base.base_config import BaseDataSetConfig
 class ImageDataSetConfig(BaseDataSetConfig):
     def __init__(self):
         super(ImageDataSetConfig, self).__init__()
-        __system = platform.system()
-        if __system == "Windows":
+        # __system = platform.system()
+        if self.system == "Windows":
             self.image_path = r"C:\(lab\datasets\polyp\TMP\07\data"
             self.mask_path = r"C:\(lab\datasets\polyp\TMP\07\mask"
-        elif __system == "Linux":
+        elif self.system == "Linux":
             self.image_path = "/home/straw/Downloads/dataset/polyp/TMP/07/data"
             self.mask_path = "/home/straw/Downloads/dataset/polyp/TMP/07/mask"
 
@@ -48,13 +48,14 @@ class ImageDataSetConfig(BaseDataSetConfig):
 
 class ImageDataSet4EdgeConfig(BaseDataSetConfig):
     def __init__(self):
-        __system = platform.system()
-        if __system == "Windows":
+        super(ImageDataSet4EdgeConfig, self).__init__()
+        # __system = platform.system()
+        if self.system == "Windows":
             self.image_path = r"C:\(lab\datasets\polyp\TMP\07\data"
             self.mask_path = r"C:\(lab\datasets\polyp\TMP\07\mask"
             self.edge_path = r"C:\(lab\datasets\polyp\TMP\07\edge_bi"
             self.predict_path = r"C:\(lab\datasets\polyp\TMP\07\predict_step_one"
-        elif __system == "Linux":
+        elif self.system == "Linux":
             # train step 1
             # self.image_path = "/home/straw/Downloads/dataset/polyp/TMP/07/data"
             # self.mask_path = "/home/straw/Downloads/dataset/polyp/TMP/07/mask"
@@ -102,6 +103,7 @@ class ImageDataSet4EdgeConfig(BaseDataSetConfig):
 
 class CSVDataSetConfig(BaseDataSetConfig):
     def __init__(self):
+        super(CSVDataSetConfig, self).__init__()
         self.xls_path = ""
         self.csv_dir = ""
         self.test_rate = 0.3
@@ -115,6 +117,7 @@ class CSVDataSetConfig(BaseDataSetConfig):
 
 class MNISTDatasetConfig(BaseDataSetConfig):
     def __init__(self):
+        super(MNISTDatasetConfig, self).__init__()
         self.dataset_path = r"C:\(lab\datasets\mnist"
         self.shuffle = True
         self.batch_size = 8

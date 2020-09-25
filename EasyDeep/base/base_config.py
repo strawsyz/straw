@@ -9,17 +9,39 @@ import string
 import random
 from base.base_logger import BaseLogger
 import torch
+
+from mixins.system_config_mixin import SystemConfigMixin
 from utils.config_utils import ConfigChecker
 from abc import ABC, abstractmethod
 from utils.time_utils import get_date
 from mixins.mysql_mixin import MySQLMixin
 
 
-class BaseConfig(BaseLogger, MySQLMixin, ConfigChecker):
+class BaseConfig(BaseLogger, SystemConfigMixin, MySQLMixin):
     def __init__(self):
         super(BaseConfig, self).__init__()
         MySQLMixin.__init__(self)
-        self._system = platform.system()
+        SystemConfigMixin.__init__(self)
+        self.hide_attrs_4_gui = ["config_info"]
+        # self._system = platform.system()
+
+    def get_attrs_4_gui(self):
+        attrs = []
+        hidden_attrs = self.system_config + self.hide_attrs_4_gui
+        for attr in self.__dict__:
+            if attr not in hidden_attrs:
+                attrs.append((attr, self.__dict__.get(attr)))
+        return attrs
+
+    def get_attrs_4_print(self):
+        attrs = []
+        hidden_attrs = self.system_config + self.hide_attrs_4_gui
+        for attr in self.__dict__:
+            if attr not in hidden_attrs:
+                attrs.append(attr)
+        print(attrs)
+        return attrs
+        # return self.get_attrs_4_gui()
 
 
 class BaseDataSetConfig(BaseConfig):
@@ -68,22 +90,6 @@ class BaseExperimentConfig(BaseConfig, ABC):
         return experiment_name
 
 
-def system_info():
-    cuda_available = torch.cuda.is_available()
-    if cuda_available:
-        num_gpu = torch.cuda.device_count()
-        devices = {}
-        for i in range(num_gpu):
-            device_name = torch.cuda.get_device_name(i)
-            devices[i] = device_name
-        print("cpu num is {}".format(num_gpu))
-        for device in devices:
-            print(device)
-            print(devices.get(device))
-    else:
-        print("no gpu is available")
-
-
 class BaseNetConfig(BaseConfig):
     def __init__(self):
         super(BaseNetConfig, self).__init__()
@@ -106,6 +112,22 @@ class BaseNetConfig(BaseConfig):
 
     def __str__(self):
         return __class__.__name__
+
+
+def system_info():
+    cuda_available = torch.cuda.is_available()
+    if cuda_available:
+        num_gpu = torch.cuda.device_count()
+        devices = {}
+        for i in range(num_gpu):
+            device_name = torch.cuda.get_device_name(i)
+            devices[i] = device_name
+        print("cpu num is {}".format(num_gpu))
+        for device in devices:
+            print(device)
+            print(devices.get(device))
+    else:
+        print("no gpu is available")
 
 
 def current_device():
