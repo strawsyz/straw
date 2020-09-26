@@ -14,7 +14,7 @@ class MySQLConnectionPool(object):
     def __enter__(self):
         self.conn = self.__get_connection()
         self.cursor = self.conn.cursor()
-        self.logger("connect to mysql {}:{}\ndatabase:{}".format(Config.DB_TEST_HOST, Config.DB_TEST_PORT,
+        self.logger.info("connect to mysql {}:{}\ndatabase:{}".format(Config.DB_TEST_HOST, Config.DB_TEST_PORT,
                                                                  Config.DB_TEST_DBNAME))
         return self
 
@@ -26,7 +26,7 @@ class MySQLConnectionPool(object):
 
     def get_conn(self):
         """
-        从线程池取出一个连接
+        get a connection
         :return:cursor, conn
         """
         conn = self.__get_connection()
@@ -47,7 +47,6 @@ class MySQLConnectionPool(object):
                                   host=Config.DB_TEST_HOST, port=Config.DB_TEST_PORT,
                                   user=Config.DB_TEST_USER, passwd=Config.DB_TEST_PASSWORD,
                                   db=Config.DB_TEST_DBNAME, use_unicode=False, charset=Config.DB_CHARSET)
-            print("==================================1")
         return cls.__pool.connection()
 
     @classmethod

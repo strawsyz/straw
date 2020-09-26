@@ -1,3 +1,4 @@
+# rename db_config_example.py to db_config.py
 DB_TEST_HOST = "127.0.0.1"
 DB_TEST_PORT = 3306
 DB_TEST_DBNAME = ""

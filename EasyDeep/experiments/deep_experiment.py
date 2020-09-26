@@ -1,3 +1,4 @@
+import json
 import os
 import time
 
@@ -143,9 +144,12 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
                     results_4_db[attr_name] = [float(getattr(self.scores_history.get(epoch_no), attr_name)) for epoch_no
                                                in
                                                self.scores_history]
-                experiment_update = 'update experiment set result = "{}" where id = {}'.format(results_4_db,
-                                                                                             self.experiment_id)
-                self.db_utils.update(experiment_update)
+                if self.use_db:
+                    results_4_db = json.dumps(results_4_db)
+                    experiment_update = "update experiment set result = '{}' where id = {}".format(results_4_db,
+                                                                                                   self.experiment_id)
+                    self.logger.debug("sql to update result :{}".format(experiment_update))
+                    self.db_utils.update(experiment_update)
         self.logger.info("================training is over=================")
         self.logger.info(
             "best valid_loss is\t{}\nbest_model_path is\t{}".format(self.best_score_models["valid_loss"].score,

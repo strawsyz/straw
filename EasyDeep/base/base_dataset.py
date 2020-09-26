@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 
 from torch.utils.data import Dataset
-from utils.config_utils import ConfigChecker
 from configs.dataset_config import BaseDataSetConfig
 
 

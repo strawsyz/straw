@@ -11,7 +11,6 @@ from base.base_logger import BaseLogger
 import torch
 
 from mixins.system_config_mixin import SystemConfigMixin
-from utils.config_utils import ConfigChecker
 from abc import ABC, abstractmethod
 from utils.time_utils import get_date
 from mixins.mysql_mixin import MySQLMixin

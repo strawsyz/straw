@@ -1,5 +1,5 @@
 import os
-from tkinter import Button, Entry, Frame, Label, StringVar, Tk, Toplevel
+from tkinter import Button, Entry, Frame, Label, StringVar, Tk, Toplevel, LEFT, YES, Y, NO, NW
 from tkinter import messagebox
 from tkinter import ttk
 from tkinter.ttk import Notebook
@@ -8,8 +8,10 @@ import torch
 
 from configs import GUI_config
 
+"""create A GUI to modify config files"""
 
-class Application_ui(Frame):
+
+class ApplicationUI(Frame):
     def __init__(self, master=None):
         Frame.__init__(self, master)
         self.master.title('ConfigGUI')
@@ -26,13 +28,13 @@ class Application_ui(Frame):
         self.main_strip.add(self.experiment_tab, text='Experiment')
 
         self.net_tab = Frame(self.main_strip)
-        self.main_strip.add(self.net_tab, text='Net')
+        self.main_strip.add(self.net_tab, text='Network')
 
         self.dataset_tab = Frame(self.main_strip)
         self.main_strip.add(self.dataset_tab, text='Dataset')
 
 
-class ConfigGUI(Application_ui):
+class ConfigGUI(ApplicationUI):
     def __init__(self, experiment_config_save_path, dataset_config_save_path=None,
                  net_config_save_path=None, experiment_config=None, net_config=None, data_config=None):
         super(ConfigGUI, self).__init__()
@@ -44,7 +46,7 @@ class ConfigGUI(Application_ui):
         self.set_config("dataset", dataset_config_save_path, data_config)
         self.set_config("net", net_config_save_path, net_config)
 
-        self.hidden_attr_names = ["logger"]
+        self.hidden_attr_names = ["logger", "experiment_record", "recorder", "hide_attrs_4_gui"]
         self.read_only_attr_names = ["experiment_record", "recorder", "_system"]
 
     def set_config(self, config_type, config_save_path: str, config_instance=None):
@@ -59,20 +61,25 @@ class ConfigGUI(Application_ui):
             else:
                 print("can't find config file for {}".format(config_type))
 
-    def get_value_by_attr_name(self, config, attr_name):
-        """get value of config file to display"""
-        value = getattr(config, attr_name)
-        if "record" in attr_name:
-            value = value.get_class_name()
-        return value
-
     def init_tab_window(self, tab_type):
         config_name = "{}_config".format(tab_type)
         config = getattr(self, config_name)
         tab_window_name = "{}_tab".format(tab_type)
         tab_window = getattr(self, tab_window_name)
         idx = 0
-        for idx, (attr, value) in enumerate(config.get_attrs_4_gui()):
+
+        button_positions = [("save", "保存"), ("load", "ロード"), ("train", "訓練"), ("test", "テスト"), ("estimate", "評価")]
+        for idx, (button_name, button_display_name) in enumerate(button_positions):
+            button_name = "{}_{}_button".format(tab_type, button_name)
+            button = Button(tab_window, text=button_display_name, bg="lightblue", width=6,
+                            command=lambda: self.save_config(tab_type))
+            setattr(self, button_name, button)
+            # button.place(0,0)
+            button.place(x=520 + idx * 80, y=0, anchor=NW)
+            # button.pack(side=LEFT, expand=NO, fill=Y)
+            # button.grid(row=0, column=idx)
+
+        for idx, (attr, value) in enumerate(config.get_attrs_4_gui(), start=1):
             if idx % 2 == 0:
                 label_bg = "#48D1CC"
                 input_bg = ""
@@ -81,7 +88,6 @@ class ConfigGUI(Application_ui):
                 input_bg = ""
             if attr in self.hidden_attr_names:
                 continue
-            # value = self.get_value_by_attr_name(config, attr)
 
             label_name = attr + "_label"
             label = Label(tab_window, text=attr, width=50, bg=label_bg)

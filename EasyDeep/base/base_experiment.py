@@ -1,5 +1,4 @@
 from configs.experiment_config import BaseExperimentConfig
-from utils.config_utils import ConfigChecker
 
 
 class BaseExperiment(BaseExperimentConfig):
