@@ -1,3 +1,4 @@
+# need to rename db_config_example.py to db_config.py
 from base.base_config import BaseNetConfig
 
 
@@ -19,7 +20,6 @@ class FCNResConfigBase(BaseNetConfig):
     def __init__(self):
         super(FCNResConfigBase, self).__init__()
         self.is_init = True
-        # self.weight_decay = None
         self.lr = 0.001
 
 
@@ -44,3 +44,13 @@ class MnistConfigBase(BaseNetConfig):
         self.n_in = 28 * 28
         self.n_out = 10
         self.loss_func_name = "MSE"
+
+
+class LoanNetConfig(BaseNetConfig):
+    def __init__(self):
+        super(LoanNetConfig, self).__init__()
+        self.n_in = 4
+        self.n_out = 1
+        self.loss_func_name = "MSE"
+        self.scheduler_step_size = 80
+        self.optim_name = "sgd"

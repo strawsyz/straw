@@ -11,10 +11,12 @@ from utils.log_utils import get_logger
 
 
 class MnistExperiment(MnistConfig, DeepExperiment):
-    def __init__(self):
+    def __init__(self, expand_config: dict = {}):
         super(MnistExperiment, self).__init__()
         self.logger = get_logger()
         self.is_bigger_better = False
+        for key in expand_config:
+            setattr(self, key, expand_config[key])
 
     def test_one_batch(self, image, mask, image_name, save_predict_result=False):
         image = self.prepare_data(image)
@@ -53,7 +55,7 @@ class MnistExperiment(MnistConfig, DeepExperiment):
         self.optimizer.step()
         return [loss.data]
 
-    def valid_one_batch(self,X,Y, *args, **kwargs):
+    def valid_one_batch(self, X, Y, *args, **kwargs):
         ones = torch.sparse.torch.eye(10)
         Y = ones.index_select(0, Y)
         batch_size = len(X)
@@ -62,6 +64,6 @@ class MnistExperiment(MnistConfig, DeepExperiment):
             X, Y = Variable(X.cuda()), Variable(Y.cuda())
         else:
             X, Y = Variable(X), Variable(Y)
-        self.net_structure.zero_grad()
+        self.optimizer.zero_grad()
         predict = self.net_structure(X)
         return self.loss_function(predict, Y).data

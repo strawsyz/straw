@@ -1,6 +1,7 @@
 import json
 import os
 import time
+from collections import namedtuple
 
 import torch
 from torch.autograd import Variable
@@ -12,6 +13,7 @@ from configs.experiment_config import DeepExperimentConfig
 from utils import file_utils
 from utils import time_utils
 from utils.matplotlib_utils import lineplot
+from utils.matplotlib_utils import save as img_save
 from utils.matplotlib_utils import show
 from utils.net_utils import save, load
 
@@ -20,12 +22,13 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
 
     def __init__(self):
         super(DeepExperiment, self).__init__()
-        self.description = "A experiment"
-        self.tag = "A tag"
+        self.description = "experiment"
+        # tag can't include a space
+        self.tag = "deep"
 
     def prepare_dataset(self, testing=False):
         if testing:
-            self.dataset.before_test()
+            self.dataset.test()
         else:
             self.dataset.train()
         self.dataset.get_dataloader(self)
@@ -40,13 +43,16 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
         train_loss = 0
         self.net_structure.train()
         other_param = self.other_param_4_batch
+        tmp_idx = 0
         for idx, (sample, label) in enumerate(self.train_loader, start=1):
             other_param = self.train_one_batch(sample, label, other_param)
             loss = other_param[0]
             train_loss += loss
             if idx % self.num_iter == 0:
-                self.logger.info("EPOCH : {}\t iter：{}, loss_data : {:.6f}".format(epoch, idx, loss))
-        train_loss = train_loss / len(self.train_loader)
+                self.logger.info("EPOCH : {}\t iter：{}, loss_data : {:.6f}".format(epoch, idx, train_loss / idx))
+            tmp_idx = idx
+        print(tmp_idx)
+        train_loss = train_loss / tmp_idx
         self.logger.info("EPOCH : {}\t train_loss : {:.6f}\t".format(epoch, train_loss))
         if self.scheduler is not None:
             self.scheduler.step()
@@ -59,11 +65,20 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
         self.net_structure.eval()
         with torch.no_grad():
             valid_loss = 0
-            for x, y in self.valid_loader:
+            for idx, (x, y) in enumerate(self.valid_loader, start=1):
                 valid_loss += self.valid_one_batch(x, y)
-            valid_loss /= len(self.valid_loader)
+            valid_loss /= idx
             self.logger.info("Epoch:{}\t valid_loss:{:.6f}".format(epoch, valid_loss))
         return valid_loss
+
+    def valid(self, pretrain_path=None):
+        if pretrain_path is not None:
+            self.pretrain_path = r"C:\(lab\models\loan\mnist-10-04-H06sZS\model\2020-10-04\ep424_19-16-16.pkl"
+            self.is_pretrain = True
+        assert self.is_pretrain == True
+        self.prepare_net()
+        self.prepare_dataset()
+        self.valid_one_epoch()
 
     @staticmethod
     def train_one_batch(self, *args, **kwargs) -> list:
@@ -81,7 +96,7 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
 
     def train_valid_one_epoch(self, epoch):
         train_loss = self.train_one_epoch(epoch)
-        if self.valid_loader is not None and len(self.valid_loader) > 0:
+        if self.valid_loader is not None:
             valid_loss = self.valid_one_epoch(epoch)
             record = self.recorder(train_loss=train_loss, valid_loss=valid_loss)
         else:
@@ -104,7 +119,7 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
         try_times = 0
         self.best_score_models = None
         # create one record on database
-        if True:
+        if self.use_db:
             now = int(time.time())
             time_struct = time.localtime(now)
             time_str = time.strftime("%Y-%m-%d %H:%M:%S", time_struct)
@@ -122,12 +137,12 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
 
             self.scores_history[epoch] = record
             need_save, best_score_models, model_save_path = self.save(epoch, record)
-            # best socre models for now
+            # best score models for now
             self.best_score_models = best_score_models
             if best_score_models != {}:
                 for score_name in best_score_models.keys():
                     best_score_model = best_score_models[score_name]
-                    self.logger.info("{} is best socre of {}, saved at {}".format(best_score_model.score, score_name,
+                    self.logger.info("{} is best score of {}, saved at {}".format(best_score_model.score, score_name,
                                                                                   best_score_model.model_path))
             if not need_save:
                 try_times += 1
@@ -136,7 +151,7 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
             if max_try_times is not None and max_try_times < try_times:
                 break
             self.logger.info("use {} seconds in the epoch".format(int(time.time() - start_time)))
-            if True:
+            if self.use_db:
                 # experiment_results
                 record_attrs = self.scores_history[list(self.scores_history.keys())[0]].scores
                 results_4_db = {}
@@ -144,12 +159,11 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
                     results_4_db[attr_name] = [float(getattr(self.scores_history.get(epoch_no), attr_name)) for epoch_no
                                                in
                                                self.scores_history]
-                if self.use_db:
-                    results_4_db = json.dumps(results_4_db)
-                    experiment_update = "update experiment set result = '{}' where id = {}".format(results_4_db,
-                                                                                                   self.experiment_id)
-                    self.logger.debug("sql to update result :{}".format(experiment_update))
-                    self.db_utils.update(experiment_update)
+                results_4_db = json.dumps(results_4_db)
+                experiment_update = "update experiment set result = '{}' where id = {}".format(results_4_db,
+                                                                                               self.experiment_id)
+                self.logger.debug("sql to update result :{}".format(experiment_update))
+                self.db_utils.update(experiment_update)
         self.logger.info("================training is over=================")
         self.logger.info(
             "best valid_loss is\t{}\nbest_model_path is\t{}".format(self.best_score_models["valid_loss"].score,
@@ -166,10 +180,13 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
             self.prepare_net()
 
         self.net_structure.eval()
-        file_utils.make_directory(self.result_save_path)
 
-    def test(self, prepare_dataset=True, prepare_net=True, save_predict_result=False):
+    def test(self, prepare_dataset=True, prepare_net=True, save_predict_result=False, pretrain_model_path=None):
+        if pretrain_model_path is not None:
+            self.pretrain_path = pretrain_model_path
         self.before_test(prepare_dataset, prepare_net)
+        if save_predict_result:
+            file_utils.make_directory(self.result_save_path)
         self.logger.info("=" * 10 + " test start " + "=" * 10)
         pps = 0
         loss = 0
@@ -277,7 +294,23 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
             self.logger.error("not set history_save_path")
         return experiment_record
 
-    def show_history(self, use_log10=False):
+    # def show_history(self, use_log10=False):
+    #     self.logger.info("showing history")
+    #     record_attrs = self.scores_history[list(self.scores_history.keys())[0]].scores
+    #     epoches = [[epoch_no for epoch_no in self.scores_history] for _ in range(len(record_attrs))]
+    #     if use_log10:
+    #         all_records = [
+    #             [torch.log10(getattr(self.scores_history.get(epoch_no), attr_name)) for epoch_no in self.scores_history]
+    #             for attr_name in record_attrs]
+    #         record_attrs = ["log10_{}".format(attr_name) for attr_name in record_attrs]
+    #         lineplot(all_records, epoches, labels=record_attrs, title="history analysis with log10")
+    #     else:
+    #         all_records = [[getattr(self.scores_history.get(epoch_no), attr_name) for epoch_no in self.scores_history]
+    #                        for attr_name in record_attrs]
+    #         lineplot(all_records, epoches, record_attrs, "history analysis")
+    #     show()
+
+    def estimate_history(self, use_log10=False, is_save=True, is_show=True, save_path=None):
         self.logger.info("showing history")
         record_attrs = self.scores_history[list(self.scores_history.keys())[0]].scores
         epoches = [[epoch_no for epoch_no in self.scores_history] for _ in range(len(record_attrs))]
@@ -291,15 +324,44 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
             all_records = [[getattr(self.scores_history.get(epoch_no), attr_name) for epoch_no in self.scores_history]
                            for attr_name in record_attrs]
             lineplot(all_records, epoches, record_attrs, "history analysis")
-        show()
+        if is_show:
+            show()
+        if is_save:
+            if save_path is None:
+                self.logger.error("please set a save_path to save the figure")
+            else:
+                img_save(save_path)
 
-    def estimate(self, use_log10=False):
-        experiment_record = self.load_history()
-        self.logger.info("config is :\n{}".format(experiment_record.config_info))
+        # get best results
+        scores_dict = {}
+        score_info = namedtuple("score_info", ["score_name", "scores", "model_path"])
+        model_paths = [getattr(self.scores_history.get(epoch_no), "model_path") for epoch_no in
+                       self.scores_history]
+
+        for attr_name in record_attrs:
+            scores = [getattr(self.scores_history.get(epoch_no), attr_name) for epoch_no in
+                      self.scores_history]
+            min_score = min(scores)
+            min_index = scores.index(min_score)
+            best_score = {}
+            for tmp_attr_name in record_attrs:
+                best_score[tmp_attr_name] = float(getattr(self.scores_history.get(min_index), tmp_attr_name))
+            model_path = model_paths[min_index]
+            score_info(score_name=attr_name, scores=best_score, model_path=model_path)
+            scores_dict[attr_name] = score_info
+            self.logger.info(
+                "{}'s best score is {},epoch is {},model path is {}".format(attr_name, best_score, min_index,
+                                                                            model_path))
+        self.logger.info("total num_epoch is {}".format(len(self.scores_history)))
+        return scores_dict
+
+    def estimate(self, save_path, use_log10=False, is_save=True, is_show=True):
+        self.load_history()
+        # print(experiment_record.config_info)
         if self.scores_history == {}:
             self.logger.error("no history")
         else:
-            self.show_history(use_log10)
+            self.estimate_history(use_log10, is_save, is_show, save_path=save_path)
 
     def sample_test(self, n_sample=3, epoch=3):
         cur_epoch = self.num_epoch
@@ -311,6 +373,7 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
         self.num_epoch = cur_epoch
 
     def prepare_data(self, data, data_type=None):
+        # handler data as numpy
         data = Variable(data)
         if data_type == "float":
             data = data.float()

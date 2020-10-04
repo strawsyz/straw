@@ -2,6 +2,9 @@ from base.base_net import BaseNet
 from configs.net_config import FCNBaseNetConfig, FCNBaseNet4EdgeConfig, FCNResConfigBase
 from net_structures.FCN import FCN, FCN4Edge, FCNRes
 
+'''FCN networks used to image segmentation
+type: 2D to 2D'''
+
 
 class FCNNet(BaseNet, FCNBaseNetConfig):
     def __init__(self):

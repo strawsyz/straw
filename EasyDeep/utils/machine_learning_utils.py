@@ -4,7 +4,7 @@
 # @Author  : Shi
 # @FileName: machine_learning_utils.py
 # @Description：
-
+import joblib
 from sklearn.model_selection import cross_val_score, GridSearchCV, KFold
 
 from sklearn.linear_model import LinearRegression
@@ -24,8 +24,32 @@ from scipy.stats import skew
 from collections import deque
 
 
-def rmse_cv(model, x, y):
-    return np.sqrt(-cross_val_score(model, x, y, scoring="neg_mean_squared_error", cv=5))
+def rmse_cv(model, x, y, scoreing="neg_mean_squared_error"):
+    return cross_val_score(model, x, y, scoring=scoreing, cv=5)
+    return np.sqrt(-cross_val_score(model, x, y, scoring=scoreing, cv=5))
+
+
+def normalization(data_set, range_=None, min_val=None):
+    if min_val is None or range_ is None:
+        min_val = np.min(data_set, axis=0)
+        max_val = np.max(data_set, axis=0)
+        range_ = max_val - min_val
+    norm_data_set = (data_set - min_val) / range_
+    return norm_data_set, range_, min_val
+
+
+def z_score(x, axis):
+    xr = np.rollaxis(x, axis=axis)
+    mean = np.mean(x, axis=axis)
+    xr -= mean
+    std = np.std(x, axis=axis)
+    xr /= std
+    return x, mean, std
+
+
+def save_model(model, save_path):
+    joblib.dump(model, save_path)
+    print("save best model at {}".format(save_path))
 
 
 def models_compare(X, Y):
@@ -44,18 +68,27 @@ def models_compare(X, Y):
 
 class GridSearch():
     """use model to compare different parameters"""
-    def __init__(self, model,cv=5):
+
+    def __init__(self, model, cv=5):
         self.model = model
         self.cv = cv
 
     def grid_get(self, X, Y, param_grid):
         grid_search = GridSearchCV(self.model, param_grid, cv=self.cv, scoring="neg_mean_squared_error")
         grid_search.fit(X, Y)
-        print(grid_search.best_estimator_, np.sqrt(-grid_search.best_score_))
+        best_estimator = grid_search.best_estimator_
+        save_path = str(best_estimator)
+        self.save_model(best_estimator, save_path)
+        print("best estimator is {} ,best score is {}".format(best_estimator,
+                                                              np.sqrt(-grid_search.best_score_)))
         grid_search.cv_results_['mean_test_score'] = np.sqrt(-grid_search.cv_results_['mean_test_score'])
         # print result of training and sort by mean_test_score
         print(pd.DataFrame(grid_search.cv_results_)[['params', 'mean_test_score', 'std_test_score']].sort_values(
             'mean_test_score'))
+
+    def save_model(self, model, save_path):
+        joblib.dump(model, save_path)
+        print("save best model at {}".format(save_path))
 
 
 class AverageWeight(BaseEstimator, RegressorMixin):
@@ -131,11 +164,12 @@ def grid_usage():
     GridSearch(Lasso()).grid_get(X, Y, {'alpha': [0.0004, 0.0005, 0.0006, 0.0007, 0.0008, 0.0009], 'max_iter': [10000]})
     GridSearch(Ridge()).grid_get(X, Y, {'alpha': [35, 40, 45, 50, 55, 60, 65, 70, 80, 90]})
     GridSearch(SVR()).grid_get(X, Y, {'C': [11, 12, 13, 14, 15], 'kernel': ['rbf'], 'gamma': [0.0003, 0.0004],
-                                'epsilon': [0.008, 0.009]})
+                                      'epsilon': [0.008, 0.009]})
     params = {'alpha': [0.2, 0.3, 0.4, 0.5], 'kernel': ['polynomial'], 'degree': [3],
               'coef0': [0.8, 1, 1.2]}
     GridSearch(KernelRidge()).grid_get(X, Y, params)
-    GridSearch(ElasticNet()).grid_get(X, Y, {'alpha': [0.0005, 0.0008, 0.004, 0.005], 'l1_ratio': [0.08, 0.1, 0.3, 0.5, 0.7],
+    GridSearch(ElasticNet()).grid_get(X, Y,
+                                      {'alpha': [0.0005, 0.0008, 0.004, 0.005], 'l1_ratio': [0.08, 0.1, 0.3, 0.5, 0.7],
                                        'max_iter': [10000]})
 
 
@@ -163,6 +197,7 @@ def average_weight_usage():
     result = res.mean()
     return result
 
+
 def stacking_usage():
     X = np.random.randn(100, 10)
     Y = np.random.randn(100)
@@ -183,5 +218,3 @@ def stacking_usage():
 
     print(rmse_cv(stack_model, x_train_add, Y))
     print(rmse_cv(stack_model, x_train_add, Y).mean())
-
-

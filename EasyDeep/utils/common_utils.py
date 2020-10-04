@@ -23,4 +23,5 @@ def copy_attr(source, target):
 
 def copy_need_attr(self, target, attr_names):
     for attr_name in attr_names:
-        setattr(target, attr_name, getattr(self, attr_name))
+        if getattr(self, attr_name, None) is not None:
+            setattr(target, attr_name, getattr(self, attr_name))

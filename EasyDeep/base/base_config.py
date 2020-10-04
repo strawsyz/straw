@@ -4,11 +4,9 @@
 # @Author  : strawsyz
 # @File    : base_config.py
 # @desc: load system information and global variables
-import platform
 import string
 import random
 from base.base_logger import BaseLogger
-import torch
 
 from mixins.system_config_mixin import SystemConfigMixin
 from abc import ABC, abstractmethod
@@ -38,7 +36,6 @@ class BaseConfig(BaseLogger, SystemConfigMixin, MySQLMixin):
         for attr in self.__dict__:
             if attr not in hidden_attrs:
                 attrs.append(attr)
-        print(attrs)
         return attrs
         # return self.get_attrs_4_gui()
 
@@ -48,6 +45,12 @@ class BaseDataSetConfig(BaseConfig):
         super(BaseDataSetConfig, self).__init__()
         self.random_state = None
         self.test_model = False
+        self.train_dataset = None
+        self.valid_dataset = None
+        self.test_dataset = None
+        self.train_loader = None
+        self.valid_loader = None
+        self.test_loader = None
 
     def __str__(self):
         return __class__.__name__
@@ -57,7 +60,7 @@ class BaseExperimentConfig(BaseConfig, ABC):
     def __init__(self, tag=None):
         super(BaseExperimentConfig, self).__init__()
         self.use_prettytable = False
-        self._system = platform.system()
+        # self._system = platform.system()
         self.dataset_config = None
         self.net_config = None
         self.tag = tag
@@ -92,8 +95,12 @@ class BaseExperimentConfig(BaseConfig, ABC):
 class BaseNetConfig(BaseConfig):
     def __init__(self):
         super(BaseNetConfig, self).__init__()
-        # net structure config
+        self.n_int = 4
         self.n_out = 1
+        self.net_structure = None
+        self.loss_function = None
+        # net structure config
+        # self.n_out = 1
         # other net config
         self.loss_func_name = "BCEWithLogitsLoss"
         self.optim_name = "adam"
@@ -101,35 +108,14 @@ class BaseNetConfig(BaseConfig):
         self.scheduler_step_size = 15
         self.scheduler_gamma = 0.8
         self.lr = 0.002
-        self.weight_decay = 0.001
+        self.weight_decay = None
         self.init_attr()
 
     def init_attr(self):
+        print("use base net config's init attr")
         # initialize some attributes
         if self.scheduler_gamma is None:
             self.scheduler_gamma = 0.1
 
     def __str__(self):
         return __class__.__name__
-
-
-def system_info():
-    cuda_available = torch.cuda.is_available()
-    if cuda_available:
-        num_gpu = torch.cuda.device_count()
-        devices = {}
-        for i in range(num_gpu):
-            device_name = torch.cuda.get_device_name(i)
-            devices[i] = device_name
-        print("cpu num is {}".format(num_gpu))
-        for device in devices:
-            print(device)
-            print(devices.get(device))
-    else:
-        print("no gpu is available")
-
-
-def current_device():
-    current_device = torch.cuda.current_device()
-    print(current_device)
-    return current_device

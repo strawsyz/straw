@@ -5,12 +5,12 @@ from experiments.deep_experiment import DeepExperiment
 
 
 # Regression task of one-dimensional data
-class Experiment(DeepExperiment):
-    def __init__(self, config_instance=experiment_config()):
-        super(Experiment, self).__init__(config_instance)
+class D_1_2_1_Experiment(DeepExperiment):
+    def __init__(self):
+        super(D_1_2_1_Experiment, self).__init__()
 
     def before_test(self):
-        super(Experiment, self).before_test()
+        super(D_1_2_1_Experiment, self).before_test()
         self.logger.info("=" * 10 + "test start" + "=" * 10)
         for i, (data, gt) in enumerate(self.test_loader):
             self.test_one_batch(data, gt, "float")

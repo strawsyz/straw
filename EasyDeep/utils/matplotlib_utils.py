@@ -38,5 +38,15 @@ def boxplot(x_labels, data_list, base_color="#539caf", median_color="#297083", x
 def show():
     plt.show()
 
+
 def save(save_path):
     plt.savefig(save_path)
+
+
+def save_ax(ax, figure, save_path, x_expand=1.1, y_expand=1.2):
+    from utils.file_utils import create_unique_name
+    save_path = create_unique_name(save_path)
+    # Save just the portion _inside_ the second axis's boundaries
+    extent = ax.get_window_extent().transformed(figure.dpi_scale_trans.inverted())
+    # Pad the saved area by 10% in the x-direction and 20% in the y-direction
+    figure.savefig(save_path, bbox_inches=extent.expanded(x_expand, y_expand))

@@ -9,9 +9,10 @@ from base.base_net import BaseNet
 from net_structures.CNN1D import MyCNN1D
 from configs.net_config import CNN1DBaseNetConfig
 
+
 class CNN1DNet(BaseNet, CNN1DBaseNetConfig):
-    def __init__(self, config_instance=None):
-        super(CNN1DNet, self).__init__(config_instance)
+    def __init__(self):
+        super(CNN1DNet, self).__init__()
         # init network
         self.net_structure = MyCNN1D()
 

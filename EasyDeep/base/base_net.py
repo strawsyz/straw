@@ -3,19 +3,12 @@ from torch import optim
 
 from base.base_logger import BaseLogger
 from utils.common_utils import copy_attr
+from base.base_config import BaseNetConfig
 
 
-class BaseNet(BaseLogger):
+class BaseNet(BaseNetConfig):
 
     def __init__(self):
-        self.loss_func_name = None
-        self.optim_name = None
-        self.weight_decay = None
-        self.lr = None
-        self.is_scheduler = False
-        self.scheduler_step_size = None
-        self.scheduler_gamma = 0.1
-        self.net_structure = None
         super(BaseNet, self).__init__()
 
     def get_net(self, target, is_use_gpu: bool):
@@ -82,7 +75,7 @@ class BaseNet(BaseLogger):
                 self.optimizer = optim.Adam(self.net_structure.parameters(), lr=self.lr, weight_decay=self.weight_decay)
         elif self.optim_name == "sgd":
             if self.weight_decay is None:
-                self.optimizer = optim.Adam(self.net_structure.parameters(), lr=self.lr)
+                self.optimizer = optim.SGD(self.net_structure.parameters(), lr=self.lr)
             else:
                 self.optimizer = optim.SGD(self.net_structure.parameters(), lr=self.lr, weight_decay=self.weight_decay)
         else:

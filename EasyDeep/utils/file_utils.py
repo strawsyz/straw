@@ -34,11 +34,13 @@ def is_valid_png(png_file):
 def is_valid_zip(zip_file):
     import zipfile36 as zipfile
     try:
-        zipfile.ZipFile(zip_file)  # 能检测文件是否完整
+        # test if file is complete
+        zipfile.ZipFile(zip_file)
+        # test unzip file
         # return z_file.testzip()  # 测试能否解压zip文件
         return True
     except zipfile.BadZipFile as e:
-        return False
+        raise e
     except Exception as e:
         # from logger import Log
         # logger = Log(__name__).get_log()
@@ -133,8 +135,8 @@ def get_extension(path):
 
 
 def get_filename_ext(path):
-    file_name, ext = os.path.splitext(os.path.basename(path))
-    return file_name, ext
+    filename, ext = os.path.splitext(os.path.basename(path))
+    return filename, ext
 
 
 def get_filename(path):
@@ -143,7 +145,19 @@ def get_filename(path):
 
 def split_path(path):
     dir_path = os.path.dirname(path)
-    full_file_name = os.path.basename(path)
-    file_name, extension = os.path.splitext(full_file_name)
+    full_filename = os.path.basename(path)
+    filename, extension = os.path.splitext(full_filename)
     extension = extension[1:]
-    return (dir_path, full_file_name, file_name, extension)
+    return (dir_path, full_filename, filename, extension)
+
+
+def create_unique_name(save_path):
+    if not os.path.exists(save_path):
+        return save_path
+    else:
+        filename, ext = get_filename_ext(save_path)
+        for i in range(10 ** 7):
+            new_filename = filename + str(i)
+            new_save_path = new_filename + ext
+            if not os.path.exists(new_save_path):
+                return new_save_path

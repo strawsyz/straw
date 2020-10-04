@@ -5,8 +5,6 @@ from torchvision import transforms
 from base.base_config import BaseDataSetConfig
 
 
-
-
 class ImageDataSetConfig(BaseDataSetConfig):
     def __init__(self):
         super(ImageDataSetConfig, self).__init__()
@@ -127,3 +125,24 @@ class MNISTDatasetConfig(BaseDataSetConfig):
         self.valid_num = 20
         self.test_num = 20
         self.set_dataset_num = True
+
+
+class LoanDatasetConfig(BaseDataSetConfig):
+    def __init__(self):
+        super(LoanDatasetConfig, self).__init__()
+        self.train_path = r"C:\(lab\datasets\signate01\train.csv"
+        self.test_path = r"C:\(lab\datasets\signate01\test.csv"
+        self.shuffle = True
+        self.batch_size = 16
+        self.batch_size_4_test = 64
+        self.valid_rate = 0.9
+        self.set_dataset_num = False
+        self.feature_names = ['term', 'interest_rate', 'grade', 'credit_score']
+        self.target_names = ["loan_status"]
+        self.feature_target_names = self.feature_names.extend(self.target_names)
+        self.preprocess = ["z_score"]
+        # self.preprocess = ["normalization", "z_score"]
+        self.train_num = None
+        self.test_num = None
+        self.test_data = None
+        self.test_gt = None

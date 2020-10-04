@@ -8,9 +8,12 @@ from configs.experiment_config import ImageSegmentationConfig
 from experiments.deep_experiment import DeepExperiment
 
 
-class ImageExperiment(DeepExperiment):
-    def __init__(self, config_instance=ImageSegmentationConfig()):
-        super(ImageExperiment, self).__init__(config_instance)
+class ImageExperiment(ImageSegmentationConfig, DeepExperiment):
+    def __init__(self):
+        super(ImageExperiment, self).__init__()
+
+    # def __init__(self, config_instance=ImageSegmentationConfig()):
+    #     super(ImageExperiment, self).__init__(config_instance)
 
     def before_test(self, prepare_dataset=True, prepare_net=True, save_predict_result=False):
         super(ImageExperiment, self).before_test(prepare_dataset, prepare_net)

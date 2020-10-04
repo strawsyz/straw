@@ -7,6 +7,8 @@ class EpochRecord:
     def __init__(self, train_loss, valid_loss=None):
         self.train_loss = train_loss
         self.valid_loss = valid_loss
+        self.model_path = None
+        # the name of score used to estimate network
         self.scores = ["train_loss", "valid_loss"]
 
     def record_2_dict(self):

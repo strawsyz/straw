@@ -133,7 +133,7 @@ class SimpleDeepExperiment(DeepExperiment):
             self.logger.error("no history")
         else:
             # display history data
-            self.show_history(use_log10)
+            self.estimate_history(use_log10)
 
     def sample_test(self, n_sample=3, epoch=3):
         cur_epoch = self.num_epoch

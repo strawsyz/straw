@@ -46,7 +46,7 @@ class BaseExperiment(BaseExperimentConfig):
     def load(self):
         raise NotImplementedError
 
-    def show_history(self):
+    def estimate_history(self):
         raise NotImplementedError
 
     def check(self):
@@ -57,4 +57,4 @@ class BaseExperiment(BaseExperimentConfig):
 if __name__ == '__main__':
     expriment = BaseExperiment()
     expriment.train()
-    expriment.show_history()
+    expriment.estimate_history()

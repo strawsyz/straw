@@ -8,15 +8,14 @@ from utils.time_utils import get_time_4_filename
 
 
 class DeepExperimentConfig(BaseExperimentConfig):
-    def __init__(self):
+    def __init__(self, tag=None):
         super(DeepExperimentConfig, self).__init__()
         self.other_param_4_batch = None
 
         self.current_epoch = 0
         self.scores_history = {}
         self.recorder = None
-
-        self.num_epoch = None
+        self.num_epoch = 100
         self.is_use_gpu = None
         self.history_save_dir = None
         self.history_save_path = None
@@ -41,11 +40,15 @@ class DeepExperimentConfig(BaseExperimentConfig):
         self.loss_function = None
         self.scheduler = None
 
+        self.recorder = EpochRecord
+        self.experiment_record = ExperimentRecord
         self.setter_by_tag(tag=self.tag)
+        self.set_model_selector()
+        self.config_info = str(self)
 
     def __repr__(self):
         delimiter = "↓" * 50
-        if self.use_prettytable and self._system == "Windows":
+        if self.use_prettytable and self.system == "Windows":
             from prettytable import PrettyTable
             config_view = PrettyTable()
             config_view.field_names = ["name", "value"]
@@ -63,7 +66,7 @@ class DeepExperimentConfig(BaseExperimentConfig):
             for attr in sorted(self.__dict__):
                 config_view.add_row([attr, getattr(self, attr)])
             return "\n{}".format(str(config_view))
-        elif self._system == 'Linux' or (self._system == 'Windows' and self.use_prettytable == False):
+        elif self.system == 'Linux' or (self.system == 'Windows' and self.use_prettytable == False):
             config_items = []
             config_items.append("dataset config\t" + delimiter)
             for attr in sorted(self.dataset_config.__dict__):
@@ -81,7 +84,7 @@ class DeepExperimentConfig(BaseExperimentConfig):
                 not os.path.isfile(self.history_save_path):
             self.history_save_path = \
                 os.path.join(self.history_save_dir, "{}_{}.pth".format(self.tag, get_time_4_filename()))
-        if getattr(self, "history_save_path", None):
+        if getattr(self, "result_save_path", None):
             self.result_save_path = os.path.join(self.result_save_path, get_date())
 
         for attr_name in self.__dict__:
@@ -103,14 +106,19 @@ class DeepExperimentConfig(BaseExperimentConfig):
 
     def show_config(self):
         """list all configure in a experiment"""
-        self.config_info = str(self)
         self.logger.info(self.config_info)
         return self.config_info
 
+    def set_model_selector(self):
+        from base.base_model_selector import BaseModelSelector
+        self.model_selector = BaseModelSelector()
+        self.model_selector.register_score_model("train_loss", bigger_better=False)
+        self.model_selector.register_score_model("valid_loss", bigger_better=False)
+
 
 class ImageSegmentationConfig(DeepExperimentConfig):
-    def __init__(self, tag=None):
-        super(ImageSegmentationConfig, self).__init__(tag)
+    def __init__(self):
+        super(ImageSegmentationConfig, self).__init__()
         self.use_prettytable = True
         self.set_model_selector()
         self.recorder = EpochRecord
@@ -143,13 +151,13 @@ class ImageSegmentationConfig(DeepExperimentConfig):
 
     def set_net(self):
         # STEP 1 use source image to predict mask image
-        # from nets.FCNNet import FCNNet
-        # from configs.net_config import FCNNetConfig
-        # self.net_config = FCNNetConfig()
-        # self.net = FCNNet()
+        from nets.FCNNet import FCNNet
+        from configs.net_config import FCNBaseNetConfig
+        self.net_config = FCNBaseNetConfig()
+        self.net = FCNNet()
         # replace vgg16 by resnet
-        from nets.FCNNet import FCNResNet
-        self.net = FCNResNet()
+        # from nets.FCNNet import FCNResNet
+        # self.net = FCNResNet()
 
     def set_net_edge(self):
         # STEP 2 USE predict result in step 1 and edge image to predict image
@@ -162,13 +170,13 @@ class ImageSegmentationConfig(DeepExperimentConfig):
         from datasets.image_dataset import ImageDataSet
         from configs.dataset_config import ImageDataSetConfig
         self.dataset_config = ImageDataSetConfig()
-        self.dataset = ImageDataSet(self.dataset_config)
+        self.dataset = ImageDataSet()
 
     def set_dataset_edge(self):
         from configs.dataset_config import ImageDataSet4EdgeConfig
         self.dataset_config = ImageDataSet4EdgeConfig()
         from datasets.image_dataset import ImageDataSet4Edge
-        self.dataset = ImageDataSet4Edge(self.dataset_config)
+        self.dataset = ImageDataSet4Edge()
 
     def set_model_selector(self):
         from base.base_model_selector import BaseModelSelector, ScoreModel
@@ -269,3 +277,32 @@ class MnistConfig(DeepExperimentConfig):
         self.model_selector = BaseModelSelector()
         self.model_selector.register_score_model("train_loss", bigger_better=False)
         self.model_selector.register_score_model("valid_loss", bigger_better=False)
+
+
+class LoanConfig(DeepExperimentConfig):
+    name = "loan"
+    tag = None
+
+    def __init__(self):
+        super(LoanConfig, self).__init__()
+        self.is_use_gpu = True
+        self.num_iter = 3000
+        self.root_path = os.path.join(r"C:\(lab\models\loan", self.create_experiment_name(MnistConfig.name))
+        self.history_save_dir = os.path.join(self.root_path, "history")
+        self.model_save_path = os.path.join(self.root_path, "model")
+        self.result_save_path = os.path.join(self.root_path, "result")
+        self.num_epoch = 500
+        self.is_pretrain = False
+        self.init_attr()
+
+    def set_dataset(self):
+        from configs.dataset_config import LoanDatasetConfig
+        self.dataset_config = LoanDatasetConfig()
+        from datasets.loan_dataset import LoanDataset
+        self.dataset = LoanDataset()
+
+    def set_net(self):
+        from nets.LoanNet import LoanNet
+        from configs.net_config import LoanNetConfig
+        self.net_config = LoanNetConfig()
+        self.net = LoanNet()
