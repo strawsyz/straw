@@ -11,8 +11,10 @@ class ImageDataSetConfig:
             self.image_path = r"C:\(lab\datasets\polyp\TMP\07\data"
             self.mask_path = r"C:\(lab\datasets\polyp\TMP\07\mask"
         elif __system == "Linux":
-            self.image_path = "/home/straw/Downloads/dataset/polyp/TMP/07/data"
-            self.mask_path = "/home/straw/Downloads/dataset/polyp/TMP/07/mask"
+            # self.image_path = "/home/straw/Downloads/dataset/polyp/TMP/07/data"
+            # self.mask_path = "/home/straw/Downloads/dataset/polyp/TMP/07/mask"
+            self.image_path = "/home/shi/Downloads/dataset/polyp/TMP/07/data"
+            self.mask_path = "/home/shi/Downloads/dataset/polyp/TMP/07/mask"
 
         self.shuffle = True
         self.image_transforms = transforms.Compose([
@@ -88,7 +90,8 @@ class ImageDataSet4EdgeConfig:
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         ])
-        self.random_state = 77
+        # random_state must not be modified
+        self.random_state = 7
         self.test_rate = 0.2
         num_samples = len(os.listdir(self.mask_path))
         self.num_test = int(num_samples * self.test_rate)

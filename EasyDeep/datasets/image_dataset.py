@@ -57,10 +57,10 @@ class ImageDataSet(BaseDataSet, ImageDataSetConfig):
                     self.num_train = len(self)
             else:
                 self.num_train = len(self.train_data)
-            if self.val_data is None or int(self.num_train * self.valid_rate) == 0:
-                self.num_train = 0
-            else:
-                self.num_train = int(self.num_train * self.valid_rate)
+            # if self.val_data is None or int(self.num_train * self.valid_rate) == 0:
+            #     self.num_train = 0
+            # else:
+            #     self.num_train = int(self.num_train * self.valid_rate)
             if self.valid_rate is None:
                 self.train_loader = DataLoader(self, batch_size=self.batch_size, shuffle=True)
                 return self.train_loader

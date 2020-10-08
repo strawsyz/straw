@@ -1,8 +1,8 @@
 import os
 
+import numpy as np
 from PIL import Image
 from matplotlib import pyplot as plt
-import numpy as np
 
 
 def read_img(file_name):
@@ -30,7 +30,7 @@ def on_key_release(event):
 def show_images(file_name):
     fig.suptitle(file_name)
     for dir_path, ax in zip(dir_paths, axs):
-        if dir_path == r"C:\(lab\datasets\polyp\TMP\07\predict_step_one":
+        if dir_path == r"/home/straw/Download\models\polyp\result/2020-09-02/":
             image_path = os.path.join(dir_path, file_name)
             ax.imshow(read_img(image_path), cmap='gray')
             ax.set_title(file_name)
@@ -55,9 +55,12 @@ def show_images(file_name):
 if __name__ == '__main__':
     """比较不同文件下的同名图像"""
     file_names = []
-    DATA_PATH = r"C:\(lab\datasets\polyp\TMP\07\data"
-    MASK_PATH = r"C:\(lab\datasets\polyp\TMP\07\mask"
-    RESULT_PATH = r"C:\(lab\datasets\polyp\TMP\07\predict_step_one"
+    # DATA_PATH = r"C:\(lab\datasets\polyp\TMP\07\data"
+    # MASK_PATH = r"C:\(lab\datasets\polyp\TMP\07\mask"
+    # RESULT_PATH = r"C:\(lab\datasets\polyp\TMP\07\predict_step_one"
+    DATA_PATH = r"/home/straw/Downloads/dataset/polyp/TMP/07/data/"
+    MASK_PATH = r"/home/straw/Downloads/dataset/polyp/TMP/07/mask/"
+    RESULT_PATH = r"/home/straw/Download\models\polyp\result/2020-09-02/"
     dir_paths = [DATA_PATH, MASK_PATH, RESULT_PATH]
     num_files_pre_dir = [len(os.listdir(dir_path)) for dir_path in dir_paths]
     min_index = num_files_pre_dir.index(min(num_files_pre_dir))

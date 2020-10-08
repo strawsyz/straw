@@ -111,7 +111,7 @@ class ImageSegmentationConfig(BaseExperimentConfig):
         elif self._system == "Linux":
             self.num_epoch = 1000
             self.is_use_gpu = True
-            self.is_pretrain = True
+            self.is_pretrain = False
             self.history_save_dir = "/home/straw/Downloads/models/polyp/history"
             self.pretrain_path = "/home/straw/Downloads/models/polyp/2020-08-11/ep77_13-22-08.pkl"
             self.model_save_path = "/home/straw/Downloads/models/polyp/"
@@ -125,6 +125,9 @@ class ImageSegmentationConfig(BaseExperimentConfig):
         # self.net_config = FCNNetConfig()
         # self.net = FCNNet()
         # replace vgg16 by resnet
+        from configs.net_config import FCNResConfig
+        self.net_config = FCNResConfig()
+
         from nets.FCNNet import FCNResNet
         self.net = FCNResNet()
 

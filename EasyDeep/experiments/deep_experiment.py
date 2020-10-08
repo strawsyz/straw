@@ -101,9 +101,9 @@ class DeepExperiment(ABC, BaseExperiment):
             self.best_score_models = best_score_models
             if best_score_models != {}:
                 for score_name in best_score_models.keys():
-                    score = best_score_models[score_name]
-                    self.logger.info("{} is best socre of {}, saved at {}".format(score.score, score_name,
-                                                                                  score.model_path))
+                    best_model = best_score_models[score_name]
+                    self.logger.info("{} is best socre of {}, saved at {}".format(best_model.score, score_name,
+                                                                                  best_model.model_path))
 
             if not need_save:
                 try_times += 1
@@ -219,7 +219,7 @@ class DeepExperiment(ABC, BaseExperiment):
                 #     self.scores_history = pickle.load(f)
                 self.logger.info("=" * 10 + " loaded history from {}".format(self.history_save_path) + "=" * 10)
             else:
-                self.logger.error("{} is not a file".format(self.history_save_path))
+                self.logger.warning("{} is not a file".format(self.history_save_path))
         else:
             self.logger.error("not set history_save_path")
         return experiment_record
