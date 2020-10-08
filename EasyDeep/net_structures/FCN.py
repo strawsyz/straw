@@ -79,25 +79,16 @@ class FCN(nn.Module):
 
     def forward(self, x):
         out_1 = self.encoder_1(x)
-        print(out_1.shape)
         out_2 = self.encoder_2(out_1)
-        print(out_2.shape)
         out_3 = self.encoder_3(out_2)
-        print(out_3.shape)
         out_4 = self.encoder_4(out_3)
-        print(out_4.shape)
         out_5 = self.encoder_5(out_4)
-        print(out_5.shape)
 
         decoder_1 = self.decoder_1(out_5)
-        print(decoder_1.shape)
         decoder_2 = self.decoder_2(decoder_1 + out_4)
-        print(decoder_2.shape)
         decoder_3 = self.decoder_3(decoder_2 + out_3)
-        print(decoder_3.shape)
         decoder_4 = self.decoder_4(decoder_3 + out_2)
         out = self.decoder_5(decoder_4 + out_1)
-        print(out.shape)
         return out
 
 
@@ -314,59 +305,3 @@ def model_info(model):
     for name, parameters in model.named_parameters():
         print(name, ':', parameters.size())
         # parm[name] = parameters.detach().numpy()
-
-
-if __name__ == '__main__':
-    # 测试数据能正常跑通
-    # x = torch.randn(1, 5, 224, 224)
-    # net = FCN4Edge()
-    # net = FCN(n_out=1)
-    # print(net)
-    # print(net)
-    # data = torch.randn(1, 3, 224, 224)
-    # net(data)
-    # net.view_net_structure(x,"refine_network")
-    # torch.Size([1, 64, 112, 112])
-    # torch.Size([1, 128, 56, 56])
-    # torch.Size([1, 256, 28, 28])
-    # torch.Size([1, 512, 14, 14])
-    # torch.Size([1, 512, 7, 7])
-
-    from torchvision import models
-
-    tmp = models.resnet18()
-    # summary(tmp, input_size=(3, 224, 224), device="cpu")
-    data = torch.rand(4, 64, 224, 224)
-    # output1 = tmp.layer1(data)
-    # print(output1.shape)
-    # output2 = tmp.layer2(output1)
-    # print(output2.shape)
-    # output3 = tmp.layer3(output2)
-    # print(output3.shape)
-
-    # modules = tmp.modules()
-    # modules = list(tmp.children())
-    # encoder1 = nn.Sequential(*list(tmp.children())[:3])
-    # # 由于renet本来就不是一条龙的形状，所以会报错
-    # # encoder2 = nn.Sequential(*list(tmp.children())[:40])
-    # encoder2 = nn.list(tmp.children())[:3]
-    #
-    # output1 = encoder1(data)
-    # print(output1.shape)
-    # # output1 =
-    # output2 = encoder2(data)
-    # print(output2.shape)
-    # resnet = models.resnet50(pretrained=True)
-    # # print(resnet) 可以打印看模型结构
-    # extract_list = ["conv1", "maxpool", "layer1", "avgpool", "fc"]
-    #
-    # extract_result = FeatureExtractor(resnet, extract_list)
-    #
-    # outputs = extract_result(data)
-    # for output in outputs:
-    #     print(output.shape)
-    # # print(extract_result(data)[4])
-    data = torch.randn(3, 3, 224, 224)
-    net = FCNRes()
-    output = net(data)
-    print(output.shape)

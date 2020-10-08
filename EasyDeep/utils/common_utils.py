@@ -1,4 +1,3 @@
-# 调用之后只执行一次
 class cached_property:
     def __init__(self, func):
         self.func = func
@@ -20,9 +19,9 @@ def copy_attr(source, target):
         for attr in source.__slots__:
             if attr is not "config_instance":
                 setattr(target, attr, getattr(source, attr))
-    # todo 复制完之后删去配置文件占用的空间
 
 
 def copy_need_attr(self, target, attr_names):
     for attr_name in attr_names:
-        setattr(target, attr_name, getattr(self, attr_name))
+        if getattr(self, attr_name, None) is not None:
+            setattr(target, attr_name, getattr(self, attr_name))

@@ -14,6 +14,13 @@ class LinearReLU(nn.Sequential):
         self.add_module("ReLU", nn.ReLU(inplace=True))
 
 
+class LinearSigmoid(nn.Sequential):
+    def __init__(self, num_in, num_out):
+        super(LinearSigmoid, self).__init__()
+        self.add_module("Linear", nn.Linear(num_in, num_out))
+        self.add_module("Sigmoid", nn.Sigmoid())
+
+
 class LinearReLUDropout(nn.Sequential):
     def __init__(self, num_in, num_out, dropout_rate=0.3):
         super(LinearReLUDropout, self).__init__()
@@ -56,22 +63,44 @@ class MyFNN(nn.Module):
 
 
 class AdaptiveFNN(nn.Module):
-    def __init__(self, num_in, num_out):
+    def __init__(self, num_in=None, num_out=None, num_units: list = None, activate_func="ReLU"):
         super(AdaptiveFNN, self).__init__()
-        expand = 4
-        num_unit_in = num_in
-        num_unit_out = int(num_unit_in / expand)
+        if activate_func == "ReLU":
+            base_layer = LinearReLU
+        elif activate_func == "sigmoid":
+            base_layer = LinearSigmoid
         idx = 0
-        while num_unit_out > num_out:
-            setattr(self, "linear{}".format(idx), LinearReLU(num_in=num_unit_in, num_out=num_unit_out))
-            num_unit_in = num_unit_out
+        if num_units is None:
+            expand = 4
+            num_unit_in = num_in
             num_unit_out = int(num_unit_in / expand)
-            idx += 1
-        setattr(self, "linear{}".format(idx), LinearReLU(num_in=num_unit_in, num_out=num_out))
-        self.num_layers = idx + 1
+            while num_unit_out > num_out:
+                setattr(self, "linear{}".format(idx), base_layer(num_in=num_unit_in, num_out=num_unit_out))
+                num_unit_in = num_unit_out
+                num_unit_out = int(num_unit_in / expand)
+                idx += 1
+            setattr(self, "linear{}".format(idx), base_layer(num_in=num_unit_in, num_out=num_out))
+            self.last_layer = nn.Linear(num_out, num_out)
+            self.num_layers = idx + 1
+        else:
+            for idx in range(0, len(num_units) - 1):
+                setattr(self, "linear{}".format(idx), base_layer(num_in=num_units[idx], num_out=num_units[idx + 1]))
+                idx += 1
+            self.last_layer = nn.Linear(num_units[idx], num_units[idx])
+            self.num_layers = idx
 
     def forward(self, x):
         out = x
         for idx in range(self.num_layers):
             out = getattr(self, "linear{}".format(idx))(out)
-        return out
+        return self.last_layer(out)
+
+
+if __name__ == '__main__':
+    import torch
+
+    data = torch.randn((16, 8))
+    model = AdaptiveFNN(num_units=[8, 8, 2])
+    out = model(data)
+    print(out)
+    print(out.shape)

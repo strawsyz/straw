@@ -15,7 +15,6 @@ class BaseCheckPoint:
         super(BaseCheckPoint, self).__init__()
         self.state_dict = None
         self.epoch = None
-        # 如果优化器是SGD的话，就不需要保存
         self.optimizer = None
 
     def __call__(self, data: dict):

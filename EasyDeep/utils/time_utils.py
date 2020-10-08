@@ -6,34 +6,37 @@ def now():
 
 
 def get_time(format_='%Y-%m-%d %H:%M:%S'):
-    """获得字符串类型的时间"""
+    """get time"""
     return now().strftime(format_)
 
-def get_time4filename(format_='%m-%d_%H-%M-%S'):
-    """获得字符串类型的时间"""
+
+def get_time_4_filename(format_='%m-%d_%H-%M-%S'):
+    """get time for filename"""
     return now().strftime(format_)
+
 
 def get_date(format_='%Y-%m-%d'):
+    """get data"""
     return now().strftime(format_)
 
 
-def str2datetime(time_str: str, fmt):
+def str_2_datetime(time_str: str, fmt):
     """将格式化的时间字符串转成datetime类型"""
     return now().strptime(time_str, fmt)
 
 
 def year():
-    """返回年份"""
+    """get year"""
     return now().year
 
 
 def month():
-    """返回月份"""
+    """get month"""
     return now().month
 
 
 def day():
-    """返回月份里的几号"""
+    """get day in a mouth"""
     return now().day
 
 

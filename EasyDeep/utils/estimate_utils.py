@@ -8,7 +8,7 @@ from matplotlib import pyplot as plt
 
 def bbox_iou(box1, box2):
     """
-    获得两个box的iou值
+    calculate IoU between two boxes
     """
     # Get the coordinates of bounding boxes
     b1_x1, b1_y1, b1_x2, b1_y2 = box1[:, 0], box1[:, 1], box1[:, 2], box1[:, 3]
@@ -27,7 +27,6 @@ def bbox_iou(box1, box2):
     # Union Area
     b1_area = (b1_x2 - b1_x1 + 1) * (b1_y2 - b1_y1 + 1)
     b2_area = (b2_x2 - b2_x1 + 1) * (b2_y2 - b2_y1 + 1)
-    # 计算iou
     iou = inter_area / (b1_area + b2_area - inter_area)
 
     return iou
@@ -35,7 +34,7 @@ def bbox_iou(box1, box2):
 
 def calcu_iou(pred, target, target_value=255):
     """
-    基于每个像素计算iou
+    calculate IoU by pixel
     :param pred: predict result
     :param target: ground truth
     :param target_value:
@@ -58,12 +57,12 @@ def iou_mean(pred, target, n_classes=1):
     for cls in range(1, n_classes + 1):
         pred_inds = pred == cls
         target_inds = target == cls
-
-        intersection = (pred_inds[target_inds]).long().sum().data.item()  # Cast to long to prevent overflows
+        # Cast to long to prevent overflows
+        intersection = (pred_inds[target_inds]).long().sum().data.item()
         union = pred_inds.long().sum().data.item() + target_inds.long().sum().data.item() - intersection
         if union == 0:
-            # 分母会变成0
-            ious.append(float('nan'))  # If there is no ground truth, do not include in evaluation
+            # If there is no union
+            ious.append(float('nan'))
         else:
             ious.append(float(intersection) / float(max(union, 1)))
             ious_sum += float(intersection) / float(max(union, 1))
@@ -130,8 +129,3 @@ def iou_estimate(gt_dir, predict_dir, thresholds=range(1, 255), draw_every_iou=F
                               is_draw_image)
 
 
-if __name__ == '__main__':
-    gt_dir = "/home/straw/Downloads/dataset/polyp/TMP/07/mask"
-    # predict_dir = "/home/straw/Download\models\polyp\\result/2020-08-09/"
-    predict_dir = "/home/straw/Download\models\polyp\\result/2020-09-01/"
-    iou_estimate(gt_dir, predict_dir)

@@ -18,8 +18,8 @@ mask图像和原图像两个文件夹
 
 class ImageDataSet(BaseDataSet, ImageDataSetConfig):
 
-    def __init__(self, config_instance=None):
-        super(ImageDataSet, self).__init__(config_instance)
+    def __init__(self):
+        super(ImageDataSet, self).__init__()
         self.image_paths = []
         self.mask_paths = []
         self.IMAGE_PATHS = []
@@ -114,8 +114,8 @@ from configs.dataset_config import ImageDataSet4EdgeConfig
 
 class ImageDataSet4Edge(BaseDataSet, ImageDataSet4EdgeConfig):
 
-    def __init__(self, config_instance=None):
-        super(ImageDataSet4Edge, self).__init__(config_instance)
+    def __init__(self, ):
+        super(ImageDataSet4Edge, self).__init__()
         self.image_paths = []
         self.mask_paths = []
         self.IMAGE_PATHS = []

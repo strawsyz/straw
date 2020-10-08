@@ -61,20 +61,36 @@ class ConvBnReLU(ConvBn):
 
 
 class DeconvBNReLU(nn.Module):
-    def __init__(self, in_n, out_n):
+
+    def __init__(self, in_n, out_n, init=False):
         super(DeconvBNReLU, self).__init__()
         self.model = nn.Sequential(nn.ConvTranspose2d(
             in_n, out_n, kernel_size=4, stride=2, padding=1),
             nn.BatchNorm2d(out_n),
             nn.ReLU(inplace=True),
         )
+        if init:
+            self.init_weight()
 
     def forward(self, x):
         return self.model(x)
 
+    def init_weight(self):
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
+                if m.bias is not None:
+                    nn.init.constant_(m.bias, 0)
+            elif isinstance(m, (nn.BatchNorm2d, nn.GroupNorm)):
+                nn.init.constant_(m.weight, 1)
+                nn.init.constant_(m.bias, 0)
+            elif isinstance(m, nn.Linear):
+                nn.init.normal_(m.weight, 0, 0.01)
+                nn.init.constant_(m.bias, 0)
+
 
 class DepthPointConv(nn.Module):
-    """深度卷积和逐点卷积"""
+    """deep conv and point conv"""
 
     def __init__(self, in_chans, out_chans, stride=1):
         super(DepthPointConv, self).__init__()
@@ -84,11 +100,3 @@ class DepthPointConv(nn.Module):
     def forward(self, x):
         out = self.conv_bn_relu1(x)
         return self.conv_bn_relu2(out)
-
-
-if __name__ == '__main__':
-    import torch
-
-    data = torch.randn((5, 5, 224, 224))
-    net = Deconv(5, 3, True)
-    print(net(data).shape)
