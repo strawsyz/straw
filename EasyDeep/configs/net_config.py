@@ -5,12 +5,17 @@ from base.base_config import BaseNetConfig
 class FCNBaseNetConfig(BaseNetConfig):
     def __init__(self):
         super(FCNBaseNetConfig, self).__init__()
+        self.n_int = 4
+        self.n_out = 1
+
         self.is_init = True
 
 
 class FCNBaseNet4EdgeConfig(BaseNetConfig):
     def __init__(self):
         super(FCNBaseNet4EdgeConfig, self).__init__()
+        self.n_int = 4
+        self.n_out = 1
         self.is_init = True
         self.weight_decay = None
         self.lr = 0.001
@@ -54,3 +59,4 @@ class LoanNetConfig(BaseNetConfig):
         self.loss_func_name = "MSE"
         self.scheduler_step_size = 80
         self.optim_name = "sgd"
+        self.lr = 0.001

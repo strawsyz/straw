@@ -169,36 +169,3 @@ class ImageExperiment(ImageSegmentationConfig, DeepExperiment):
         return pps, loss.data
 
 
-if __name__ == '__main__':
-    from configs.experiment_config import ImageSegmentationConfig
-
-    experiment_config = ImageSegmentationConfig()
-    experiment = ImageExperiment(experiment_config)
-    from torchvision import transforms
-
-    image_path = r"C:\(lab\datasets\polyp\TMP\07\data\Proc201506020034_1_2_2.png"
-    mask_path = r"C:\(lab\datasets\polyp\TMP\07\mask\Proc201506020034_1_2_2.png"
-    edge_path = r"C:\(lab\datasets\polyp\TMP\07\edgnet_structuree_bi\Proc201506020034_1_2_2.png"
-    predict_path = r"C:\(lab\datasets\polyp\TMP\07\predict_step_one\Proc201506020034_1_2_2.png"
-
-    # image_path = r"C:\(lab\datasets\polyp\img_jpg\200.jpg"
-    # mask_path = r"C:\(lab\datasets\polyp\mask_jpg\200.jpg"
-
-    import torch
-
-    # obj = torch.load(experiment.pretrain_path)
-    # print(dir(obj))
-    # print(obj.history_path)
-    # experiment.history_save_path = obj.history_path
-    # history = experiment.load_history()
-
-    # experiment.test_file(image_path, mask_path, edge_path, predict_path)
-    # print(history)
-    # experiment.predict_all_data()
-    # experiment.sample_test()
-    # experiment.train(max_try_times=8)
-    experiment.train_new_network(max_try_times=8)
-
-    # experiment.test(save_predict_result=True)
-    # experiment.estimate(use_log10=True)
-# /home/straw/Downloads/models/polyp/history/history_1596127749.pth

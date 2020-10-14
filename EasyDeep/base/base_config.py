@@ -95,12 +95,8 @@ class BaseExperimentConfig(BaseConfig, ABC):
 class BaseNetConfig(BaseConfig):
     def __init__(self):
         super(BaseNetConfig, self).__init__()
-        self.n_int = 4
-        self.n_out = 1
         self.net_structure = None
         self.loss_function = None
-        # net structure config
-        # self.n_out = 1
         # other net config
         self.loss_func_name = "BCEWithLogitsLoss"
         self.optim_name = "adam"

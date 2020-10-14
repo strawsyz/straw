@@ -8,7 +8,6 @@ class BaseDataSet(BaseDataSetConfig, ABC, Dataset):
     def __init__(self):
         super(BaseDataSet, self).__init__()
 
-    @abstractmethod
     def __len__(self):
         raise NotImplementedError
 

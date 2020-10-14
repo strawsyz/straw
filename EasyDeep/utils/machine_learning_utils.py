@@ -20,13 +20,11 @@ import numpy as np
 import pandas as pd
 
 from sklearn.base import BaseEstimator, TransformerMixin, RegressorMixin, clone
-from scipy.stats import skew
 from collections import deque
 
 
-def rmse_cv(model, x, y, scoreing="neg_mean_squared_error"):
-    return cross_val_score(model, x, y, scoring=scoreing, cv=5)
-    return np.sqrt(-cross_val_score(model, x, y, scoring=scoreing, cv=5))
+def rmse_cv(model, x, y, scoring="neg_mean_squared_error", cv=5):
+    return cross_val_score(model, x, y, scoring=scoring, cv=cv)
 
 
 def normalization(data_set, range_=None, min_val=None):
@@ -73,12 +71,14 @@ class GridSearch():
         self.model = model
         self.cv = cv
 
-    def grid_get(self, X, Y, param_grid):
+    def use_grid_search(self, X, Y, param_grid, save_model=True):
         grid_search = GridSearchCV(self.model, param_grid, cv=self.cv, scoring="neg_mean_squared_error")
         grid_search.fit(X, Y)
         best_estimator = grid_search.best_estimator_
-        save_path = str(best_estimator)
-        self.save_model(best_estimator, save_path)
+        # save model
+        if save_model:
+            save_path = str(best_estimator)
+            self.save_model(best_estimator, save_path)
         print("best estimator is {} ,best score is {}".format(best_estimator,
                                                               np.sqrt(-grid_search.best_score_)))
         grid_search.cv_results_['mean_test_score'] = np.sqrt(-grid_search.cv_results_['mean_test_score'])
@@ -161,16 +161,18 @@ def grid_usage():
     X = np.random.randn(100, 10)
     Y = np.random.randn(100)
 
-    GridSearch(Lasso()).grid_get(X, Y, {'alpha': [0.0004, 0.0005, 0.0006, 0.0007, 0.0008, 0.0009], 'max_iter': [10000]})
-    GridSearch(Ridge()).grid_get(X, Y, {'alpha': [35, 40, 45, 50, 55, 60, 65, 70, 80, 90]})
-    GridSearch(SVR()).grid_get(X, Y, {'C': [11, 12, 13, 14, 15], 'kernel': ['rbf'], 'gamma': [0.0003, 0.0004],
-                                      'epsilon': [0.008, 0.009]})
+    GridSearch(Lasso()).use_grid_search(X, Y, {'alpha': [0.0004, 0.0005, 0.0006, 0.0007, 0.0008, 0.0009],
+                                               'max_iter': [10000]})
+    GridSearch(Ridge()).use_grid_search(X, Y, {'alpha': [35, 40, 45, 50, 55, 60, 65, 70, 80, 90]})
+    GridSearch(SVR()).use_grid_search(X, Y, {'C': [11, 12, 13, 14, 15], 'kernel': ['rbf'], 'gamma': [0.0003, 0.0004],
+                                             'epsilon': [0.008, 0.009]})
     params = {'alpha': [0.2, 0.3, 0.4, 0.5], 'kernel': ['polynomial'], 'degree': [3],
               'coef0': [0.8, 1, 1.2]}
-    GridSearch(KernelRidge()).grid_get(X, Y, params)
-    GridSearch(ElasticNet()).grid_get(X, Y,
-                                      {'alpha': [0.0005, 0.0008, 0.004, 0.005], 'l1_ratio': [0.08, 0.1, 0.3, 0.5, 0.7],
-                                       'max_iter': [10000]})
+    GridSearch(KernelRidge()).use_grid_search(X, Y, params)
+    GridSearch(ElasticNet()).use_grid_search(X, Y,
+                                             {'alpha': [0.0005, 0.0008, 0.004, 0.005],
+                                              'l1_ratio': [0.08, 0.1, 0.3, 0.5, 0.7],
+                                              'max_iter': [10000]})
 
 
 def average_weight_usage():
