@@ -18,7 +18,6 @@ class BaseNetStructure:
         else:
             self.logger.error("please set config file for net")
 
-
     def view_net_structure(self, x, filename=None):
         from torchviz import make_dot
         y = self(x)
@@ -32,4 +31,6 @@ class BaseNetStructure:
     def get_parameters_amount(net):
         total_num = sum(p.numel() for p in net.parameters())
         trainable_num = sum(p.numel() for p in net.parameters() if p.requires_grad)
+        for name, parameters in net.named_parameters():
+            print(name, ':', parameters.size())
         return {'Total': total_num, 'Trainable': trainable_num}

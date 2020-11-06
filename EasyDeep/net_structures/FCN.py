@@ -281,6 +281,57 @@ class FCNRes(nn.Module):
         return out
 
 
+class FCNRes50(nn.Module):
+
+    def __init__(self, num_classes=1, is_init=False):
+        super(FCNRes50, self).__init__()
+        import torchvision.models as models
+
+        self.encoder = models.resnet50(pretrained=False)
+
+        self.decoder_1 = Deconv(2048, 1024, is_init)
+        self.decoder_2 = Deconv(1024, 512, is_init)
+        self.decoder_3 = Deconv(512, 256, is_init)
+        self.decoder_4 = Deconv(256, 64, is_init)
+        self.decoder_5 = Deconv(64, num_classes, is_init)
+
+    def forward(self, x):
+        out = self.encoder.conv1(x)
+        print(out.shape)
+        out = self.encoder.bn1(out)
+        print(out.shape)
+        out_0 = self.encoder.relu(out)
+        print(out_0.shape)
+        out_0 = self.encoder.maxpool(out_0)
+        print('out_0', out_0.shape)
+        out_1 = self.encoder.layer1(out_0)
+        print('out_1', out_1.shape)
+        out_2 = self.encoder.layer2(out_1)
+        print('out_2', out_2.shape)
+        out_3 = self.encoder.layer3(out_2)
+        print('out_3', out_3.shape)
+        out_4 = self.encoder.layer4(out_3)
+        print('out_4', out_4.shape)
+        decoder_1 = self.decoder_1(out_4)
+        print('decoder_1', decoder_1.shape)
+        decoder_2 = self.decoder_2(decoder_1 + out_3)
+        print('decoder_2', decoder_2.shape)
+        decoder_3 = self.decoder_3(decoder_2 + out_2)
+        print('decoder_3', decoder_3.shape)
+        decoder_4 = self.decoder_4(decoder_3 + out_1)
+        print('decoder_4', decoder_4.shape)
+        out = self.decoder_5(decoder_4 + out)
+        print("out", out.shape)
+        return out
+
+
+if __name__ == '__main__':
+    data = torch.randn(3, 3, 224, 224)
+    model = FCNRes50()
+    output = model(data)
+    # print(output)
+
+
 class FeatureExtractor(nn.Module):
     """提取特定层的输出，依靠层的名字来匹配"""
 
@@ -299,9 +350,3 @@ class FeatureExtractor(nn.Module):
                 outputs.append(x)
         return outputs
 
-
-def model_info(model):
-    # parm = {}
-    for name, parameters in model.named_parameters():
-        print(name, ':', parameters.size())
-        # parm[name] = parameters.detach().numpy()
