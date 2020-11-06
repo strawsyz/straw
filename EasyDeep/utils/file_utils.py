@@ -37,7 +37,7 @@ def is_valid_zip(zip_file):
         # test if file is complete
         zipfile.ZipFile(zip_file)
         # test unzip file
-        # return z_file.testzip()  # 测试能否解压zip文件
+        # return z_file.testzip()  # test zip file
         return True
     except zipfile.BadZipFile as e:
         raise e
@@ -58,7 +58,7 @@ def valid_file(file_path, file_type: str = None):
     elif file_type == '.zip':
         return is_valid_zip(file_path)
     else:
-        raise NotImplementedError("还不支持{}格式,文件在{}".format((file_type, file_path)))
+        raise NotImplementedError("Can't check this file type : {}, file path is {}".format((file_type, file_path)))
 
 
 def valid_file_batch(root_path, recursive=False):
@@ -106,7 +106,6 @@ def img2thumbnail(file_path, dest_path, size, is_overwrite=False):
     """
     if os.path.exists(dest_path) and not is_overwrite:
         return
-    # 文件后缀名检查
     ext = get_extension(file_path)
     if ext not in [".jpg", ".png"]:
         return

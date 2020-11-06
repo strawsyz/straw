@@ -4,27 +4,66 @@
 # @Author  : Shi
 # @FileName: machine_learning_utils.py
 # @Description：
+import operator
+from collections import deque
+
 import joblib
-from sklearn.model_selection import cross_val_score, GridSearchCV, KFold
-
-from sklearn.linear_model import LinearRegression
-from sklearn.linear_model import Ridge
-from sklearn.linear_model import Lasso
-
-from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor, ExtraTreesRegressor
-from sklearn.svm import SVR, LinearSVR
-from sklearn.linear_model import ElasticNet, SGDRegressor, BayesianRidge
-from sklearn.kernel_ridge import KernelRidge
-from xgboost import XGBRegressor
 import numpy as np
 import pandas as pd
-
 from sklearn.base import BaseEstimator, TransformerMixin, RegressorMixin, clone
-from collections import deque
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor, ExtraTreesRegressor
+from sklearn.kernel_ridge import KernelRidge
+from sklearn.linear_model import ElasticNet, SGDRegressor, BayesianRidge
+from sklearn.linear_model import Lasso
+from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import Ridge
+from sklearn.model_selection import cross_val_score, GridSearchCV, KFold
+from sklearn.svm import SVR, LinearSVR
+from xgboost import XGBRegressor
+
+
+def kNN(test_x, data_set, labels, k):
+    num_data_set = data_set.shape[0]
+    diff_mat = np.tile(test_x, (num_data_set, 1)) - data_set
+    distances = (diff_mat ** 2).sum(axis=1) ** 0.5
+    indicies_sorted_distance = distances.argsort()
+    label_counter = {}
+    for i in range(k):
+        voted_label = labels[indicies_sorted_distance[i]]
+        label_counter[voted_label] = label_counter.get(voted_label, 0) + 1
+    return sorted(label_counter.items(),
+                  key=operator.itemgetter(1), reverse=True)[0][0]
+
+
+def kNN_classify(train_data, train_gt_data, valid_data, valid_gt_data=None, k=5):
+    predict_data = []
+    if valid_gt_data is None:
+        for idx, data in enumerate(valid_data):
+            predict = kNN(data, train_data, train_gt_data, k)
+            predict_data.append(predict)
+    else:
+        correct = 0
+        for data, gt_data in zip(valid_data, valid_gt_data):
+            predict = kNN(data, train_data, train_gt_data, k)
+            predict_data.append(predict)
+            if gt_data == predict:
+                correct += 1
+        print("correct : {}, number of validation data : {}".format(correct, len(valid_data)))
+        print("correct rate : {}".format(correct / len(valid_data)))
+    return predict_data
 
 
 def rmse_cv(model, x, y, scoring="neg_mean_squared_error", cv=5):
     return cross_val_score(model, x, y, scoring=scoring, cv=cv)
+
+
+def print_cv_result(grid_search):
+    print("Best Estimator:\n{}".format(grid_search.best_estimator_))
+    print("Best Score :{}".format(grid_search.best_score_))
+    print("CV Result : \n{}".format(pd.DataFrame(grid_search.cv_results_)[
+        ['params', 'mean_test_score', 'std_test_score', 'mean_fit_time', 'std_fit_time', 'mean_score_time',
+         'std_score_time']].sort_values(
+        'mean_test_score', ascending=False)))
 
 
 def normalization(data_set, range_=None, min_val=None):
@@ -36,11 +75,13 @@ def normalization(data_set, range_=None, min_val=None):
     return norm_data_set, range_, min_val
 
 
-def z_score(x, axis):
+def z_score(x, mean=None, std=None, axis=0):
+    if mean is None or std is None:
+        mean = np.mean(x, axis=axis)
+        std = np.std(x, axis=axis)
+    # 旋转特定的轴到0之前 ，这段代码可能有问题
     xr = np.rollaxis(x, axis=axis)
-    mean = np.mean(x, axis=axis)
     xr -= mean
-    std = np.std(x, axis=axis)
     xr /= std
     return x, mean, std
 
@@ -64,7 +105,7 @@ def models_compare(X, Y):
         print("{}: {:6f}, {:6f}".format(name, score.mean(), score.std()))
 
 
-class GridSearch():
+class GridSearch:
     """use model to compare different parameters"""
 
     def __init__(self, model, cv=5):

@@ -125,28 +125,28 @@ class ImageSegmentationConfig(DeepExperimentConfig):
         from base.base_recorder import ExperimentRecord
         self.experiment_record = ExperimentRecord
 
-        if self._system == "Windows":
+        if self.system == "Windows":
             self.num_epoch = 500
             self.is_use_gpu = True
             self.is_pretrain = False
-            self.model_save_path = r"C:\(lab\models\polyp"
-            self.history_save_dir = r"C:\(lab\models\polyp\hisotry"
+            self.model_save_path = r""
+            self.history_save_dir = r""
             self.history_save_path = None
             # step 1
-            self.pretrain_path = r"C:\(lab\models\polyp\ep410_00-30-36.pkl"
+            self.pretrain_path = r""
             # step 2 not use edge
-            self.pretrain_path = r"C:\(lab\models\polyp\ep68_03-13-11.pkl"
+            self.pretrain_path = r""
             # step 2 use edge
-            self.pretrain_path = r"C:\(lab\models\polyp\ep77_13-22-08.pkl"
-            self.result_save_path = r"C:\(lab\models\polyp\\result"
-        elif self._system == "Linux":
+            self.pretrain_path = r""
+            self.result_save_path = r""
+        elif self.system == "Linux":
             self.num_epoch = 1000
             self.is_use_gpu = True
             self.is_pretrain = True
-            self.history_save_dir = r"/home/straw/Downloads/models/polyp/history"
-            self.pretrain_path = r"/home/straw/Downloads/models/polyp/2020-08-11/ep77_13-22-08.pkl"
-            self.model_save_path = r"/home/straw/Downloads/models/polyp/"
-            self.result_save_path = r"/home/straw/Download\models\polyp/result"
+            self.history_save_dir = r""
+            self.pretrain_path = r""
+            self.model_save_path = r""
+            self.result_save_path = r""
         self.init_attr()
 
     def set_net(self):
@@ -251,7 +251,7 @@ class MnistConfig(DeepExperimentConfig):
         self.experiment_record = ExperimentRecord
         self.num_iter = 2
 
-        self.root_path = os.path.join(r"C:\(lab\models\mnist", self.create_experiment_name(MnistConfig.name))
+        self.root_path = os.path.join(r"", self.create_experiment_name(MnistConfig.name))
         self.history_save_dir = os.path.join(self.root_path, "history")
         self.model_save_path = os.path.join(self.root_path, "model")
         self.result_save_path = os.path.join(self.root_path, "result")
@@ -290,7 +290,7 @@ class LoanConfig(DeepExperimentConfig):
         super(LoanConfig, self).__init__()
         self.is_use_gpu = True
         self.num_iter = 3000
-        self.root_path = os.path.join(r"C:\(lab\models\loan", self.create_experiment_name(MnistConfig.name))
+        self.root_path = os.path.join(r"", self.create_experiment_name(MnistConfig.name))
         self.history_save_dir = os.path.join(self.root_path, "history")
         self.model_save_path = os.path.join(self.root_path, "model")
         self.result_save_path = os.path.join(self.root_path, "result")
