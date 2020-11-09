@@ -182,6 +182,7 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
         self.net_structure.eval()
 
     def test(self, prepare_dataset=True, prepare_net=True, save_predict_result=False, pretrain_model_path=None):
+        assert self.is_pretrain is True
         if pretrain_model_path is not None:
             self.pretrain_path = pretrain_model_path
         self.before_test(prepare_dataset, prepare_net)

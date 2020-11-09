@@ -7,8 +7,9 @@ class FCNBaseNetConfig(BaseNetConfig):
         super(FCNBaseNetConfig, self).__init__()
         self.n_int = 4
         self.n_out = 1
-
+        # if init parameters in the network
         self.is_init = True
+        self.lr = 0.001
 
 
 class FCNBaseNet4EdgeConfig(BaseNetConfig):
@@ -21,9 +22,9 @@ class FCNBaseNet4EdgeConfig(BaseNetConfig):
         self.lr = 0.001
 
 
-class FCNResConfigBase(BaseNetConfig):
+class FCNResBaseConfig(BaseNetConfig):
     def __init__(self):
-        super(FCNResConfigBase, self).__init__()
+        super(FCNResBaseConfig, self).__init__()
         self.is_init = True
         self.lr = 0.001
 

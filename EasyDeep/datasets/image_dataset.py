@@ -33,17 +33,21 @@ class ImageDataSet(BaseDataSet, ImageDataSetConfig):
             self.MASK_PATHS.append(os.path.join(self.mask_path, file_name))
             self.image_paths.append(os.path.join(self.image_path, file_name))
             self.mask_paths.append(os.path.join(self.mask_path, file_name))
+        if self.num_train is None:
+            self.num_train = len(self.mask_paths)
+        if self.num_test is None:
+            self.num_test = len(self.mask_paths)
 
     def get_sample_dataloader(self, num_samples, target):
         self.image_paths, self.mask_paths = self.IMAGE_PATHS[:num_samples * 3], self.MASK_PATHS[:num_samples * 3]
-        self.train_data, self.val_data, self.test_data = torch.utils.data.random_split(self,
+        self.train_data, self.valid_data, self.test_data = torch.utils.data.random_split(self,
                                                                                        [num_samples,
                                                                                         num_samples,
                                                                                         num_samples])
         self.train_loader = DataLoader(self.train_data, batch_size=self.batch_size, shuffle=True)
-        self.val_loader = DataLoader(self.val_data, batch_size=self.batch_size, shuffle=True)
+        self.valid_loader = DataLoader(self.valid_data, batch_size=self.batch_size, shuffle=True)
         self.test_loader = DataLoader(self.test_data, batch_size=self.batch_size4test, shuffle=True)
-        copy_need_attr(target, ["val_loader", "train_loader", "test_loader"])
+        copy_need_attr(target, ["valid_loader", "train_loader", "test_loader"])
 
     def train(self):
         super().train()

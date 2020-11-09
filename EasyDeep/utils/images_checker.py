@@ -69,8 +69,8 @@ def show_images(file_name):
     fig.canvas.draw()
 
 
-def main(result_path, ax_save_path="results/tmp.png", data_path=r"C:\(lab\datasets\polyp\TMP\07\data",
-         mask_path=r"C:\(lab\datasets\polyp\TMP\07\mask"):
+def main(result_path, data_path=r"",
+         mask_path=r"", ax_save_path="results/tmp.png"):
     """check images in three different folders"""
     dir_paths = [data_path, mask_path, result_path]
     fig, (axs) = plt.subplots(1, len(dir_paths))

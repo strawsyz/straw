@@ -3,14 +3,17 @@ import time
 
 from PIL import Image
 from torch.autograd import Variable
+from torchvision.transforms import transforms
 
 from configs.experiment_config import ImageSegmentationConfig
 from experiments.deep_experiment import DeepExperiment
+import torch
 
 
 class ImageExperiment(ImageSegmentationConfig, DeepExperiment):
     def __init__(self):
         super(ImageExperiment, self).__init__()
+        self.show_config()
 
     # def __init__(self, config_instance=ImageSegmentationConfig()):
     #     super(ImageExperiment, self).__init__(config_instance)
@@ -41,10 +44,11 @@ class ImageExperiment(ImageSegmentationConfig, DeepExperiment):
         _, _, width, height = mask.size()
         loss = self.loss_function(out, mask)
         self.logger.info("test_loss is {}".format(loss))
-
+        num_batch,  *_ = out.shape
         if save_predict_result:
             predict = out.squeeze().cpu().data.numpy()
-            for index, pred in enumerate(predict):
+            for index in range(num_batch):
+                pred = predict[index]
                 pred = pred * 255
                 pred = pred.astype('uint8')
                 pred = Image.fromarray(pred)
@@ -167,5 +171,3 @@ class ImageExperiment(ImageSegmentationConfig, DeepExperiment):
             self.logger.info("================{}=================".format(save_path))
         self.logger.info("{}:{}".format(filename, pps))
         return pps, loss.data
-
-

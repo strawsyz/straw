@@ -13,7 +13,7 @@ class BaseNet(BaseNetConfig):
 
     def get_net(self, target, is_use_gpu: bool):
         if self.net_structure is None:
-            self.logger.error("please select a net_structure to use")
+            raise NotImplemented("please select a net_structure to use")
         self.set_loss_function()
         if is_use_gpu:
             self.net_structure = self.net_structure.cuda()

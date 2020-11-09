@@ -88,7 +88,6 @@ def calcu_iou_with_threshold(pred_part, gt_part, threshold=127, draw=False):
 def analysis_iou_by_threshold(gt_image_paths, predict_image_paths, thresholds=range(1, 255), draw_every_iou=False,
                               is_draw_image=False):
     assert (len(gt_image_paths) == len(predict_image_paths))
-    # plt.figure()
     all_ious = []
     for index, (gt_image_path, predict_image_path) in enumerate(zip(gt_image_paths, predict_image_paths)):
         gt_image = np.array(Image.open(gt_image_path).convert("L"))

@@ -254,7 +254,7 @@ class FCNRes(nn.Module):
         super(FCNRes, self).__init__()
         # vgg = vgg16_bn(pretrained=False)
 
-        self.encoder = models.resnet34(pretrained=False)
+        self.encoder = models.resnet34(pretrained=True)
         self.conv_bn_relu0 = ConvBnReLU(512, 512, kernel_size=3, stride=2)
 
         self.decoder_1 = Deconv(512, 512, is_init)
