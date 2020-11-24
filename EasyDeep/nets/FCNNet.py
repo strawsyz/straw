@@ -1,20 +1,20 @@
 from base.base_net import BaseNet
-from configs.net_config import FCNBaseNetConfig, FCNBaseNet4EdgeConfig, FCNResBaseConfig
-from net_structures.FCN import FCN, FCN4Edge, FCNRes, FCNRes50
+from configs.net_config import FCNVgg16NetConfig, FCNBaseNet4EdgeConfig, FCNResBaseConfig
+from net_structures.FCN import FCNVgg16, FCN4Edge, FCNRes, FCNRes50
 
 '''FCN networks used to image segmentation
 type: 2D to 2D'''
 
 
-class FCNNet(BaseNet, FCNBaseNetConfig):
+class FCNVgg16Net(BaseNet, FCNVgg16NetConfig):
     def __init__(self):
-        super(FCNNet, self).__init__()
-        self.net_structure = FCN(n_out=self.n_out, is_init=True)
+        super(FCNVgg16Net, self).__init__()
+        self.net_structure = FCNVgg16(n_out=self.n_out, is_init=self.is_init)
 
 
-class FCNResNet(BaseNet, FCNResBaseConfig):
+class FCNRes34Net(BaseNet, FCNResBaseConfig):
     def __init__(self):
-        super(FCNResNet, self).__init__()
+        super(FCNRes34Net, self).__init__()
         self.net_structure = FCNRes(is_init=self.is_init)
 
 
@@ -23,8 +23,8 @@ class FCN4EdgeNet(BaseNet, FCNBaseNet4EdgeConfig):
         super(FCN4EdgeNet, self).__init__()
         self.net_structure = FCN4Edge(n_out=self.n_out, is_init=self.is_init)
 
+
 class FCNRes50Net(BaseNet, FCNResBaseConfig):
     def __init__(self):
         super(FCNRes50Net, self).__init__()
         self.net_structure = FCNRes50(is_init=self.is_init)
-

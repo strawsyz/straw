@@ -2,9 +2,9 @@
 from base.base_config import BaseNetConfig
 
 
-class FCNBaseNetConfig(BaseNetConfig):
+class FCNVgg16NetConfig(BaseNetConfig):
     def __init__(self):
-        super(FCNBaseNetConfig, self).__init__()
+        super(FCNVgg16NetConfig, self).__init__()
         self.n_int = 4
         self.n_out = 1
         # if init parameters in the network
@@ -58,6 +58,6 @@ class LoanNetConfig(BaseNetConfig):
         self.n_in = 4
         self.n_out = 1
         self.loss_func_name = "MSE"
-        self.scheduler_step_size = 80
+        self.scheduler_step_size = 20
         self.optim_name = "sgd"
         self.lr = 0.001

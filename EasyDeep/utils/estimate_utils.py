@@ -106,7 +106,7 @@ def analysis_iou_by_threshold(gt_image_paths, predict_image_paths, thresholds=ra
     average_iou = iousum / len(gt_image_paths)
     print("average calcu_iou is {}".format(average_iou))
     print("max average calcu_iou is {}".format(np.max(average_iou)))
-    plt.plot(thresholds, ious, label="threshold-ious")
+    plt.plot(thresholds, average_iou, label="threshold-ious")
 
     plt.xlabel("threshold")
     plt.ylabel("iou")

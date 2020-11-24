@@ -12,6 +12,7 @@ from mixins.system_config_mixin import SystemConfigMixin
 from abc import ABC, abstractmethod
 from utils.time_utils import get_date
 from mixins.mysql_mixin import MySQLMixin
+from base.base_config_item import BaseConfigItem as ConfigItem
 
 
 class BaseConfig(BaseLogger, SystemConfigMixin, MySQLMixin):
@@ -20,7 +21,6 @@ class BaseConfig(BaseLogger, SystemConfigMixin, MySQLMixin):
         MySQLMixin.__init__(self)
         SystemConfigMixin.__init__(self)
         self.hide_attrs_4_gui = ["config_info"]
-        # self._system = platform.system()
 
     def get_attrs_4_gui(self):
         attrs = []
@@ -37,20 +37,26 @@ class BaseConfig(BaseLogger, SystemConfigMixin, MySQLMixin):
             if attr not in hidden_attrs:
                 attrs.append(attr)
         return attrs
-        # return self.get_attrs_4_gui()
+
+    def add_config_item(self, config_item):
+        setattr(self, config_item.name, config_item.value)
 
 
 class BaseDataSetConfig(BaseConfig):
+
     def __init__(self):
         super(BaseDataSetConfig, self).__init__()
-        self.random_state = None
-        self.test_model = False
-        self.train_dataset = None
-        self.valid_dataset = None
-        self.test_dataset = None
-        self.train_loader = None
-        self.valid_loader = None
-        self.test_loader = None
+
+        class ConfigItems:
+            def __init__(self):
+                self.random_state = None
+                self.test_model = False
+                self.train_dataset = None
+                self.valid_dataset = None
+                self.test_dataset = None
+                self.train_loader = None
+                self.valid_loader = None
+                self.test_loader = None
 
     def __str__(self):
         return __class__.__name__
@@ -60,7 +66,6 @@ class BaseExperimentConfig(BaseConfig, ABC):
     def __init__(self, tag=None):
         super(BaseExperimentConfig, self).__init__()
         self.use_prettytable = False
-        # self._system = platform.system()
         self.dataset_config = None
         self.net_config = None
         self.tag = tag

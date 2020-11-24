@@ -39,11 +39,12 @@ class ImageDataSet(BaseDataSet, ImageDataSetConfig):
             self.num_test = len(self.mask_paths)
 
     def get_sample_dataloader(self, num_samples, target):
+        """get sample dataloader to test"""
         self.image_paths, self.mask_paths = self.IMAGE_PATHS[:num_samples * 3], self.MASK_PATHS[:num_samples * 3]
         self.train_data, self.valid_data, self.test_data = torch.utils.data.random_split(self,
-                                                                                       [num_samples,
-                                                                                        num_samples,
-                                                                                        num_samples])
+                                                                                         [num_samples,
+                                                                                          num_samples,
+                                                                                          num_samples])
         self.train_loader = DataLoader(self.train_data, batch_size=self.batch_size, shuffle=True)
         self.valid_loader = DataLoader(self.valid_data, batch_size=self.batch_size, shuffle=True)
         self.test_loader = DataLoader(self.test_data, batch_size=self.batch_size4test, shuffle=True)
@@ -61,10 +62,6 @@ class ImageDataSet(BaseDataSet, ImageDataSetConfig):
                     self.num_train = len(self)
             else:
                 self.num_train = len(self.train_data)
-            # if self.val_data is None or int(self.num_train * self.valid_rate) == 0:
-            #     self.num_train = 0
-            # else:
-            #     self.num_train = int(self.num_train * self.valid_rate)
             if self.valid_rate is None:
                 self.train_loader = DataLoader(self, batch_size=self.batch_size, shuffle=True)
                 return self.train_loader
@@ -86,6 +83,78 @@ class ImageDataSet(BaseDataSet, ImageDataSetConfig):
 
         copy_attr(self, target)
 
+    def sort_dataset(self):
+        """calculate number of train_dataset, valid_dataset and test_dataset"""
+        # calculate the number of samples to train
+        if not self.test_model:
+            if self.num_train is not None:
+                if len(self) > self.num_train:
+                    self.set_data_num(self.num_train)
+                else:
+                    self.num_train = len(self)
+            else:
+                self.num_train = len(self.train_data)
+            if self.valid_rate is None:
+                self.num_valid = 0
+            else:
+                num_valid_data = int(self.num_train * self.valid_rate)
+                if num_valid_data == 0 or num_valid_data == self.num_train:
+                    self.logger.error("valid datateset is None or train dataset is None")
+                self.train_data, self.val_data = torch.utils.data.random_split(self,
+                                                                               [self.num_train - num_valid_data,
+                                                                                num_valid_data])
+                self.train_loader = DataLoader(self.train_data, batch_size=self.batch_size, shuffle=True)
+                self.valid_loader = DataLoader(self.val_data, batch_size=self.batch_size, shuffle=True)
+        else:
+            if self.num_test is not None:
+                self.set_data_num(self.num_test)
+            else:
+                self.num_test = len(self)
+            self.test_loader = DataLoader(self, batch_size=self.batch_size4test, shuffle=True)
+
+
+        if self.test_model:
+            if self.num_test is not None:
+                self.set_data_num(self.num_test)
+            else:
+                self.num_test = len(self)
+        else:
+            if self.num_train is None:
+                self.num_train = len(self.train_data)
+            else:
+                if len(self) > self.num_train:
+                    self.set_data_num(self.num_train)
+                else:
+                    self.num_train = len(self)
+        if self.num_train is not None:
+            # if number of train which been set is bigger than amount of train_dataset
+            if len(self.Y) > self.num_train:
+                self.set_data_num(self.num_train)
+            else:
+                self.num_train = len(self)
+        else:
+            self.num_train = len(self.Y)
+
+        # calculate the number of samples to valid
+        if self.valid_rate is None:
+            self.num_valid = 0
+        else:
+            self.num_valid = int(self.num_train * self.valid_rate)
+            self.num_train = self.num_train - self.num_valid
+            if self.num_valid == 0 or self.num_valid == self.num_train:
+                self.logger.error("valid dataset is None or train dataset is None")
+
+
+        self.logger.info(
+            "num_train:{} \t num_valid:{} \t num_test:{} ".format(self.num_train, self.num_valid, self.num_test))
+        return self.num_train, self.num_test, self.num_valid
+
+    def create_dataset(self):
+        pass
+
+    def create_dataloader(self):
+        pass
+
     def load_config(self):
         copy_attr(ImageDataSetConfig(), self)
 
@@ -105,7 +174,6 @@ class ImageDataSet(BaseDataSet, ImageDataSetConfig):
         else:
             return image, mask
 
-    # todo 之后可能删除，如果randomstate不设置的话，就这样就无法区分测试集和训练集的位置了
     def set_data_num(self, num):
         if self.test_model:
             self.image_paths, self.mask_paths = self.IMAGE_PATHS[-num:], self.MASK_PATHS[-num:]
@@ -207,7 +275,6 @@ class ImageDataSet4Edge(BaseDataSet, ImageDataSet4EdgeConfig):
         else:
             return image, mask
 
-    # todo 之后可能删除，如果randomstate不设置的话，就这样就无法区分测试集和训练集的位置了
     def set_data_num(self, num):
         if self.test_model:
             self.image_paths, self.mask_paths = self.IMAGE_PATHS[-num:], self.MASK_PATHS[-num:]

@@ -1,13 +1,31 @@
 import torch
 from torch import nn
 from torch.nn import functional as F
-from torchvision.models import vgg16_bn
 from torchvision import models
+from torchvision.models import vgg16_bn
+
+from base.base_net_structure import BaseNetStructure
+from utils.net_modules_utils import Conv
 
 
-class Deconv(nn.Module):
-    def __init__(self, in_n, out_n, is_init=False):
-        super(Deconv, self).__init__()
+class InitWeightMixin:
+    def init_weight(self):
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
+                if m.bias is not None:
+                    nn.init.constant_(m.bias, 0)
+            elif isinstance(m, (nn.BatchNorm2d, nn.GroupNorm)):
+                nn.init.constant_(m.weight, 1)
+                nn.init.constant_(m.bias, 0)
+            elif isinstance(m, nn.Linear):
+                nn.init.normal_(m.weight, 0, 0.01)
+                nn.init.constant_(m.bias, 0)
+
+
+class DeconvBnReLU(nn.Module, InitWeightMixin):
+    def __init__(self, in_n, out_n, is_init=True):
+        super(DeconvBnReLU, self).__init__()
         self.model = nn.Sequential(nn.ConvTranspose2d(
             in_n, out_n, kernel_size=4, stride=2, padding=1),
             nn.BatchNorm2d(out_n),
@@ -19,24 +37,8 @@ class Deconv(nn.Module):
     def forward(self, x):
         return self.model(x)
 
-    def init_weight(self):
-        for m in self.modules():
-            if isinstance(m, nn.Conv2d):
-                nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
-                if m.bias is not None:
-                    nn.init.constant_(m.bias, 0)
-            elif isinstance(m, (nn.BatchNorm2d, nn.GroupNorm)):
-                nn.init.constant_(m.weight, 1)
-                nn.init.constant_(m.bias, 0)
-            elif isinstance(m, nn.Linear):
-                nn.init.normal_(m.weight, 0, 0.01)
-                nn.init.constant_(m.bias, 0)
 
-
-from utils.net_modules_utils import Conv
-
-
-class ConvBnReLU(Conv):
+class ConvBnReLU(Conv, InitWeightMixin):
     def __init__(self, in_n, out_n, is_init=False, kernel_size=3, stride=1, padding=1, bias=False):
         super(ConvBnReLU, self).__init__(in_n, out_n, kernel_size, stride, padding, bias)
         self.add_module("BN", nn.BatchNorm2d(out_n, eps=1e-5, momentum=0.999))
@@ -44,38 +46,25 @@ class ConvBnReLU(Conv):
         if is_init:
             self.init_weight()
 
-    def init_weight(self):
-        for m in self.modules():
-            if isinstance(m, nn.Conv2d):
-                nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
-                if m.bias is not None:
-                    nn.init.constant_(m.bias, 0)
-            elif isinstance(m, (nn.BatchNorm2d, nn.GroupNorm)):
-                nn.init.constant_(m.weight, 1)
-                nn.init.constant_(m.bias, 0)
-            elif isinstance(m, nn.Linear):
-                nn.init.normal_(m.weight, 0, 0.01)
-                nn.init.constant_(m.bias, 0)
 
-
-class FCN(nn.Module):
+class FCNVgg16(nn.Module):
     def __init__(self, n_out=4, is_init=False):
         """
         网络初始化，特点输出结果的图像大小和输入图像的是一样的
         :param n_out: 输出结果的频道数。
         """
-        super(FCN, self).__init__()
+        super(FCNVgg16, self).__init__()
         vgg = vgg16_bn(pretrained=False)
         self.encoder_1 = vgg.features[:7]
         self.encoder_2 = vgg.features[7:14]
         self.encoder_3 = vgg.features[14:24]
         self.encoder_4 = vgg.features[24:34]
         self.encoder_5 = vgg.features[34:]
-        self.decoder_1 = Deconv(512, 512, is_init)
-        self.decoder_2 = Deconv(512, 256, is_init)
-        self.decoder_3 = Deconv(256, 128, is_init)
-        self.decoder_4 = Deconv(128, 64, is_init)
-        self.decoder_5 = Deconv(64, n_out, is_init)
+        self.decoder_1 = DeconvBnReLU(512, 512, is_init)
+        self.decoder_2 = DeconvBnReLU(512, 256, is_init)
+        self.decoder_3 = DeconvBnReLU(256, 128, is_init)
+        self.decoder_4 = DeconvBnReLU(128, 64, is_init)
+        self.decoder_5 = DeconvBnReLU(64, n_out, is_init)
 
     def forward(self, x):
         out_1 = self.encoder_1(x)
@@ -115,11 +104,11 @@ class FCN4Edge_3(nn.Module):
         self.encoder1_4 = vgg.features[24:34]
         self.encoder1_5 = vgg.features[34:]
 
-        self.decoder_1 = Deconv(512, 512, is_init)
-        self.decoder_2 = Deconv(512, 256, is_init)
-        self.decoder_3 = Deconv(256, 128, is_init)
-        self.decoder_4 = Deconv(128, 64, is_init)
-        self.decoder_5 = Deconv(64, n_out, is_init)
+        self.decoder_1 = DeconvBnReLU(512, 512, is_init)
+        self.decoder_2 = DeconvBnReLU(512, 256, is_init)
+        self.decoder_3 = DeconvBnReLU(256, 128, is_init)
+        self.decoder_4 = DeconvBnReLU(128, 64, is_init)
+        self.decoder_5 = DeconvBnReLU(64, n_out, is_init)
 
     def forward(self, x):
         image = x[:, :3]
@@ -170,11 +159,11 @@ class FCN4Edge_2(nn.Module):
         self.encoder1_4 = vgg.features[24:34]
         self.encoder1_5 = vgg.features[34:]
 
-        self.decoder_1 = Deconv(1024, 512, is_init)
-        self.decoder_2 = Deconv(1536, 256, is_init)
-        self.decoder_3 = Deconv(768, 128, is_init)
-        self.decoder_4 = Deconv(384, 64, is_init)
-        self.decoder_5 = Deconv(192, n_out, is_init)
+        self.decoder_1 = DeconvBnReLU(1024, 512, is_init)
+        self.decoder_2 = DeconvBnReLU(1536, 256, is_init)
+        self.decoder_3 = DeconvBnReLU(768, 128, is_init)
+        self.decoder_4 = DeconvBnReLU(384, 64, is_init)
+        self.decoder_5 = DeconvBnReLU(192, n_out, is_init)
 
     def forward(self, x):
         image = x[:, :3]
@@ -206,9 +195,6 @@ class FCN4Edge_2(nn.Module):
         return out
 
 
-from base.base_net_structure import BaseNetStructure
-
-
 class FCN4Edge(nn.Module, BaseNetStructure):
     def __init__(self, n_in=5, n_out=4, is_init=False):
         """
@@ -226,11 +212,11 @@ class FCN4Edge(nn.Module, BaseNetStructure):
         self.encoder_4 = vgg.features[24:34]
         self.encoder_5 = vgg.features[34:]
 
-        self.decoder_1 = Deconv(512, 512, is_init)
-        self.decoder_2 = Deconv(512, 256, is_init)
-        self.decoder_3 = Deconv(256, 128, is_init)
-        self.decoder_4 = Deconv(128, 64, is_init)
-        self.decoder_5 = Deconv(64, n_out, is_init)
+        self.decoder_1 = DeconvBnReLU(512, 512, is_init)
+        self.decoder_2 = DeconvBnReLU(512, 256, is_init)
+        self.decoder_3 = DeconvBnReLU(256, 128, is_init)
+        self.decoder_4 = DeconvBnReLU(128, 64, is_init)
+        self.decoder_5 = DeconvBnReLU(64, n_out, is_init)
 
     def forward(self, x):
         out_0 = self.encoder_0(x)
@@ -252,16 +238,15 @@ class FCNRes(nn.Module):
 
     def __init__(self, n_out=1, is_init=False):
         super(FCNRes, self).__init__()
-        # vgg = vgg16_bn(pretrained=False)
 
         self.encoder = models.resnet34(pretrained=True)
         self.conv_bn_relu0 = ConvBnReLU(512, 512, kernel_size=3, stride=2)
 
-        self.decoder_1 = Deconv(512, 512, is_init)
-        self.decoder_2 = Deconv(512, 256, is_init)
-        self.decoder_3 = Deconv(256, 128, is_init)
-        self.decoder_4 = Deconv(128, 64, is_init)
-        self.decoder_5 = Deconv(64, n_out, is_init)
+        self.decoder_1 = DeconvBnReLU(512, 512, is_init)
+        self.decoder_2 = DeconvBnReLU(512, 256, is_init)
+        self.decoder_3 = DeconvBnReLU(256, 128, is_init)
+        self.decoder_4 = DeconvBnReLU(128, 64, is_init)
+        self.decoder_5 = DeconvBnReLU(64, n_out, is_init)
 
     def forward(self, x):
         out = self.encoder.conv1(x)
@@ -289,11 +274,11 @@ class FCNRes50(nn.Module):
 
         self.encoder = models.resnet50(pretrained=False)
 
-        self.decoder_1 = Deconv(2048, 1024, is_init)
-        self.decoder_2 = Deconv(1024, 512, is_init)
-        self.decoder_3 = Deconv(512, 256, is_init)
-        self.decoder_4 = Deconv(256, 64, is_init)
-        self.decoder_5 = Deconv(64, num_classes, is_init)
+        self.decoder_1 = DeconvBnReLU(2048, 1024, is_init)
+        self.decoder_2 = DeconvBnReLU(1024, 512, is_init)
+        self.decoder_3 = DeconvBnReLU(512, 256, is_init)
+        self.decoder_4 = DeconvBnReLU(256, 64, is_init)
+        self.decoder_5 = DeconvBnReLU(64, num_classes, is_init)
 
     def forward(self, x):
         out = self.encoder.conv1(x)
@@ -325,13 +310,6 @@ class FCNRes50(nn.Module):
         return out
 
 
-if __name__ == '__main__':
-    data = torch.randn(3, 3, 224, 224)
-    model = FCNRes50()
-    output = model(data)
-    # print(output)
-
-
 class FeatureExtractor(nn.Module):
     """提取特定层的输出，依靠层的名字来匹配"""
 
@@ -349,4 +327,3 @@ class FeatureExtractor(nn.Module):
             if name in self.extracted_layers:
                 outputs.append(x)
         return outputs
-

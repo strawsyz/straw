@@ -69,8 +69,8 @@ def show_images(file_name):
     fig.canvas.draw()
 
 
-def main(result_path, data_path=r"",
-         mask_path=r"", ax_save_path="results/tmp.png"):
+def image_checker(result_path, data_path=r"",
+                  mask_path=r"", ax_save_path="results/tmp.png", shuffle=False):
     """check images in three different folders"""
     dir_paths = [data_path, mask_path, result_path]
     fig, (axs) = plt.subplots(1, len(dir_paths))
@@ -80,7 +80,8 @@ def main(result_path, data_path=r"",
     filenames = []
     for file_name in os.listdir(dir_paths[min_index]):
         filenames.append(file_name)
-    random.shuffle(filenames)
+    if shuffle:
+        random.shuffle(filenames)
 
     globals()["file_names"] = filenames
     globals()["RESULT_PATH"] = result_path

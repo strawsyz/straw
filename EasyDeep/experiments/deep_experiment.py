@@ -278,19 +278,22 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
         """
         experiment_record = None
         if hasattr(self, "history_save_path") and self.history_save_path is not None and self.history_save_path != "":
-            if os.path.isfile(self.history_save_path):
-                self.logger.info("loading history")
-                experiment_record = self.create_experiment_record()
-                experiment_record = experiment_record.load(self.history_save_path)
-                self.scores_history = experiment_record.epoch_records
-                if is4train:
-                    # delete history after current_epoch
-                    for epoch_no in experiment_record.epoch_records:
-                        if epoch_no <= self.current_epoch:
-                            self.scores_history[epoch_no] = experiment_record.epoch_records[epoch_no]
-                self.logger.info("loaded history from {}".format(self.history_save_path))
+            if os.path.exists(self.history_save_path):
+                if os.path.isfile(self.history_save_path):
+                    self.logger.info("loading history")
+                    experiment_record = self.create_experiment_record()
+                    experiment_record = experiment_record.load(self.history_save_path)
+                    self.scores_history = experiment_record.epoch_records
+                    if is4train:
+                        # delete history after current_epoch
+                        for epoch_no in experiment_record.epoch_records:
+                            if epoch_no <= self.current_epoch:
+                                self.scores_history[epoch_no] = experiment_record.epoch_records[epoch_no]
+                    self.logger.info("loaded history from {}".format(self.history_save_path))
+                else:
+                    self.logger.warning("{} is not a file".format(self.history_save_path))
             else:
-                self.logger.warning("{} is not a file".format(self.history_save_path))
+                self.logger("no history to load")
         else:
             self.logger.error("not set history_save_path")
         return experiment_record

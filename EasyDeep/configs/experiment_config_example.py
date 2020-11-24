@@ -151,16 +151,16 @@ class ImageSegmentationConfig(DeepExperimentConfig):
 
     def set_net(self):
         # STEP 1 use source image to predict mask image
-        from nets.FCNNet import FCNNet
-        from configs.net_config import FCNBaseNetConfig
-        self.net_config = FCNBaseNetConfig()
-        self.net = FCNNet()
+        from nets.FCNNet import FCNVgg16Net
+        from configs.net_config import FCNVgg16NetConfig
+        self.net_config = FCNVgg16NetConfig()
+        self.net = FCNVgg16Net()
         # replace vgg16 by resnet
         from configs.net_config import FCNResConfig
         self.net_config = FCNResConfig()
 
-        from nets.FCNNet import FCNResNet
-        self.net = FCNResNet()
+        from nets.FCNNet import FCNRes34Net
+        self.net = FCNRes34Net()
 
     def set_net_edge(self):
         # STEP 2 USE predict result in step 1 and edge image to predict image

@@ -15,10 +15,9 @@ class ImageExperiment(ImageSegmentationConfig, DeepExperiment):
         super(ImageExperiment, self).__init__()
         self.show_config()
 
-    # def __init__(self, config_instance=ImageSegmentationConfig()):
-    #     super(ImageExperiment, self).__init__(config_instance)
 
     def before_test(self, prepare_dataset=True, prepare_net=True, save_predict_result=False):
+        """call this function before test a trained model"""
         super(ImageExperiment, self).before_test(prepare_dataset, prepare_net)
         self.logger.info("=" * 10 + " test start " + "=" * 10)
         pps = 0
@@ -44,7 +43,7 @@ class ImageExperiment(ImageSegmentationConfig, DeepExperiment):
         _, _, width, height = mask.size()
         loss = self.loss_function(out, mask)
         self.logger.info("test_loss is {}".format(loss))
-        num_batch,  *_ = out.shape
+        num_batch, *_ = out.shape
         if save_predict_result:
             predict = out.squeeze().cpu().data.numpy()
             for index in range(num_batch):
@@ -96,7 +95,7 @@ class ImageExperiment(ImageSegmentationConfig, DeepExperiment):
         return valid_loss
 
     def predict_all_data(self):
-        """ predict all data ,include test dataset, traindataset and valid dataset"""
+        """predict all data ,include test dataset, train dataset and valid dataset"""
         self.prepare_net()
         # self.prepare_dataset()
         self.dataset.get_dataloader(self)

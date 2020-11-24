@@ -30,7 +30,7 @@ urlpatterns = [
     path('blog_update/', views.blog_update),
     path('head/', views.head),
     path('left/', views.left),
-    path('main/', views.main),
+    path('main/', views.image_checker),
     path('tab/', views.tab),
     path('left/bC/', views.bC),
     path('left/bT/', views.bT),
