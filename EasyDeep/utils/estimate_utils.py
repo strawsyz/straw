@@ -102,7 +102,9 @@ def analysis_iou_by_threshold(gt_image_paths, predict_image_paths, thresholds=ra
     iousum = np.array([0 for _ in range(len(ious))], dtype=np.float32)
     for ious in all_ious:
         iousum += ious
-    print("best is threshold is {}".format(thresholds[np.argmax(iousum)]))
+    best_threshold = thresholds[np.argmax(iousum)]
+    print("best is threshold is {}".format(best_threshold))
+    print(iousum)
     average_iou = iousum / len(gt_image_paths)
     print("average calcu_iou is {}".format(average_iou))
     print("max average calcu_iou is {}".format(np.max(average_iou)))
@@ -113,7 +115,7 @@ def analysis_iou_by_threshold(gt_image_paths, predict_image_paths, thresholds=ra
     plt.title("threshold-iou")
     plt.legend()
     plt.show()
-    return thresholds[np.argmax(iousum)], np.max(iousum) / len(gt_image_paths)
+    return best_threshold, np.max(iousum) / len(gt_image_paths)
 
 
 def iou_estimate(gt_dir, predict_dir, thresholds=range(1, 255), draw_every_iou=False,
@@ -122,6 +124,7 @@ def iou_estimate(gt_dir, predict_dir, thresholds=range(1, 255), draw_every_iou=F
     predict_paths = []
 
     for file_name in os.listdir(predict_dir):
+        print(file_name)
         gt_paths.append(os.path.join(gt_dir, file_name))
         predict_paths.append(os.path.join(predict_dir, file_name))
     analysis_iou_by_threshold(gt_paths, predict_paths, thresholds, draw_every_iou,

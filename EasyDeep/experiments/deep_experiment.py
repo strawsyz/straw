@@ -293,7 +293,7 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
                 else:
                     self.logger.warning("{} is not a file".format(self.history_save_path))
             else:
-                self.logger("no history to load")
+                self.logger.error("no history to load")
         else:
             self.logger.error("not set history_save_path")
         return experiment_record
