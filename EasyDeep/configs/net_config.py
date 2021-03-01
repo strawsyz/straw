@@ -5,11 +5,12 @@ from base.base_config import BaseNetConfig
 class FCNVgg16NetConfig(BaseNetConfig):
     def __init__(self):
         super(FCNVgg16NetConfig, self).__init__()
-        self.n_int = 4
+        self.n_int = 3
         self.n_out = 1
         # if init parameters in the network
         self.is_init = True
-        self.lr = 0.001
+        self.lr = 0.00001
+        self.pretrained = True
 
 
 class FCNBaseNet4EdgeConfig(BaseNetConfig):

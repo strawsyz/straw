@@ -370,7 +370,8 @@ def get_point(max_x, max_y):
     return start_x, start_y
 
 
-from convert_utils import *
+from utils.convert_utils import image_2_np as Image2np
+
 
 
 def check_mask_valid(mask_image, num_pixels, detected_size=0.3, max_detected_size=0.9):
