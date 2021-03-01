@@ -1,9 +1,9 @@
 import os
 
 import h5py
-from matplotlib import pyplot as plt
 import numpy as np
 from PIL import Image
+from matplotlib import pyplot as plt
 
 
 def data_preprocess():
@@ -275,9 +275,6 @@ def get_needed_data(source_path, target_path, needed_part, ext=None):
         file_path = os.path.join(source_path, file_name)
         img = Image.open(file_path)
         cropped = img.crop(needed_part)
-        # 理论上来讲经过之前的处理之后，所有的文件都被保存为png格式了。
-        # 但为了保险，还是重新处理一遍后缀名
-        # target_path = os.path.join(target_path, "{}.png".format(file_util.get_filename(file_path)))
         from utils import file_utils
         if ext is None:
             cropped.save(os.path.join(target_path, "{}.png".format(file_utils.get_filename(file_path))))
@@ -376,13 +373,15 @@ def get_point(max_x, max_y):
 from convert_utils import *
 
 
-def check_mask_valid(mask_image, num_pixels, detected_size=0.3):
+def check_mask_valid(mask_image, num_pixels, detected_size=0.3, max_detected_size=0.9):
     mask_array = Image2np(mask_image)
     # print((mask_array==0).sum())
     print((mask_array == 255).sum() / num_pixels)
     print(mask_image.size)
-    if (mask_array == 255).sum() < num_pixels * detected_size or (mask_array == 255).sum() > num_pixels * 0.9:
-        print('==========================')
+    if (mask_array == 255).sum() < num_pixels * detected_size or (
+            mask_array == 255).sum() > num_pixels * max_detected_size:
+        print('cut image is not valid,min detected size: {}, max detected size : {}'.format(detected_size,
+                                                                                            max_detected_size))
         return False
     else:
         return True
@@ -398,7 +397,7 @@ def analy_image(path):
     return image
 
 
-def binary_img(img_path, target_path, threshold=127):
+def binary_img(img_path, target_path, threshold=128):
     img_arr = np.array(Image.open(img_path).convert("L"))
     img_arr[img_arr < threshold] = 0
     img_arr[img_arr >= threshold] = 255

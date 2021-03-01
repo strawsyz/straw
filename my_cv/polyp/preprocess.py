@@ -254,18 +254,70 @@ if flag:
         target_path = os.path.join(EDGE_TARGET_PATH, file_name)
         binary_img(source_path, target_path)
 
+# 将没有切成patch的图像分为测试图像和训练图像
+flag = False
+test_rate = 0.2
+if flag:
+    SOURCE_IMAGE_PATH = r"/home/straw/Downloads/dataset/polyp/TMP/03/data/"
+    SOURCE_MASK_PATH = r"/home/straw/Downloads/dataset/polyp/TMP/03/edge/"
+    TARGET_TRAIN_IMAGE_PATH = r"/home/straw/Downloads/dataset/polyp/TMP/08/train/data"
+    TARGET_TEST_IMAGE_PATH = r"/home/straw/Downloads/dataset/polyp/TMP/08/test/data"
+    TARGET_TRAIN_EDGE_PATH = r"/home/straw/Downloads/dataset/polyp/TMP/08/train/edge"
+    TARGET_TEST_EDGE_PATH = r"/home/straw/Downloads/dataset/polyp/TMP/08/test/edge"
+    TARGET_TRAIN_MASK_PATH = r"/home/straw/Downloads/dataset/polyp/TMP/08/train/mask"
+    TARGET_TEST_MASK_PATH = r"/home/straw/Downloads/dataset/polyp/TMP/08/test/mask"
 
+    filenames = os.listdir(SOURCE_IMAGE_PATH)
+    filenames.sort()
+    import random
+
+    random.seed(0)
+    random.shuffle(filenames)
+    num_test = int(len(filenames) * test_rate)
+    num_train = len(filenames) - num_test
+    # copy train image files
+    for filename in filenames[:num_train]:
+        source_image_path = os.path.join(SOURCE_IMAGE_PATH, filename)
+        source_mask_path = os.path.join(SOURCE_MASK_PATH, filename)
+        target_image_path = os.path.join(TARGET_TRAIN_IMAGE_PATH, filename)
+        target_mask_path = os.path.join(TARGET_TRAIN_MASK_PATH, filename)
+        shutil.copyfile(source_image_path, target_image_path)
+        binary_img(source_mask_path, target_mask_path)
+    # copy test image files
+    for filename in filenames[num_train:]:
+        source_image_path = os.path.join(SOURCE_IMAGE_PATH, filename)
+        source_mask_path = os.path.join(SOURCE_MASK_PATH, filename)
+        target_image_path = os.path.join(TARGET_TEST_IMAGE_PATH, filename)
+        target_mask_path = os.path.join(TARGET_TEST_MASK_PATH, filename)
+        shutil.copyfile(source_image_path, target_image_path)
+        binary_img(source_mask_path, target_mask_path)
+
+# 将图像分别切成小的patch图像
+flag = False
+if flag:
+    SOURCE_TRAIN_IMAGE_PATH = r"/home/straw/Downloads/dataset/polyp/TMP/08/train/data"
+    SOURCE_TEST_IMAGE_PATH = r"/home/straw/Downloads/dataset/polyp/TMP/08/test/data"
+    SOURCE_TRAIN_MASK_PATH = r"/home/straw/Downloads/dataset/polyp/TMP/08/train/mask"
+    SOURCE_TEST_MASK_PATH = r"/home/straw/Downloads/dataset/polyp/TMP/08/test/mask"
+
+    TARGET_TRAIN_IMAGE_PATH = r"/home/straw/Downloads/dataset/polyp/TMP/09/train/data"
+    TARGET_TEST_IMAGE_PATH = r"/home/straw/Downloads/dataset/polyp/TMP/09/test/data"
+    TARGET_TRAIN_MASK_PATH = r"/home/straw/Downloads/dataset/polyp/TMP/09/train/mask"
+    TARGET_TEST_MASK_PATH = r"/home/straw/Downloads/dataset/polyp/TMP/09/test/mask"
+
+    detected_size = 0.3
+    patch_width = 224
+    patch_height = 224
+    create_patch_by_absolute_size(SOURCE_TRAIN_IMAGE_PATH, SOURCE_TRAIN_MASK_PATH, TARGET_TRAIN_IMAGE_PATH,
+                                  TARGET_TRAIN_MASK_PATH,
+                                  detected_size,
+                                  patch_width, patch_height, max_num=200)
+    create_patch_by_absolute_size(SOURCE_TEST_IMAGE_PATH, SOURCE_TEST_MASK_PATH, TARGET_TEST_IMAGE_PATH,
+                                  TARGET_TEST_MASK_PATH,
+                                  detected_size,
+                                  patch_width, patch_height, max_num=200)
 # 轮廓图和mask图像重叠的部分作为正确的图
 # 输入原图像，从图像检测出轮廓，获得轮廓图
 # 输出是一个轮廓图。真值是轮廓图和mask图像重叠的部分
 # 简介：检测polyp的轮廓的网络
 # 需要的数据：轮廓图。轮廓和mask图像重叠的部分
-
-
-if __name__ == '__main__':
-    # win上的测试
-    # SOURCE_IMAGE_PATH = "sample_data/"
-    # TARGET_IMAGE_PATH = "source/"
-    # 1000*800
-    # get_needed_data(SOURCE_IMAGE_PATH, TARGET_IMAGE_PATH, needed_part=(100, 100, 1100, 900))
-    pass
