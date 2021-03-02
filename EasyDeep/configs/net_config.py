@@ -9,8 +9,9 @@ class FCNVgg16NetConfig(BaseNetConfig):
         self.n_out = 1
         # if init parameters in the network
         self.is_init = True
-        self.lr = 0.00001
+        self.lr = 0.003
         self.pretrained = True
+        self.loss_func_name = "Dice"
 
 
 class FCNBaseNet4EdgeConfig(BaseNetConfig):

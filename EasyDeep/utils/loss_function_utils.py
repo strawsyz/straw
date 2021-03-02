@@ -53,9 +53,9 @@ class DiceLoss(torch.nn.Module):
         return 1 - dice
 
 
-class DiceLossLoss(nn.Module):
+class DiceBCELoss(nn.Module):
     def __init__(self):
-        super(DiceLossLoss, self).__init__()
+        super(DiceBCELoss, self).__init__()
 
     def forward(self, pred, gt, smooth=1):
         pred = F.sigmoid(pred)
