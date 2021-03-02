@@ -299,7 +299,7 @@ if flag:
         print("test: {}".format(filename))
 
 # 将图像分别切成小的patch图像
-flag = True
+flag = False
 if flag:
     SOURCE_TRAIN_IMAGE_PATH = r"/home/shi/Downloads/dataset/polyp/TMP/08/train/data"
     SOURCE_TEST_IMAGE_PATH = r"/home/shi/Downloads/dataset/polyp/TMP/08/test/data"
@@ -327,6 +327,26 @@ if flag:
                                   detected_size,
                                   patch_width, patch_height, max_num=200)
     # test batches:2103   train batches:8393
+
+# create edge images
+flag = True
+if flag:
+    SOURCE_TRAIN_IMAGE_PATH = r"/home/shi/Downloads/dataset/polyp/TMP/09/train/data"
+    SOURCE_TEST_IMAGE_PATH = r"/home/shi/Downloads/dataset/polyp/TMP/09/test/data"
+    TARGET_TRAIN_EDGE_PATH = r"/home/shi/Downloads/dataset/polyp/TMP/09/train/edge"
+    TARGET_TEST_EDGE_PATH = r"/home/shi/Downloads/dataset/polyp/TMP/09/test/edge"
+    file_util.make_directory(TARGET_TRAIN_EDGE_PATH)
+    file_util.make_directory(TARGET_TEST_EDGE_PATH)
+    for filename in os.listdir(SOURCE_TRAIN_IMAGE_PATH):
+        source_path = os.path.join(SOURCE_TRAIN_IMAGE_PATH, filename)
+        target_path = os.path.join(TARGET_TRAIN_EDGE_PATH, filename)
+        edge_detector(source_path, target_path)
+        binary_img(target_path, target_path)
+    for filename in os.listdir(SOURCE_TEST_IMAGE_PATH):
+        source_path = os.path.join(SOURCE_TEST_IMAGE_PATH, filename)
+        target_path = os.path.join(TARGET_TEST_EDGE_PATH, filename)
+        edge_detector(source_path, target_path)
+        binary_img(target_path, target_path)
 # 轮廓图和mask图像重叠的部分作为正确的图
 # 输入原图像，从图像检测出轮廓，获得轮廓图
 # 输出是一个轮廓图。真值是轮廓图和mask图像重叠的部分
