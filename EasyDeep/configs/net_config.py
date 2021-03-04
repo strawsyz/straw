@@ -5,23 +5,24 @@ from base.base_config import BaseNetConfig
 class FCNVgg16NetConfig(BaseNetConfig):
     def __init__(self):
         super(FCNVgg16NetConfig, self).__init__()
-        self.n_int = 3
         self.n_out = 1
         # if init parameters in the network
         self.is_init = True
-        self.lr = 0.003
+        self.lr = 0.0001
         self.pretrained = True
-        self.loss_func_name = "Dice"
+        self.loss_func_name = "BCEWithLogitsLoss"
 
 
 class FCNBaseNet4EdgeConfig(BaseNetConfig):
     def __init__(self):
         super(FCNBaseNet4EdgeConfig, self).__init__()
-        self.n_int = 4
+        self.n_in = 4
         self.n_out = 1
+        # if init parameters in the network
         self.is_init = True
-        self.weight_decay = None
         self.lr = 0.001
+        self.pretrained = True
+        self.loss_func_name = "BCEWithLogitsLoss"
 
 
 class FCNResBaseConfig(BaseNetConfig):

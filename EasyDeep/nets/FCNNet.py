@@ -21,7 +21,7 @@ class FCNRes34Net(BaseNet, FCNResBaseConfig):
 class FCN4EdgeNet(BaseNet, FCNBaseNet4EdgeConfig):
     def __init__(self):
         super(FCN4EdgeNet, self).__init__()
-        self.net_structure = FCN4Edge(n_out=self.n_out, is_init=self.is_init)
+        self.net_structure = FCN4Edge(n_in=self.n_in, n_out=self.n_out, is_init=self.is_init)
 
 
 class FCNRes50Net(BaseNet, FCNResBaseConfig):

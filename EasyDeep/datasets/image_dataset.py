@@ -21,14 +21,13 @@ class MyImageDataSet(ImageDataSetConfig):
         super(MyImageDataSet, self).__init__()
         self.train_path = r"/home/shi/Downloads/dataset/polyp/TMP/09/train/"
         self.test_path = r"/home/shi/Downloads/dataset/polyp/TMP/09/test/"
-        self.train_dataset = ImageEdgeDataset(self.train_path, self.image_transforms, self.mask_transforms,
-                                              edge_transforms=None,
-                                              random_state=self.random_state)
+        self.train_dataset = ImageDataSet(self.train_path, self.image_transforms, self.mask_transforms,
+                                          random_state=self.random_state)
         self.num_train = len(self.train_dataset)
-        self.test_dataset = ImageEdgeDataset(self.test_path, self.image_transforms, self.mask_transforms,
-                                             edge_transforms=None,
-                                             random_state=self.random_state)
+        self.test_dataset = ImageDataSet(self.test_path, self.image_transforms, self.mask_transforms,
+                                         random_state=self.random_state)
         self.num_valid = self.num_test = len(self.test_dataset)
+        print("num train : {}, num_test : {}, num valid : {}".format(self.num_train, self.num_test, self.num_valid))
 
     def get_dataloader(self, target):
         self.train_loader = DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=self.shuffle)
@@ -47,11 +46,11 @@ class MyImageEdgeDataSet(ImageDataSetConfig):
         self.train_path = r"/home/shi/Downloads/dataset/polyp/TMP/09/train/"
         self.test_path = r"/home/shi/Downloads/dataset/polyp/TMP/09/test/"
         self.train_dataset = ImageEdgeDataset(self.train_path, self.image_transforms, self.mask_transforms,
-                                              edge_transforms=None,
+                                              edge_transforms=self.edge_transforms,
                                               random_state=self.random_state)
         self.num_train = len(self.train_dataset)
         self.test_dataset = ImageEdgeDataset(self.test_path, self.image_transforms, self.mask_transforms,
-                                             edge_transforms=None,
+                                             edge_transforms=self.edge_transforms,
                                              random_state=self.random_state)
         self.num_valid = self.num_test = len(self.test_dataset)
 
@@ -64,6 +63,7 @@ class MyImageEdgeDataSet(ImageDataSetConfig):
     def train(self):
         self.train_dataset.train()
         self.test_dataset.train()
+
 
 class ImageEdgeDataset(BaseDataSet):
     def __init__(self, root_path=None, image_transforms=None, mask_transforms=None, edge_transforms=None,
@@ -109,11 +109,12 @@ class ImageEdgeDataset(BaseDataSet):
             mask = self.mask_transforms(mask)
         if self.edge_transforms is not None:
             edge = self.edge_transforms(edge)
+        image = torch.cat([image, edge])
         # if use few sample for test ,will not have test_model
         if getattr(self, "test_model", False):
-            return image, mask, edge, os.path.basename(self.image_paths[index])
+            return image, mask, os.path.basename(self.image_paths[index])
         else:
-            return image, mask, edge
+            return image, mask
 
     def set_data_num(self, num):
         self.image_paths = self.image_paths[:num]

@@ -48,7 +48,7 @@ class ConvBnReLU(Conv, InitWeightMixin):
 
 
 class FCNVgg16(nn.Module):
-    def __init__(self, n_out=4, is_init=False,pretrained=True):
+    def __init__(self, n_out=4, is_init=False, pretrained=True):
         """
         网络初始化，特点输出结果的图像大小和输入图像的是一样的
         :param n_out: 输出结果的频道数。
@@ -196,15 +196,15 @@ class FCN4Edge_2(nn.Module):
 
 
 class FCN4Edge(nn.Module, BaseNetStructure):
-    def __init__(self, n_in=5, n_out=4, is_init=False):
+    def __init__(self, n_in=4, n_out=4, is_init=False, pretrained=True):
         """
-        网络初始化，特点输出结果的图像大小和输入图像的是一样的
+         use raw image and edge image to predict result
         :param n_out: 输出结果的频道数。
         """
         super(FCN4Edge, self).__init__()
         self.encoder_0 = ConvBnReLU(n_in, 3, is_init=is_init)
 
-        vgg = vgg16_bn(pretrained=False)
+        vgg = vgg16_bn(pretrained=pretrained)
 
         self.encoder_1 = vgg.features[:7]
         self.encoder_2 = vgg.features[7:14]
