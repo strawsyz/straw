@@ -39,6 +39,10 @@ class MyImageDataSet(ImageDataSetConfig):
         self.train_dataset.train()
         self.test_dataset.train()
 
+    def test(self):
+        self.train_dataset.test()
+        self.test_dataset.test()
+
 
 class MyImageEdgeDataSet(ImageDataSetConfig):
     def __init__(self):
@@ -53,6 +57,7 @@ class MyImageEdgeDataSet(ImageDataSetConfig):
                                              edge_transforms=self.edge_transforms,
                                              random_state=self.random_state)
         self.num_valid = self.num_test = len(self.test_dataset)
+        print("num train : {}, num_test : {}, num valid : {}".format(self.num_train, self.num_test, self.num_valid))
 
     def get_dataloader(self, target):
         self.train_loader = DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=self.shuffle)
@@ -63,6 +68,10 @@ class MyImageEdgeDataSet(ImageDataSetConfig):
     def train(self):
         self.train_dataset.train()
         self.test_dataset.train()
+
+    def test(self):
+        self.train_dataset.test()
+        self.test_dataset.test()
 
 
 class ImageEdgeDataset(BaseDataSet):

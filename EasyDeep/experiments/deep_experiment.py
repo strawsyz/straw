@@ -200,6 +200,8 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
         self.logger.info("average predict {} images per second".format(pps))
         self.logger.info("average loss is {}".format(loss))
         self.logger.info("=" * 10 + " testing end " + "=" * 10)
+        if save_predict_result:
+            print("save result of prediction at {}".format(self.result_save_path))
         return self.result_save_path
 
     def create_checkpoint(self, epoch=None, create4load=False):

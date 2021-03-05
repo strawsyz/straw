@@ -11,27 +11,16 @@ import torch
 
 
 class ImageExperiment(ImageSegmentationConfig, DeepExperiment):
-    def __init__(self):
-        super(ImageExperiment, self).__init__()
+    def __init__(self, tag=None):
+        ImageSegmentationConfig.__init__(self, tag=tag)
+        # DeepExperiment.__init__(self)
+        # super(ImageExperiment, self).__init__()
         self.show_config()
-
 
     def before_test(self, prepare_dataset=True, prepare_net=True, save_predict_result=False):
         """call this function before test a trained model"""
         super(ImageExperiment, self).before_test(prepare_dataset, prepare_net)
-        self.logger.info("=" * 10 + " test start " + "=" * 10)
-        pps = 0
-        loss = 0
-        for i, (image, mask, image_name) in enumerate(self.test_loader):
-            pps_batch, loss_batch = self.test_one_batch(image, mask, image_name, save_predict_result)
-            pps += pps_batch
-            loss += loss_batch
-        pps /= len(self.test_loader)
-        loss /= len(self.test_loader)
-        self.logger.info("average predict {} images per second".format(pps))
-        self.logger.info("average loss is {}".format(loss))
-        self.logger.info("=" * 10 + " testing end " + "=" * 10)
-        return self.result_save_path
+
 
     def test_one_batch(self, image, mask, image_name, save_predict_result=False):
         image = self.prepare_data(image)
@@ -46,12 +35,11 @@ class ImageExperiment(ImageSegmentationConfig, DeepExperiment):
         num_batch, *_ = out.shape
         if save_predict_result:
             predict = out.squeeze().cpu().data.numpy()
-            for index in range(num_batch):
-                pred = predict[index]
+            for index, pred in enumerate(predict):
                 pred = pred * 255
                 pred = pred.astype('uint8')
                 pred = Image.fromarray(pred)
-                pred = pred.resize((width, height))
+                # pred = pred.resize((width, height))
                 save_path = os.path.join(self.result_save_path, image_name[index])
                 pred.save(save_path)
                 self.logger.info("================{}=================".format(save_path))

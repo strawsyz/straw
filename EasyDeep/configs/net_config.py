@@ -20,7 +20,7 @@ class FCNBaseNet4EdgeConfig(BaseNetConfig):
         self.n_out = 1
         # if init parameters in the network
         self.is_init = True
-        self.lr = 0.001
+        self.lr = 0.0001
         self.pretrained = True
         self.loss_func_name = "BCEWithLogitsLoss"
 

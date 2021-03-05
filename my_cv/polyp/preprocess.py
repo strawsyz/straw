@@ -349,7 +349,7 @@ if flag:
         binary_img(target_path, target_path)
 
 # 将图像分别切成小的patch图像
-flag = False
+flag = True
 if flag:
     SOURCE_TRAIN_IMAGE_PATH = r"/home/shi/Downloads/dataset/polyp/TMP/08/train/data"
     SOURCE_TEST_IMAGE_PATH = r"/home/shi/Downloads/dataset/polyp/TMP/08/test/data"

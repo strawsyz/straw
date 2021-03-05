@@ -1,6 +1,7 @@
 import numpy as np
 from PIL import Image
 from matplotlib import pyplot as plt
+import os
 
 
 def bbox_iou(box1, box2):
@@ -149,8 +150,6 @@ def analysis_iou_on_miyazakidata(result_path, pattern="GT_o"):
 
     return ious
 
-
-import os
 
 if __name__ == '__main__':
     # paths = [os.path.join("miyazaki", file) for file in os.listdir("miyazaki")]
