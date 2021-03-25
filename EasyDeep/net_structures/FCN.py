@@ -23,6 +23,21 @@ class InitWeightMixin:
                 nn.init.constant_(m.bias, 0)
 
 
+class DeconvBn(nn.Module, InitWeightMixin):
+    def __init__(self, in_n, out_n, is_init=True):
+        super(DeconvBn, self).__init__()
+        self.model = nn.Sequential(nn.ConvTranspose2d(
+            in_n, out_n, kernel_size=4, stride=2, padding=1),
+            nn.BatchNorm2d(out_n),
+            # nn.ReLU(inplace=True),
+        )
+        if is_init:
+            self.init_weight()
+
+    def forward(self, x):
+        return self.model(x)
+
+
 class DeconvBnReLU(nn.Module, InitWeightMixin):
     def __init__(self, in_n, out_n, is_init=True):
         super(DeconvBnReLU, self).__init__()
@@ -64,7 +79,8 @@ class FCNVgg16(nn.Module):
         self.decoder_2 = DeconvBnReLU(512, 256, is_init)
         self.decoder_3 = DeconvBnReLU(256, 128, is_init)
         self.decoder_4 = DeconvBnReLU(128, 64, is_init)
-        self.decoder_5 = DeconvBnReLU(64, n_out, is_init)
+        # self.decoder_5 = DeconvBnReLU(64, n_out, is_init)
+        self.decoder_5 = DeconvBn(64, n_out, is_init)
 
     def forward(self, x):
         out_1 = self.encoder_1(x)
@@ -246,7 +262,8 @@ class FCNRes(nn.Module):
         self.decoder_2 = DeconvBnReLU(512, 256, is_init)
         self.decoder_3 = DeconvBnReLU(256, 128, is_init)
         self.decoder_4 = DeconvBnReLU(128, 64, is_init)
-        self.decoder_5 = DeconvBnReLU(64, n_out, is_init)
+        # self.decoder_5 = DeconvBnReLU(64, n_out, is_init)
+        self.decoder_5 = DeconvBn(64, n_out, is_init)
 
     def forward(self, x):
         out = self.encoder.conv1(x)
@@ -278,7 +295,9 @@ class FCNRes50(nn.Module):
         self.decoder_2 = DeconvBnReLU(1024, 512, is_init)
         self.decoder_3 = DeconvBnReLU(512, 256, is_init)
         self.decoder_4 = DeconvBnReLU(256, 64, is_init)
-        self.decoder_5 = DeconvBnReLU(64, num_classes, is_init)
+        # self.decoder_5 = DeconvBnReLU(64, num_classes, is_init)
+        self.decoder_5 = DeconvBn(64, num_classes, is_init)
+
 
     def forward(self, x):
         out = self.encoder.conv1(x)

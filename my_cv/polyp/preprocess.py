@@ -329,7 +329,7 @@ if flag:
     # test batches:2103   train batches:8393
 
 # create edge images
-flag = False
+flag = True
 if flag:
     SOURCE_TRAIN_IMAGE_PATH = r"/home/shi/Downloads/dataset/polyp/TMP/09/train/data"
     SOURCE_TEST_IMAGE_PATH = r"/home/shi/Downloads/dataset/polyp/TMP/09/test/data"
@@ -341,15 +341,15 @@ if flag:
         source_path = os.path.join(SOURCE_TRAIN_IMAGE_PATH, filename)
         target_path = os.path.join(TARGET_TRAIN_EDGE_PATH, filename)
         edge_detector(source_path, target_path)
-        binary_img(target_path, target_path)
+        binary_img(target_path, target_path,threshold=1)
     for filename in os.listdir(SOURCE_TEST_IMAGE_PATH):
         source_path = os.path.join(SOURCE_TEST_IMAGE_PATH, filename)
         target_path = os.path.join(TARGET_TEST_EDGE_PATH, filename)
         edge_detector(source_path, target_path)
-        binary_img(target_path, target_path)
+        binary_img(target_path, target_path,threshold=1)
 
 # 将图像分别切成小的patch图像
-flag = True
+flag = False
 if flag:
     SOURCE_TRAIN_IMAGE_PATH = r"/home/shi/Downloads/dataset/polyp/TMP/08/train/data"
     SOURCE_TEST_IMAGE_PATH = r"/home/shi/Downloads/dataset/polyp/TMP/08/test/data"

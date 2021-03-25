@@ -51,3 +51,14 @@ def show_images(images, labels=None):
         axs.set_title(labels[0])
         axs.axis("off")
     plt.show()
+
+
+def compare_images(rootpath1, rootpath2):
+    import os
+    for filename in os.listdir(rootpath1):
+        filepath = os.path.join(rootpath1, filename)
+        filepath2 = os.path.join(rootpath2, filename)
+        image = cv2.imread(filepath)
+        image2 = cv2.imread(filepath2)
+        if image.shape != image2.shape:
+            raise RuntimeWarning("Size is different")

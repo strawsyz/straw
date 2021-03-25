@@ -70,7 +70,8 @@ def edge_detector(source_path, save_path):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     # canny_gray(gray)
     # detected_edges = cv2.GaussianBlur(gray, (3, 3), 0)
-    detected_edges = cv2.Canny(gray, 60, 110, apertureSize=3)
+    # detected_edges = cv2.Canny(gray, 60, 110, apertureSize=3)
+    detected_edges = cv2.Canny(gray, 0, 0, apertureSize=3)
     # just add some colours to edges from original image.
     dst = cv2.bitwise_and(img, img, mask=detected_edges)
     # cv2.imshow('canny demo', dst)
@@ -101,21 +102,3 @@ if __name__ == '__main__':
         target1_image, target2_image = images[0], images[1]
         target1_image.save(target1_path)
         target2_image.save(target2_path)
-    # dir1 = "D:\Download\datasets\polyp\\05\mask"
-    # dir2 = "D:\Download\datasets\polyp\\05\data"
-    # target_dir = "D:\Download\datasets\polyp\\05\\target"
-    # target2_dir = "D:\Download\datasets\polyp\\05\\target1"
-    # for file in os.listdir(dir1):
-    #     path = os.path.join(dir1, file)
-    #     target_path = os.path.join(target_dir, file)
-    #     img = Image.open(path)
-    #     img = image_transforms(img)
-    #     img = to_image(img)
-    #     img.save(target_path)
-    # for file in os.listdir(dir2):
-    #     path = os.path.join(dir2, file)
-    #     target_path = os.path.join(target2_dir, file)
-    #     img = Image.open(path)
-    #     img = mask_transforms(img)
-    #     img = to_image(img)
-    #     img.save(target_path)

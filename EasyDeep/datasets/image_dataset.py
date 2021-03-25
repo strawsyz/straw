@@ -118,7 +118,8 @@ class ImageEdgeDataset(BaseDataSet):
             mask = self.mask_transforms(mask)
         if self.edge_transforms is not None:
             edge = self.edge_transforms(edge)
-        image = torch.cat([image, edge])
+        image = image * 0.9 + edge * 0.1
+        # image = torch.cat([image, edge])
         # if use few sample for test ,will not have test_model
         if getattr(self, "test_model", False):
             return image, mask, os.path.basename(self.image_paths[index])

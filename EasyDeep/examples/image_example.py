@@ -121,7 +121,7 @@ class ImageExperiment(ImageSegmentationConfig, DeepExperiment):
         image_transforms = transforms.Compose([
             transforms.Resize((224, 224)),
             transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+            # transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         ])
         image = image_transforms(image)
         image = self.prepare_data(image)
@@ -151,6 +151,15 @@ class ImageExperiment(ImageSegmentationConfig, DeepExperiment):
             pred = pred.astype('uint8')
             import numpy as np
             pred = np.where(pred > 1, 255, 0)
+
+            # if len(pred.shape) == 2:
+            #     pred = np.expand_dims(pred, 0)
+            # pred.unsqueeze(pred)
+            print(np.max(pred))
+            print(np.min(pred))
+            # print(pred)
+            print(pred.shape)
+            torch.log_softmax()
             pred = Image.fromarray(pred)
             pred = pred.resize((width, height))
             save_path = os.path.join(self.result_save_path, filename)

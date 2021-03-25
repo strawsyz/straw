@@ -49,7 +49,7 @@ class DiceLoss(torch.nn.Module):
         gt = gt.view(-1)
 
         intersection = (pred * gt).sum()
-        dice = (2. * intersection + smooth) / pred.sum() + gt.sum() + smooth
+        dice = 2. * (intersection + smooth) / (pred.sum() + gt.sum() + smooth)
         return 1 - dice
 
 
@@ -64,7 +64,7 @@ class DiceBCELoss(nn.Module):
         gt = gt.view(-1)
 
         intersection = (pred * gt).sum()
-        DICE_loss = 1 - (2. * intersection + smooth) / pred.sum() + gt.sum() + smooth
+        DICE_loss = 1 - 2. * (intersection + smooth) / (pred.sum() + gt.sum() + smooth)
         BCE_loss = F.binary_cross_entropy(pred, gt, reduction="mean")
         return DICE_loss + BCE_loss
 
