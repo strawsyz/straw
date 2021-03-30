@@ -1,3 +1,9 @@
+from base.base_model_selector import BaseModelSelector, ScoreModel
+
+from nets.FCNNet import FCNVgg16Net, FCN4EdgeNet
+from configs.net_config import FCNVgg16NetConfig, FCNBaseNet4EdgeConfig
+from datasets.image_dataset import ImageDataSet, MyImageDataSet, MyImageEdgeDataSet, ImageDataSet0302
+from configs.dataset_config import ImageDataSetConfig
 from base.base_recorder import ExperimentRecord
 import os
 
@@ -9,7 +15,8 @@ from utils.time_utils import get_time_4_filename
 
 class DeepExperimentConfig(BaseExperimentConfig):
     def __init__(self, tag=None):
-        super(DeepExperimentConfig, self).__init__()
+        BaseExperimentConfig.__init__(self, tag=tag)
+        # super(DeepExperimentConfig, self).__init__(tag=tag)
         self.other_param_4_batch = None
 
         self.current_epoch = 0
@@ -84,7 +91,7 @@ class DeepExperimentConfig(BaseExperimentConfig):
                 not os.path.isfile(self.history_save_path):
             self.history_save_path = \
                 os.path.join(self.history_save_dir, "{}_{}.pth".format(self.tag, get_time_4_filename()))
-        if getattr(self, "result_save_path", None):
+        if getattr(self, "result_save_path", False):
             self.result_save_path = os.path.join(self.result_save_path, get_date())
 
         for attr_name in self.__dict__:
@@ -117,8 +124,9 @@ class DeepExperimentConfig(BaseExperimentConfig):
 
 
 class ImageSegmentationConfig(DeepExperimentConfig):
-    def __init__(self):
-        super(ImageSegmentationConfig, self).__init__()
+    def __init__(self, tag=None):
+        DeepExperimentConfig.__init__(self, tag=tag)
+        # super(ImageSegmentationConfig, self).__init__(tag=tag)
         self.use_prettytable = True
         self.set_model_selector()
         self.recorder = EpochRecord
@@ -129,60 +137,54 @@ class ImageSegmentationConfig(DeepExperimentConfig):
             self.num_epoch = 500
             self.is_use_gpu = True
             self.is_pretrain = False
-            self.model_save_path = r""
-            self.history_save_dir = r""
             self.history_save_path = None
-            # step 1
-            self.pretrain_path = r""
-            # step 2 not use edge
-            self.pretrain_path = r""
-            # step 2 use edge
-            self.pretrain_path = r""
-            self.result_save_path = r""
+
         elif self.system == "Linux":
             self.num_epoch = 1000
             self.is_use_gpu = True
-            self.is_pretrain = True
+            self.is_pretrain = False
             self.history_save_dir = r""
-            self.pretrain_path = r""
+            # self.pretrain_path = r"/home/shi/Downloads/models/polyp/2020-08-11/ep77_13-22-08.pkl"
             self.model_save_path = r""
             self.result_save_path = r""
         self.init_attr()
 
     def set_net(self):
         # STEP 1 use source image to predict mask image
-        from nets.FCNNet import FCNVgg16Net
-        from configs.net_config import FCNVgg16NetConfig
-        self.net_config = FCNVgg16NetConfig()
-        self.net = FCNVgg16Net()
-        # replace vgg16 by resnet
-        from configs.net_config import FCNResConfig
-        self.net_config = FCNResConfig()
+        # raw
+        # self.net_config = FCNVgg16NetConfig()
+        # self.net = FCNVgg16Net()
 
+        # replace vgg16 by resnet34
+        from configs.net_config import FCNResBaseConfig
+        self.net_config = FCNResBaseConfig()
+        # # # use resnet34
         from nets.FCNNet import FCNRes34Net
         self.net = FCNRes34Net()
 
-    def set_net_edge(self):
-        # STEP 2 USE predict result in step 1 and edge image to predict image
-        from configs.net_config import FCNBaseNet4EdgeConfig
-        self.net_config = FCNBaseNet4EdgeConfig()
-        from nets import FCN4EdgeNet
-        self.net = FCN4EdgeNet()
+        #     use resnet50
+        # from nets.FCNNet import FCNRes50Net
+        # self.net = FCNRes50Net()
 
     def set_dataset(self):
-        from datasets.image_dataset import ImageDataSet
-        from configs.dataset_config import ImageDataSetConfig
         self.dataset_config = ImageDataSetConfig()
-        self.dataset = ImageDataSet()
+        # self.dataset = MyImageDataSet()
+        self.dataset = ImageDataSet0302()
+
+    def set_net_edge(self):
+        # STEP 2 USE predict result in step 1 and edge image to predict image
+        # self.net_config = FCNBaseNet4EdgeConfig()
+        # self.net = FCN4EdgeNet()
+
+        # used for
+        self.net_config = FCNVgg16NetConfig()
+        self.net = FCNVgg16Net()
 
     def set_dataset_edge(self):
-        from configs.dataset_config import ImageDataSet4EdgeConfig
-        self.dataset_config = ImageDataSet4EdgeConfig()
-        from datasets.image_dataset import ImageDataSet4Edge
-        self.dataset = ImageDataSet4Edge()
+        self.dataset_config = ImageDataSetConfig()
+        self.dataset = MyImageEdgeDataSet()
 
     def set_model_selector(self):
-        from base.base_model_selector import BaseModelSelector, ScoreModel
         score_models = []
         score_models.append(ScoreModel("train_loss", bigger_better=False))
         score_models.append(ScoreModel("valid_loss", bigger_better=False))
