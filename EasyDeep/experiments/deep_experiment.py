@@ -94,16 +94,18 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
         """
         raise NotImplementedError
 
-    def train_valid_one_epoch(self, epoch):
+    def train_valid_one_epoch(self, epoch, trail=None):
         train_loss = self.train_one_epoch(epoch)
         if self.valid_loader is not None:
             valid_loss = self.valid_one_epoch(epoch)
             record = self.recorder(train_loss=train_loss, valid_loss=valid_loss)
+            trail.report(valid_loss, epoch)
         else:
             record = self.recorder(train_loss=train_loss)
+            trail.report(train_loss, epoch)
         return record
 
-    def train(self, max_try_times=None, prepare_dataset=True, prepare_net=True):
+    def train(self, max_try_times=None, prepare_dataset=True, prepare_net=True, trail=None):
         """
 
         :param max_try_times: if loss don't decrease for some times, then stop training
@@ -133,7 +135,7 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
             self.experiment_id = self.db_utils.insert(experiment_insert)
         for epoch in range(self.current_epoch, self.current_epoch + self.num_epoch):
             start_time = time.time()
-            record = self.train_valid_one_epoch(epoch)
+            record = self.train_valid_one_epoch(epoch, trail=trail)
 
             self.scores_history[epoch] = record
             need_save, best_score_models, model_save_path = self.save(epoch, record)
