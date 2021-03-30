@@ -321,6 +321,7 @@ class ImageDataSet0302(BaseDataSet, ImageDataSetConfig):
             image = self.image_transforms(image)
         if self.mask_transforms is not None:
             mask = self.mask_transforms(mask)
+            mask = torch.unsqueeze(mask[0], dim=0)
         # if use few sample for test ,will not have test_model
         if getattr(self, "test_model", False):
             return image, mask, os.path.basename(self.image_paths[index])

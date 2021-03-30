@@ -20,6 +20,23 @@ class FCNVgg16NetConfig(BaseNetConfig):
         self.init_attr()
 
 
+
+
+class FCNResBaseConfig(BaseNetConfig):
+    def __init__(self):
+        super(FCNResBaseConfig, self).__init__()
+        self.is_init = True
+        self.lr = 0.0003
+        self.loss_func_name = "BCEWithLogitsLoss"
+        # self.loss_func_name = "DiceLoss"
+        self.optim_name = "adam"
+        self.is_scheduler = True
+        self.scheduler_step_size = 15
+        self.scheduler_gamma = 0.8
+        self.weight_decay = None
+        self.init_attr()
+
+
 class FCNBaseNet4EdgeConfig(BaseNetConfig):
     def __init__(self):
         super(FCNBaseNet4EdgeConfig, self).__init__()
@@ -30,23 +47,8 @@ class FCNBaseNet4EdgeConfig(BaseNetConfig):
         self.lr = 0.0003
         self.pretrained = True
         self.loss_func_name = "DiceLoss"
+        # self.loss_func_name = "DiceBCELoss"
         self.weight_decay = 0.01
-
-
-class FCNResBaseConfig(BaseNetConfig):
-    def __init__(self):
-        super(FCNResBaseConfig, self).__init__()
-        self.is_init = True
-        self.lr = 0.0003
-        self.loss_func_name = "DiceLoss"
-        self.optim_name = "adam"
-        self.is_scheduler = True
-        self.scheduler_step_size = 15
-        self.scheduler_gamma = 0.8
-        self.weight_decay = None
-        self.init_attr()
-
-
 class FNNBaseNetConfig(BaseNetConfig):
     def __init__(self):
         super(FNNBaseNetConfig, self).__init__()

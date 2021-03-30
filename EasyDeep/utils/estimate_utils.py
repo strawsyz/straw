@@ -73,6 +73,9 @@ def calcu_iou_with_threshold(pred_part, gt_part, threshold=127, draw=False):
     pred_part = pred_part.copy()
     pred_part[pred_part >= threshold] = 255
     pred_part[pred_part < threshold] = 0
+    gt_part = gt_part.copy()
+    gt_part[gt_part >= 128] = 255
+    gt_part[gt_part < 128] = 0
 
     res = calcu_iou(pred_part, gt_part)
     if draw:

@@ -177,54 +177,41 @@ class ImageExperiment(ImageSegmentationConfig, DeepExperiment):
         # Generate the optimizers.
         # 创建可选优化器
         optimizer_name = trial.suggest_categorical("optimizer", ["Adam", "RMSprop", "SGD"])
+
         # 创建可调整的学习率
         lr = trial.suggest_float("lr", 1e-5, 1e-1, log=True)
-        optimizer = getattr(optim, optimizer_name)(model.parameters(), lr=lr)
+        self.prepare_net()
+        self.optimizer = getattr(optim, optimizer_name)(self.net_structure.parameters(), lr=lr)
         # if self.prepare_dataset:
         #     self.prepare_dataset()
         # if self.prepare_net:
         #     self.prepare_net()
-        best_loss = self.train(max_try_times=4, prepare_net=True, prepare_dataset=True)
+        best_loss = self.train(max_try_times=4, prepare_net=False, prepare_dataset=True, trial=trial)
         return best_loss
-        # Get the MNIST dataset.
-        # train_loader, valid_loader = get_mnist()
 
-        # # Training of the model.
-        # for epoch in range(EPOCHS):
-        #     model.train()
-        #     for batch_idx, (data, target) in enumerate(train_loader):
-        #         # Limiting training data for faster epochs.
-        #         # if batch_idx * BATCHSIZE >= N_TRAIN_EXAMPLES:
-        #         #     break
-        #
-        #         data, target = data.view(data.size(0), -1).to(DEVICE), target.to(DEVICE)
-        #
-        #         optimizer.zero_grad()
-        #         output = model(data)
-        #         loss = F.nll_loss(output, target)
-        #         loss.backward()
-        #         optimizer.step()
-        #
-        #     # Validation of the model.
-        #     model.eval()
-        #     correct = 0
-        #     with torch.no_grad():
-        #         for batch_idx, (data, target) in enumerate(valid_loader):
-        #             # Limiting validation data.
-        #             # if batch_idx * BATCHSIZE >= N_VALID_EXAMPLES:
-        #             #     break
-        #             data, target = data.view(data.size(0), -1).to(DEVICE), target.to(DEVICE)
-        #             output = model(data)
-        #             # Get the index of the max log-probability.
-        #             pred = output.argmax(dim=1, keepdim=True)
-        #             correct += pred.eq(target.view_as(pred)).sum().item()
-        #
-        #     accuracy = correct / len(valid_loader)
-        #
-        #     trial.report(accuracy, epoch)
-        #
-        #     # Handle pruning based on the intermediate value.
-        #     if trial.should_prune():
-        #         raise optuna.exceptions.TrialPruned()
-        #     print(accuracy)
-        # return accuracy
+    def optuna_trials(self, direction="minimize", n_trials=100, timeout=None):
+        import optuna
+        study = optuna.create_study(direction=direction)
+        objective = self.objective
+        study.optimize(objective, n_trials=n_trials, timeout=timeout)
+
+        pruned_trials = [t for t in study.trials if t.state == optuna.trial.TrialState.PRUNED]
+        complete_trials = [t for t in study.trials if t.state == optuna.trial.TrialState.COMPLETE]
+
+        print("Study statistics: ")
+        print(f"  Number of finished trials: {len(study.trials)}")
+        print(f"  Number of pruned trials: {len(pruned_trials)}")
+        print(f"  Number of complete trials: {len(complete_trials)}")
+
+        # 选择出来的做好的结果
+        print("Best trial:")
+        trial = study.best_trial
+        # 选择出来的最好的超参数
+        # params = study.best_params
+        # 最优超参数下，objective函数的返回值
+        # values = study.best_value
+        print(f"  Value: {trial.value}")
+
+        print("  Params: ")
+        for key, value in trial.params.items():
+            print(f"    {key}: {value}")
