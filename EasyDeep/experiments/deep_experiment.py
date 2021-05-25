@@ -3,6 +3,7 @@ import os
 import time
 from collections import namedtuple
 
+import optuna
 import torch
 from torch.autograd import Variable
 
@@ -16,7 +17,7 @@ from utils.matplotlib_utils import lineplot
 from utils.matplotlib_utils import save as img_save
 from utils.matplotlib_utils import show
 from utils.net_utils import save, load
-import optuna
+
 
 class DeepExperiment(DeepExperimentConfig, BaseExperiment):
 
@@ -99,12 +100,14 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
         if self.valid_loader is not None:
             valid_loss = self.valid_one_epoch(epoch)
             record = self.recorder(train_loss=train_loss, valid_loss=valid_loss)
-            trial.report(valid_loss, epoch)
+            if trial is not None:
+                trial.report(valid_loss, epoch)
         else:
             record = self.recorder(train_loss=train_loss)
-            trial.report(train_loss, epoch)
+            if trial is not None:
+                trial.report(train_loss, epoch)
         # Handle pruning based on the intermediate value.
-        if trial.should_prune():
+        if trial is not None and trial.should_prune():
             raise optuna.exceptions.TrialPruned()
         return record
 
@@ -230,7 +233,7 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
         model_save_path = os.path.join(model_save_path, file_name)
         if self.model_selector is None:
             self.__save_model(epoch, model_save_path)
-            return True
+            return True, True, True
         else:
             is_need_save, need_reason, best_socre_models = self.model_selector.add_record(record, model_save_path)
             if is_need_save:
@@ -266,7 +269,8 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
 
     def create_experiment_record(self):
         experiment_record = self.experiment_record()
-        experiment_record.config_info = self.config_info
+        if hasattr(self, "config_info"):
+            experiment_record.config_info = self.config_info
         experiment_record.epoch_records = self.scores_history
         return experiment_record
 

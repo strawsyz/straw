@@ -1,6 +1,6 @@
 import numpy as np
-from PIL import Image
 import torch
+from PIL import Image
 from torch.autograd import Variable
 
 
@@ -26,3 +26,12 @@ def np_2_variable(np_arr):
 
 def variable_2_np(variable):
     return variable.data.numpy()
+
+
+def df_2_np(df):
+    return df.values
+
+
+def np_2_df(np):
+    import pandas as pd
+    return pd.DataFrame(np)

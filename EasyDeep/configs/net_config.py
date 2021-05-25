@@ -81,3 +81,13 @@ class LoanNetConfig(BaseNetConfig):
         self.scheduler_step_size = 20
         self.optim_name = "sgd"
         self.lr = 0.001
+
+class MultiLabelNetConfig(BaseNetConfig):
+    def __init__(self):
+        super(MultiLabelNetConfig, self).__init__()
+        self.n_in = 46
+        self.n_out = 11
+        self.loss_func_name = "BCEWithLogitsLoss"
+        self.scheduler_step_size = 20
+        self.optim_name = "Adam"
+        self.lr = 0.001

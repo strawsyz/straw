@@ -2,6 +2,7 @@ import numpy as np
 import torch
 from torch import nn
 from torch.autograd import Variable
+from torch.nn import functional as F
 
 from utils.data_augm_utils import find_contours
 
@@ -34,9 +35,6 @@ class FReLU(nn.Module):
 
     def forward(self, x):
         return torch.max(x, self.bn(self.conv(x)))
-
-
-from torch.nn import functional as F
 
 
 class DiceLoss(torch.nn.Module):
@@ -136,3 +134,20 @@ class ActivateContourLoss(nn.Module):
         loss = self.weight * lenth + region
 
         return loss
+
+
+class LabelSmoothingLoss(nn.Module):
+    def __init__(self, classes, smoothing=0.0, dim=-1):
+        super(LabelSmoothingLoss, self).__init__()
+        self.confidence = 1.0 - smoothing
+        self.smoothing = smoothing
+        self.cls = classes
+        self.dim = dim
+
+    def forward(self, pred, target):
+        pred = pred.log_softmax(dim=self.dim)
+        with torch.no_grad():
+            true_dist = torch.zeros_like(pred)
+            true_dist.fill_(self.smoothing / (self.cls - 1))
+            true_dist.scatter_(1, target.data.unsqueeze(1), self.confidence)
+        return torch.mean(torch.sum(-true_dist * pred, dim=self.dim))

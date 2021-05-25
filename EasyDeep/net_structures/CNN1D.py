@@ -6,7 +6,7 @@
 # @Description：
 
 from torch import nn
-
+import torch
 """使用一维的卷积组成的网络"""
 
 
@@ -87,12 +87,35 @@ class MyCNN1D(nn.Module):
         return output
 
 
-if __name__ == '__main__':
-    import torch
+class MultiLabelCNN1D(nn.Module):
+    def __init__(self):
+        super(MultiLabelCNN1D, self).__init__()
+        self.conv_1 = CNN1DBlockNoPool(1, 4)
+        self.conv_2 = CNN1DBlockNoPool(4, 16, k_size=8)
+        self.conv_3 = CNN1DBlockNoPool(16, 16, k_size=8)
+        self.conv_4 = CNN1DBlockNoPool(16, 32, k_size=8)
+        self.conv_5 = CNN1DBlockNoPool(32, 64, k_size=8)
+        self.conv_6 = CNN1DBlockNoPool(64, 32, k_size=8)
+        self.conv_7 = CNN1DBlockNoPool(32, 16, k_size=8)
+        self.conv_8 = CNN1DBlockNoPool(16, 11, k_size=3)
 
-    data = torch.rand((1, 40000))
-    net = MyCNN1D()
-    print(net.parameters())
+    def forward(self, input):
+        input = torch.unsqueeze(input, dim=1)
+        output = self.conv_1(input)
+        output = self.conv_2(output)
+        output = self.conv_3(output)
+        output = self.conv_4(output)
+        output = self.conv_5(output)
+        output = self.conv_6(output)
+        output = self.conv_7(output)
+        output = self.conv_8(output)
+        output = torch.squeeze(output,dim=2)
+        return output
+
+
+if __name__ == '__main__':
+
+    data = torch.rand((4, 1, 46))
+    net = MultiLabelCNN1D()
     out = net(data)
-    print(out)
-    print(net.parameters())
+    print(out.shape)

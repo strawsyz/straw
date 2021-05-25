@@ -74,7 +74,7 @@ class BaseNet(BaseNetConfig):
             raise RuntimeError("please set a valid loss function's name")
 
     def set_optimizer(self):
-        if self.optim_name == "adam":
+        if self.optim_name == "Adam":
             if self.weight_decay is None:
                 self.optimizer = optim.Adam(self.net_structure.parameters(), lr=self.lr)
             else:

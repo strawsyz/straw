@@ -18,6 +18,7 @@ from sklearn.linear_model import Lasso
 from sklearn.linear_model import LinearRegression
 from sklearn.linear_model import Ridge
 from sklearn.model_selection import cross_val_score, GridSearchCV, KFold
+from sklearn.preprocessing import Normalizer
 from sklearn.svm import SVR, LinearSVR
 from xgboost import XGBRegressor
 
@@ -53,11 +54,11 @@ def kNN_classify(train_data, train_gt_data, valid_data, valid_gt_data=None, k=5)
     return predict_data
 
 
-def rmse_cv(model, x, y, scoring="neg_mean_squared_error", cv=5):
+def rmse_cv(model, x, y, scoring, cv=5):
     return cross_val_score(model, x, y, scoring=scoring, cv=cv)
 
 
-def print_cv_result(grid_search):
+def print_gridcv_result(grid_search):
     print("Best Estimator:\n{}".format(grid_search.best_estimator_))
     print("Best Score :{}".format(grid_search.best_score_))
     print("CV Result : \n{}".format(pd.DataFrame(grid_search.cv_results_)[
@@ -154,10 +155,11 @@ class AverageWeight(BaseEstimator, RegressorMixin):
 
 
 class stacking(BaseEstimator, RegressorMixin, TransformerMixin):
-    def __init__(self, models, meta_model):
+    def __init__(self, models, meta_model, cv=5):
         self.models = models
         self.meta_model = meta_model
-        self.kf = KFold(n_splits=5, random_state=0, shuffle=True)
+        self.cv = 5
+        self.kf = KFold(n_splits=self.cv, random_state=0, shuffle=True)
 
     def fit(self, X, Y):
         self.saved_model = [deque(maxlen=5) for _ in self.models]
@@ -166,9 +168,11 @@ class stacking(BaseEstimator, RegressorMixin, TransformerMixin):
         for i, model in enumerate(self.models):
             for train_index, val_index in self.kf.split(X, Y):
                 renew_model = clone(model)
-                renew_model.fit(X[train_index], Y[train_index])
+                renew_model.fit(X.iloc[train_index, :], Y.iloc[train_index, :])
                 self.saved_model[i].append(renew_model)
-                train_result[val_index, i] = renew_model.predict(X[val_index])
+                te = renew_model.predict(X.iloc[val_index, :])
+                te = np.squeeze(te)
+                train_result[val_index, i] = te
         # train meta model
         self.meta_model.fit(train_result, Y)
         return self
@@ -182,17 +186,19 @@ class stacking(BaseEstimator, RegressorMixin, TransformerMixin):
 
     def get_oof(self, X, Y, test_X):
         oof = np.zeros((X.shape[0], len(self.models)))
-        test_single = np.zeros((test_X.shape[0], 5))
+        test_single = np.zeros((test_X.shape[0], self.cv))
 
         test_mean = np.zeros((test_X.shape[0], len(self.models)))
         for i, model in enumerate(self.models):
             for j, (train_index, val_index) in enumerate(self.kf.split(X, Y)):
                 clone_model = clone(model)
                 # train model
-                clone_model.fit(X[train_index], Y[train_index])
+                clone_model.fit(X.iloc[train_index, :], Y.iloc[train_index, :])
                 # predict for validation dataset
-                oof[val_index, i] = clone_model.predict(X[val_index])
-                test_single[:, j] = clone_model.predict(test_X)
+                te = clone_model.predict(X.iloc[val_index, :])
+                te = np.squeeze(te)
+                oof[val_index, i] = te
+                test_single[:, j] = np.square(clone_model.predict(test_X))
             # save the mean of every model
             test_mean[:, i] = test_single.mean(axis=1)
         return oof, test_mean
@@ -261,3 +267,8 @@ def stacking_usage():
 
     print(rmse_cv(stack_model, x_train_add, Y))
     print(rmse_cv(stack_model, x_train_add, Y).mean())
+
+
+def normalizer(data):
+    normalizer = Normalizer(norm='l2')  # L2范式
+    return normalizer.transform(data)

@@ -1,6 +1,6 @@
-from matplotlib import pyplot as plt
 import cv2
 from PIL import Image
+from matplotlib import pyplot as plt
 
 
 def img_hist_plt(gray_image_array):
@@ -62,3 +62,9 @@ def compare_images(rootpath1, rootpath2):
         image2 = cv2.imread(filepath2)
         if image.shape != image2.shape:
             raise RuntimeWarning("Size is different")
+
+
+def pd_profiling(data_frame):
+    import pandas_profiling
+    profile = pandas_profiling.ProfileReport(data_frame)
+    profile.to_file(output_file="pandas_profiling.html")
