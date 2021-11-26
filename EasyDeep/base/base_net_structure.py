@@ -34,3 +34,13 @@ class BaseNetStructure:
         for name, parameters in net.named_parameters():
             print(name, ':', parameters.size())
         return {'Total': total_num, 'Trainable': trainable_num}
+
+    def print_layer_size(self):
+        """print every layer's parameter_size"""
+        for name, parameters in self.named_parameters():
+            print(name, ':', parameters.size())
+            # parm[name] = parameters.detach().numpy()
+
+    def describe(self):
+        self.print_layer_size()
+        self.print_parameters_amount()
