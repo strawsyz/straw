@@ -39,7 +39,6 @@ class BaseNetStructure:
         """print every layer's parameter_size"""
         for name, parameters in self.named_parameters():
             print(name, ':', parameters.size())
-            # parm[name] = parameters.detach().numpy()
 
     def describe(self):
         self.print_layer_size()
