@@ -9,38 +9,37 @@ class ImageDataSetConfig(BaseDataSetConfig):
     def __init__(self):
         super(ImageDataSetConfig, self).__init__()
         if self.system == "Windows":
-            self.image_path = r"{image_path}}"
+            self.image_path = r"{image_path}"
             self.mask_path = r"{mask_path}"
         elif self.system == "Linux":
-            self.image_path = ""
-            self.mask_path = ""
-
+            self.image_path = r""
+            self.mask_path = r""
         self.shuffle = True
+        from PIL import Image
         self.image_transforms = transforms.Compose([
-            transforms.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1, hue=0.1),
-            transforms.Resize((224, 224)),
+            # transforms.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1, hue=0.1),
+            transforms.Resize((224, 224), interpolation=Image.NEAREST),
             transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+            # transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         ])
         self.mask_transforms = transforms.Compose([
-            transforms.Resize((224, 224)),
-            transforms.Grayscale(),
+            transforms.Resize((224, 224), interpolation=Image.NEAREST),
+            # transforms.Grayscale(),
             transforms.ToTensor(),
+            # transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         ])
-        self.image_transforms_4_test = transforms.Compose([
-            transforms.Resize((224, 224)),
+        self.edge_transforms = transforms.Compose([
             transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         ])
         # dataloader
         self.random_state = 0
-        self.batch_size = 2
+        self.batch_size = 2  # 4  # 16
         self.test_rate = 0.2
         num_samples = len(os.listdir(self.mask_path))
         self.num_test = int(num_samples * self.test_rate)
         self.num_train = num_samples - self.num_test
         self.valid_rate = 0.2
-        self.batch_size4test = 8
+        self.batch_size4test = 24
 
 
 class ImageDataSet4EdgeConfig(BaseDataSetConfig):

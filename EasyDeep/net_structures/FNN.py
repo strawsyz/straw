@@ -94,7 +94,7 @@ class AdaptiveFNN(nn.Module):
         super(AdaptiveFNN, self).__init__()
         if activate_func == "ReLU":
             base_layer = LinearReLU
-        elif activate_func == "sigmoid":
+        elif activate_func == "Sigmoid":
             base_layer = LinearSigmoid
         elif activate_func is None:
             base_layer = Linear

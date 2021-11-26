@@ -63,12 +63,18 @@ class BaseNet(BaseNetConfig):
             self.loss_function = nn.TripletMarginLoss()
         elif self.loss_func_name == "CTCLoss":
             self.loss_function = nn.CTCLoss()
+        elif self.loss_func_name == "DiceLoss":
+            from utils.loss_function_utils import DiceLoss
+            self.loss_function = DiceLoss()
+        elif self.loss_func_name == "DiceBCELoss":
+            from utils.loss_function_utils import DiceBCELoss
+            self.loss_function = DiceBCELoss()
         else:
             self.logger.error("please set a valid loss function's name")
             raise RuntimeError("please set a valid loss function's name")
 
     def set_optimizer(self):
-        if self.optim_name == "adam":
+        if self.optim_name == "Adam":
             if self.weight_decay is None:
                 self.optimizer = optim.Adam(self.net_structure.parameters(), lr=self.lr)
             else:

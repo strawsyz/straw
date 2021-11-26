@@ -12,7 +12,6 @@ from mixins.system_config_mixin import SystemConfigMixin
 from abc import ABC, abstractmethod
 from utils.time_utils import get_date
 from mixins.mysql_mixin import MySQLMixin
-from base.base_config_item import BaseConfigItem as ConfigItem
 
 
 class BaseConfig(BaseLogger, SystemConfigMixin, MySQLMixin):

@@ -154,7 +154,7 @@ if flag:
                                   patch_width, patch_height)
 
 # 使用canny生成轮廓图
-from my_data_auge import edge_detector
+from my_data_aug import edge_detector
 
 # flag = True
 flag = False
@@ -218,7 +218,7 @@ if flag:
     # print(len(os.listdir(SOURCE_MASK_PATH)))
 
 # 使用canny生成轮廓图
-from my_data_auge import edge_detector
+from my_data_aug import edge_detector
 
 # flag = True
 flag = False
@@ -254,18 +254,150 @@ if flag:
         target_path = os.path.join(EDGE_TARGET_PATH, file_name)
         binary_img(source_path, target_path)
 
+# 将没有切成patch的图像分为测试图像和训练图像
+flag = False
+test_rate = 0.2
+if flag:
+    SOURCE_IMAGE_PATH = r"/home/shi/Downloads/dataset/polyp/TMP/03/data/"
+    SOURCE_MASK_PATH = r"/home/shi/Downloads/dataset/polyp/TMP/03/mask/"
+
+    TARGET_TRAIN_IMAGE_PATH = r"/home/shi/Downloads/dataset/polyp/TMP/08/train/data"
+    TARGET_TEST_IMAGE_PATH = r"/home/shi/Downloads/dataset/polyp/TMP/08/test/data"
+    TARGET_TRAIN_MASK_PATH = r"/home/shi/Downloads/dataset/polyp/TMP/08/train/mask"
+    TARGET_TEST_MASK_PATH = r"/home/shi/Downloads/dataset/polyp/TMP/08/test/mask"
+    file_util.make_directory(TARGET_TRAIN_IMAGE_PATH)
+    file_util.make_directory(TARGET_TEST_MASK_PATH)
+    file_util.make_directory(TARGET_TRAIN_MASK_PATH)
+    file_util.make_directory(TARGET_TEST_IMAGE_PATH)
+
+    filenames = os.listdir(SOURCE_IMAGE_PATH)
+    filenames.sort()
+    import random
+    import shutil
+
+    random.seed(0)
+    random.shuffle(filenames)
+    num_test = int(len(filenames) * test_rate)  # 37
+    num_train = len(filenames) - num_test  # 148
+    # copy train image files
+    for filename in filenames[:num_train]:
+        source_image_path = os.path.join(SOURCE_IMAGE_PATH, filename)
+        source_mask_path = os.path.join(SOURCE_MASK_PATH, filename)
+        target_image_path = os.path.join(TARGET_TRAIN_IMAGE_PATH, filename)
+        target_mask_path = os.path.join(TARGET_TRAIN_MASK_PATH, filename)
+        shutil.copyfile(source_image_path, target_image_path)
+        binary_img(source_mask_path, target_mask_path)
+        print("train: {}".format(filename))
+    # copy test image files
+    for filename in filenames[num_train:]:
+        source_image_path = os.path.join(SOURCE_IMAGE_PATH, filename)
+        source_mask_path = os.path.join(SOURCE_MASK_PATH, filename)
+        target_image_path = os.path.join(TARGET_TEST_IMAGE_PATH, filename)
+        target_mask_path = os.path.join(TARGET_TEST_MASK_PATH, filename)
+        shutil.copyfile(source_image_path, target_image_path)
+        binary_img(source_mask_path, target_mask_path)
+        print("test: {}".format(filename))
+
+# 将图像分别切成小的patch图像
+flag = False
+if flag:
+    SOURCE_TRAIN_IMAGE_PATH = r"/home/shi/Downloads/dataset/polyp/TMP/08/train/data"
+    SOURCE_TEST_IMAGE_PATH = r"/home/shi/Downloads/dataset/polyp/TMP/08/test/data"
+    SOURCE_TRAIN_MASK_PATH = r"/home/shi/Downloads/dataset/polyp/TMP/08/train/mask"
+    SOURCE_TEST_MASK_PATH = r"/home/shi/Downloads/dataset/polyp/TMP/08/test/mask"
+
+    TARGET_TRAIN_IMAGE_PATH = r"/home/shi/Downloads/dataset/polyp/TMP/09/train/data"
+    TARGET_TEST_IMAGE_PATH = r"/home/shi/Downloads/dataset/polyp/TMP/09/test/data"
+    TARGET_TRAIN_MASK_PATH = r"/home/shi/Downloads/dataset/polyp/TMP/09/train/mask"
+    TARGET_TEST_MASK_PATH = r"/home/shi/Downloads/dataset/polyp/TMP/09/test/mask"
+    file_util.make_directory(TARGET_TRAIN_IMAGE_PATH)
+    file_util.make_directory(TARGET_TEST_MASK_PATH)
+    file_util.make_directory(TARGET_TRAIN_MASK_PATH)
+    file_util.make_directory(TARGET_TEST_IMAGE_PATH)
+
+    detected_size = 0.3
+    patch_width = 224
+    patch_height = 224
+    create_patch_by_absolute_size(SOURCE_TRAIN_IMAGE_PATH, SOURCE_TRAIN_MASK_PATH, TARGET_TRAIN_IMAGE_PATH,
+                                  TARGET_TRAIN_MASK_PATH,
+                                  detected_size,
+                                  patch_width, patch_height, max_num=200)
+    create_patch_by_absolute_size(SOURCE_TEST_IMAGE_PATH, SOURCE_TEST_MASK_PATH, TARGET_TEST_IMAGE_PATH,
+                                  TARGET_TEST_MASK_PATH,
+                                  detected_size,
+                                  patch_width, patch_height, max_num=200)
+    # test batches:2103   train batches:8393
+
+# create edge images
+flag = True
+if flag:
+    SOURCE_TRAIN_IMAGE_PATH = r"/home/shi/Downloads/dataset/polyp/TMP/09/train/data"
+    SOURCE_TEST_IMAGE_PATH = r"/home/shi/Downloads/dataset/polyp/TMP/09/test/data"
+    TARGET_TRAIN_EDGE_PATH = r"/home/shi/Downloads/dataset/polyp/TMP/09/train/edge"
+    TARGET_TEST_EDGE_PATH = r"/home/shi/Downloads/dataset/polyp/TMP/09/test/edge"
+    file_util.make_directory(TARGET_TRAIN_EDGE_PATH)
+    file_util.make_directory(TARGET_TEST_EDGE_PATH)
+    for filename in os.listdir(SOURCE_TRAIN_IMAGE_PATH):
+        source_path = os.path.join(SOURCE_TRAIN_IMAGE_PATH, filename)
+        target_path = os.path.join(TARGET_TRAIN_EDGE_PATH, filename)
+        edge_detector(source_path, target_path)
+        binary_img(target_path, target_path,threshold=1)
+    for filename in os.listdir(SOURCE_TEST_IMAGE_PATH):
+        source_path = os.path.join(SOURCE_TEST_IMAGE_PATH, filename)
+        target_path = os.path.join(TARGET_TEST_EDGE_PATH, filename)
+        edge_detector(source_path, target_path)
+        binary_img(target_path, target_path,threshold=1)
+
+# 将图像分别切成小的patch图像
+flag = False
+if flag:
+    SOURCE_TRAIN_IMAGE_PATH = r"/home/shi/Downloads/dataset/polyp/TMP/08/train/data"
+    SOURCE_TEST_IMAGE_PATH = r"/home/shi/Downloads/dataset/polyp/TMP/08/test/data"
+    SOURCE_TRAIN_MASK_PATH = r"/home/shi/Downloads/dataset/polyp/TMP/08/train/mask"
+    SOURCE_TEST_MASK_PATH = r"/home/shi/Downloads/dataset/polyp/TMP/08/test/mask"
+
+    TARGET_TRAIN_IMAGE_PATH = r"/home/shi/Downloads/dataset/polyp/TMP/10/train/data"
+    TARGET_TEST_IMAGE_PATH = r"/home/shi/Downloads/dataset/polyp/TMP/10/test/data"
+    TARGET_TRAIN_MASK_PATH = r"/home/shi/Downloads/dataset/polyp/TMP/10/train/mask"
+    TARGET_TEST_MASK_PATH = r"/home/shi/Downloads/dataset/polyp/TMP/10/test/mask"
+    file_util.make_directory(TARGET_TRAIN_IMAGE_PATH)
+    file_util.make_directory(TARGET_TEST_MASK_PATH)
+    file_util.make_directory(TARGET_TRAIN_MASK_PATH)
+    file_util.make_directory(TARGET_TEST_IMAGE_PATH)
+    # create patches
+    detected_size = 0.2
+    patch_width = 224
+    patch_height = 224
+    max_num = 100
+    create_patch_by_absolute_size(SOURCE_TRAIN_IMAGE_PATH, SOURCE_TRAIN_MASK_PATH, TARGET_TRAIN_IMAGE_PATH,
+                                  TARGET_TRAIN_MASK_PATH,
+                                  detected_size,
+                                  patch_width, patch_height, max_num=max_num)
+    create_patch_by_absolute_size(SOURCE_TEST_IMAGE_PATH, SOURCE_TEST_MASK_PATH, TARGET_TEST_IMAGE_PATH,
+                                  TARGET_TEST_MASK_PATH,
+                                  detected_size,
+                                  patch_width, patch_height, max_num=max_num)
+
+    # create edge images
+    SOURCE_TRAIN_IMAGE_PATH = r"/home/shi/Downloads/dataset/polyp/TMP/10/train/data"
+    SOURCE_TEST_IMAGE_PATH = r"/home/shi/Downloads/dataset/polyp/TMP/10/test/data"
+    TARGET_TRAIN_EDGE_PATH = r"/home/shi/Downloads/dataset/polyp/TMP/10/train/edge"
+    TARGET_TEST_EDGE_PATH = r"/home/shi/Downloads/dataset/polyp/TMP/10/test/edge"
+    file_util.make_directory(TARGET_TRAIN_EDGE_PATH)
+    file_util.make_directory(TARGET_TEST_EDGE_PATH)
+    for filename in os.listdir(SOURCE_TRAIN_IMAGE_PATH):
+        source_path = os.path.join(SOURCE_TRAIN_IMAGE_PATH, filename)
+        target_path = os.path.join(TARGET_TRAIN_EDGE_PATH, filename)
+        edge_detector(source_path, target_path)
+        binary_img(target_path, target_path)
+    for filename in os.listdir(SOURCE_TEST_IMAGE_PATH):
+        source_path = os.path.join(SOURCE_TEST_IMAGE_PATH, filename)
+        target_path = os.path.join(TARGET_TEST_EDGE_PATH, filename)
+        edge_detector(source_path, target_path)
+        binary_img(target_path, target_path)
 
 # 轮廓图和mask图像重叠的部分作为正确的图
 # 输入原图像，从图像检测出轮廓，获得轮廓图
 # 输出是一个轮廓图。真值是轮廓图和mask图像重叠的部分
 # 简介：检测polyp的轮廓的网络
 # 需要的数据：轮廓图。轮廓和mask图像重叠的部分
-
-
-if __name__ == '__main__':
-    # win上的测试
-    # SOURCE_IMAGE_PATH = "sample_data/"
-    # TARGET_IMAGE_PATH = "source/"
-    # 1000*800
-    # get_needed_data(SOURCE_IMAGE_PATH, TARGET_IMAGE_PATH, needed_part=(100, 100, 1100, 900))
-    pass

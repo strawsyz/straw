@@ -73,6 +73,9 @@ def calcu_iou_with_threshold(pred_part, gt_part, threshold=127, draw=False):
     pred_part = pred_part.copy()
     pred_part[pred_part >= threshold] = 255
     pred_part[pred_part < threshold] = 0
+    gt_part = gt_part.copy()
+    gt_part[gt_part >= 128] = 255
+    gt_part[gt_part < 128] = 0
 
     res = calcu_iou(pred_part, gt_part)
     if draw:
@@ -90,7 +93,7 @@ def analysis_iou_by_threshold(gt_image_paths, predict_image_paths, thresholds=ra
     assert (len(gt_image_paths) == len(predict_image_paths))
     all_ious = []
     for index, (gt_image_path, predict_image_path) in enumerate(zip(gt_image_paths, predict_image_paths)):
-        gt_image = np.array(Image.open(gt_image_path).convert("L"))
+        gt_image = np.array(Image.open(gt_image_path).convert("L").resize((224, 224)))
         repdict_image = np.array(Image.open(predict_image_path).convert("L"))
         ious = [0 for _ in range(len(thresholds))]
         for index, threshold in enumerate(thresholds):
@@ -124,10 +127,8 @@ def iou_estimate(gt_dir, predict_dir, thresholds=range(1, 255), draw_every_iou=F
     predict_paths = []
 
     for file_name in os.listdir(predict_dir):
-        print(file_name)
+        # print(file_name)
         gt_paths.append(os.path.join(gt_dir, file_name))
         predict_paths.append(os.path.join(predict_dir, file_name))
     analysis_iou_by_threshold(gt_paths, predict_paths, thresholds, draw_every_iou,
                               is_draw_image)
-
-

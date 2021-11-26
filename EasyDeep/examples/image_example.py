@@ -1,37 +1,25 @@
 import os
 import time
 
+import torch
 from PIL import Image
 from torch.autograd import Variable
 from torchvision.transforms import transforms
 
 from configs.experiment_config import ImageSegmentationConfig
 from experiments.deep_experiment import DeepExperiment
-import torch
 
 
 class ImageExperiment(ImageSegmentationConfig, DeepExperiment):
-    def __init__(self):
-        super(ImageExperiment, self).__init__()
+    def __init__(self, tag=None):
+        ImageSegmentationConfig.__init__(self, tag=tag)
+        # DeepExperiment.__init__(self)
+        # super(ImageExperiment, self).__init__()
         self.show_config()
-
 
     def before_test(self, prepare_dataset=True, prepare_net=True, save_predict_result=False):
         """call this function before test a trained model"""
         super(ImageExperiment, self).before_test(prepare_dataset, prepare_net)
-        self.logger.info("=" * 10 + " test start " + "=" * 10)
-        pps = 0
-        loss = 0
-        for i, (image, mask, image_name) in enumerate(self.test_loader):
-            pps_batch, loss_batch = self.test_one_batch(image, mask, image_name, save_predict_result)
-            pps += pps_batch
-            loss += loss_batch
-        pps /= len(self.test_loader)
-        loss /= len(self.test_loader)
-        self.logger.info("average predict {} images per second".format(pps))
-        self.logger.info("average loss is {}".format(loss))
-        self.logger.info("=" * 10 + " testing end " + "=" * 10)
-        return self.result_save_path
 
     def test_one_batch(self, image, mask, image_name, save_predict_result=False):
         image = self.prepare_data(image)
@@ -46,12 +34,11 @@ class ImageExperiment(ImageSegmentationConfig, DeepExperiment):
         num_batch, *_ = out.shape
         if save_predict_result:
             predict = out.squeeze().cpu().data.numpy()
-            for index in range(num_batch):
-                pred = predict[index]
+            for index, pred in enumerate(predict):
                 pred = pred * 255
                 pred = pred.astype('uint8')
                 pred = Image.fromarray(pred)
-                pred = pred.resize((width, height))
+                # pred = pred.resize((width, height))
                 save_path = os.path.join(self.result_save_path, image_name[index])
                 pred.save(save_path)
                 self.logger.info("================{}=================".format(save_path))
@@ -133,7 +120,7 @@ class ImageExperiment(ImageSegmentationConfig, DeepExperiment):
         image_transforms = transforms.Compose([
             transforms.Resize((224, 224)),
             transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+            # transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         ])
         image = image_transforms(image)
         image = self.prepare_data(image)
@@ -163,6 +150,15 @@ class ImageExperiment(ImageSegmentationConfig, DeepExperiment):
             pred = pred.astype('uint8')
             import numpy as np
             pred = np.where(pred > 1, 255, 0)
+
+            # if len(pred.shape) == 2:
+            #     pred = np.expand_dims(pred, 0)
+            # pred.unsqueeze(pred)
+            print(np.max(pred))
+            print(np.min(pred))
+            # print(pred)
+            print(pred.shape)
+            torch.log_softmax()
             pred = Image.fromarray(pred)
             pred = pred.resize((width, height))
             save_path = os.path.join(self.result_save_path, filename)
@@ -170,3 +166,52 @@ class ImageExperiment(ImageSegmentationConfig, DeepExperiment):
             self.logger.info("================{}=================".format(save_path))
         self.logger.info("{}:{}".format(filename, pps))
         return pps, loss.data
+
+    def objective(self, trial):
+        """used for optuna"""
+        # Generate the model.
+        # 创建包含优化的模型
+        model = None
+        from torch import optim
+        import optuna
+        # Generate the optimizers.
+        # 创建可选优化器
+        optimizer_name = trial.suggest_categorical("optimizer", ["Adam", "RMSprop", "SGD"])
+
+        # 创建可调整的学习率
+        lr = trial.suggest_float("lr", 1e-5, 1e-1, log=True)
+        self.prepare_net()
+        self.optimizer = getattr(optim, optimizer_name)(self.net_structure.parameters(), lr=lr)
+        # if self.prepare_dataset:
+        #     self.prepare_dataset()
+        # if self.prepare_net:
+        #     self.prepare_net()
+        best_loss = self.train(max_try_times=4, prepare_net=False, prepare_dataset=True, trial=trial)
+        return best_loss
+
+    def optuna_trials(self, direction="minimize", n_trials=100, timeout=None):
+        import optuna
+        study = optuna.create_study(direction=direction)
+        objective = self.objective
+        study.optimize(objective, n_trials=n_trials, timeout=timeout)
+
+        pruned_trials = [t for t in study.trials if t.state == optuna.trial.TrialState.PRUNED]
+        complete_trials = [t for t in study.trials if t.state == optuna.trial.TrialState.COMPLETE]
+
+        print("Study statistics: ")
+        print(f"  Number of finished trials: {len(study.trials)}")
+        print(f"  Number of pruned trials: {len(pruned_trials)}")
+        print(f"  Number of complete trials: {len(complete_trials)}")
+
+        # 选择出来的做好的结果
+        print("Best trial:")
+        trial = study.best_trial
+        # 选择出来的最好的超参数
+        # params = study.best_params
+        # 最优超参数下，objective函数的返回值
+        # values = study.best_value
+        print(f"  Value: {trial.value}")
+
+        print("  Params: ")
+        for key, value in trial.params.items():
+            print(f"    {key}: {value}")

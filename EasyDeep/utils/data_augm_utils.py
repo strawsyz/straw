@@ -13,14 +13,14 @@ def rotate_images(images):
     return images
 
 
-def rotate_images(images, probability=0.5):
+def vflip_images(images, probability=0.5):
     if random.random() < probability:
         for i, image in enumerate(images):
             images[i] = functional.vflip(image)
     return images
 
 
-def rotate_images(images, probability=0.5):
+def hflip_images(images, probability=0.5):
     if random.random() < probability:
         for i, image in enumerate(images):
             images[i] = functional.hflip(image)

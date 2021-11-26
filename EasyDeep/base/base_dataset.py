@@ -1,12 +1,14 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 
 from torch.utils.data import Dataset
+
 from configs.dataset_config import BaseDataSetConfig
 
 
 class BaseDataSet(BaseDataSetConfig, ABC, Dataset):
     def __init__(self):
         super(BaseDataSet, self).__init__()
+        self.set_seed()
 
     def __len__(self):
         raise NotImplementedError
@@ -24,6 +26,7 @@ class BaseDataSet(BaseDataSetConfig, ABC, Dataset):
         import torch
         import numpy as np
         import random
+        import os
         if self.random_state is not None:
             torch.manual_seed(self.random_state)  # cpu
             torch.cuda.manual_seed(self.random_state)  # gpu
@@ -31,6 +34,8 @@ class BaseDataSet(BaseDataSetConfig, ABC, Dataset):
             np.random.seed(self.random_state)  # numpy
             random.seed(self.random_state)  # random and transforms
             torch.backends.cudnn.deterministic = True  # cudnn
+            torch.backends.cudnn.benchmark = True
+            os.environ['PYTHONHASHSEED'] = str(self.random_state)
 
     def get_sample_dataloader(self):
         """

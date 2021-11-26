@@ -23,6 +23,21 @@ class InitWeightMixin:
                 nn.init.constant_(m.bias, 0)
 
 
+class DeconvBn(nn.Module, InitWeightMixin):
+    def __init__(self, in_n, out_n, is_init=True):
+        super(DeconvBn, self).__init__()
+        self.model = nn.Sequential(nn.ConvTranspose2d(
+            in_n, out_n, kernel_size=4, stride=2, padding=1),
+            nn.BatchNorm2d(out_n),
+            # nn.ReLU(inplace=True),
+        )
+        if is_init:
+            self.init_weight()
+
+    def forward(self, x):
+        return self.model(x)
+
+
 class DeconvBnReLU(nn.Module, InitWeightMixin):
     def __init__(self, in_n, out_n, is_init=True):
         super(DeconvBnReLU, self).__init__()
@@ -48,13 +63,13 @@ class ConvBnReLU(Conv, InitWeightMixin):
 
 
 class FCNVgg16(nn.Module):
-    def __init__(self, n_out=4, is_init=False):
+    def __init__(self, n_out=4, is_init=False, pretrained=True):
         """
         网络初始化，特点输出结果的图像大小和输入图像的是一样的
         :param n_out: 输出结果的频道数。
         """
         super(FCNVgg16, self).__init__()
-        vgg = vgg16_bn(pretrained=False)
+        vgg = vgg16_bn(pretrained=pretrained)
         self.encoder_1 = vgg.features[:7]
         self.encoder_2 = vgg.features[7:14]
         self.encoder_3 = vgg.features[14:24]
@@ -64,7 +79,8 @@ class FCNVgg16(nn.Module):
         self.decoder_2 = DeconvBnReLU(512, 256, is_init)
         self.decoder_3 = DeconvBnReLU(256, 128, is_init)
         self.decoder_4 = DeconvBnReLU(128, 64, is_init)
-        self.decoder_5 = DeconvBnReLU(64, n_out, is_init)
+        # self.decoder_5 = DeconvBnReLU(64, n_out, is_init)
+        self.decoder_5 = DeconvBn(64, n_out, is_init)
 
     def forward(self, x):
         out_1 = self.encoder_1(x)
@@ -196,15 +212,15 @@ class FCN4Edge_2(nn.Module):
 
 
 class FCN4Edge(nn.Module, BaseNetStructure):
-    def __init__(self, n_in=5, n_out=4, is_init=False):
+    def __init__(self, n_in=4, n_out=4, is_init=False, pretrained=True):
         """
-        网络初始化，特点输出结果的图像大小和输入图像的是一样的
+         use raw image and edge image to predict result
         :param n_out: 输出结果的频道数。
         """
         super(FCN4Edge, self).__init__()
         self.encoder_0 = ConvBnReLU(n_in, 3, is_init=is_init)
 
-        vgg = vgg16_bn(pretrained=False)
+        vgg = vgg16_bn(pretrained=pretrained)
 
         self.encoder_1 = vgg.features[:7]
         self.encoder_2 = vgg.features[7:14]
@@ -246,7 +262,8 @@ class FCNRes(nn.Module):
         self.decoder_2 = DeconvBnReLU(512, 256, is_init)
         self.decoder_3 = DeconvBnReLU(256, 128, is_init)
         self.decoder_4 = DeconvBnReLU(128, 64, is_init)
-        self.decoder_5 = DeconvBnReLU(64, n_out, is_init)
+        # self.decoder_5 = DeconvBnReLU(64, n_out, is_init)
+        self.decoder_5 = DeconvBn(64, n_out, is_init)
 
     def forward(self, x):
         out = self.encoder.conv1(x)
@@ -272,41 +289,43 @@ class FCNRes50(nn.Module):
         super(FCNRes50, self).__init__()
         import torchvision.models as models
 
-        self.encoder = models.resnet50(pretrained=False)
+        self.encoder = models.resnet50(pretrained=True)
 
         self.decoder_1 = DeconvBnReLU(2048, 1024, is_init)
         self.decoder_2 = DeconvBnReLU(1024, 512, is_init)
         self.decoder_3 = DeconvBnReLU(512, 256, is_init)
         self.decoder_4 = DeconvBnReLU(256, 64, is_init)
-        self.decoder_5 = DeconvBnReLU(64, num_classes, is_init)
+        # self.decoder_5 = DeconvBnReLU(64, num_classes, is_init)
+        self.decoder_5 = DeconvBn(64, num_classes, is_init)
+
 
     def forward(self, x):
         out = self.encoder.conv1(x)
-        print(out.shape)
+        # print(out.shape)
         out = self.encoder.bn1(out)
-        print(out.shape)
+        # print(out.shape)
         out_0 = self.encoder.relu(out)
-        print(out_0.shape)
+        # print(out_0.shape)
         out_0 = self.encoder.maxpool(out_0)
-        print('out_0', out_0.shape)
+        # print('out_0', out_0.shape)
         out_1 = self.encoder.layer1(out_0)
-        print('out_1', out_1.shape)
+        # print('out_1', out_1.shape)
         out_2 = self.encoder.layer2(out_1)
-        print('out_2', out_2.shape)
+        # print('out_2', out_2.shape)
         out_3 = self.encoder.layer3(out_2)
-        print('out_3', out_3.shape)
+        # print('out_3', out_3.shape)
         out_4 = self.encoder.layer4(out_3)
-        print('out_4', out_4.shape)
+        # print('out_4', out_4.shape)
         decoder_1 = self.decoder_1(out_4)
-        print('decoder_1', decoder_1.shape)
+        # print('decoder_1', decoder_1.shape)
         decoder_2 = self.decoder_2(decoder_1 + out_3)
-        print('decoder_2', decoder_2.shape)
+        # print('decoder_2', decoder_2.shape)
         decoder_3 = self.decoder_3(decoder_2 + out_2)
-        print('decoder_3', decoder_3.shape)
+        # print('decoder_3', decoder_3.shape)
         decoder_4 = self.decoder_4(decoder_3 + out_1)
-        print('decoder_4', decoder_4.shape)
+        # print('decoder_4', decoder_4.shape)
         out = self.decoder_5(decoder_4 + out)
-        print("out", out.shape)
+        # print("out", out.shape)
         return out
 
 

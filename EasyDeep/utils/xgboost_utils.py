@@ -13,7 +13,7 @@ from sklearn import metrics
 from sklearn.model_selection import GridSearchCV
 
 import matplotlib.pylab as plt
-from utils.machine_learning_utils import print_cv_result
+from utils.machine_learning_utils import print_gridcv_result
 
 """ use xgboost to train, validation and test"""
 
@@ -65,7 +65,7 @@ def XGB_CV(train_data, train_gt, params: dict = None, scoring: str = "f1", cv=5,
             del params[key]
     grid_search = GridSearchCV(estimator=estimator, param_grid=params, scoring=scoring, n_jobs=n_jobs, iid=False, cv=cv)
     grid_search.fit(train_data, train_gt)
-    print_cv_result(grid_search)
+    print_gridcv_result(grid_search)
     # get the best estimator
     best_estimator = grid_search.best_estimator_
     return best_estimator

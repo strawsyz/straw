@@ -35,6 +35,12 @@ class CustomCheckPoint(BaseCheckPoint):
         for attr_name in attr_names:
             setattr(self, attr_name, None)
 
+    def __repr__(self):
+        info = ""
+        for attr_name in self.__dict__:
+            info = "{}:{}\t{}".format(attr_name, getattr(self, attr_name), info)
+        return info
+
 
 def save(checkpoint, path):
     torch.save(checkpoint, path)

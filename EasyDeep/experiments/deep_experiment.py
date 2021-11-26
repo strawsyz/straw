@@ -3,6 +3,7 @@ import os
 import time
 from collections import namedtuple
 
+import optuna
 import torch
 from torch.autograd import Variable
 
@@ -94,16 +95,23 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
         """
         raise NotImplementedError
 
-    def train_valid_one_epoch(self, epoch):
+    def train_valid_one_epoch(self, epoch, trial=None):
         train_loss = self.train_one_epoch(epoch)
         if self.valid_loader is not None:
             valid_loss = self.valid_one_epoch(epoch)
             record = self.recorder(train_loss=train_loss, valid_loss=valid_loss)
+            if trial is not None:
+                trial.report(valid_loss, epoch)
         else:
             record = self.recorder(train_loss=train_loss)
+            if trial is not None:
+                trial.report(train_loss, epoch)
+        # Handle pruning based on the intermediate value.
+        if trial is not None and trial.should_prune():
+            raise optuna.exceptions.TrialPruned()
         return record
 
-    def train(self, max_try_times=None, prepare_dataset=True, prepare_net=True):
+    def train(self, max_try_times=None, prepare_dataset=True, prepare_net=True, trial=None):
         """
 
         :param max_try_times: if loss don't decrease for some times, then stop training
@@ -133,7 +141,7 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
             self.experiment_id = self.db_utils.insert(experiment_insert)
         for epoch in range(self.current_epoch, self.current_epoch + self.num_epoch):
             start_time = time.time()
-            record = self.train_valid_one_epoch(epoch)
+            record = self.train_valid_one_epoch(epoch, trial=trial)
 
             self.scores_history[epoch] = record
             need_save, best_score_models, model_save_path = self.save(epoch, record)
@@ -200,6 +208,8 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
         self.logger.info("average predict {} images per second".format(pps))
         self.logger.info("average loss is {}".format(loss))
         self.logger.info("=" * 10 + " testing end " + "=" * 10)
+        if save_predict_result:
+            print("save result of prediction at {}".format(self.result_save_path))
         return self.result_save_path
 
     def create_checkpoint(self, epoch=None, create4load=False):
@@ -223,7 +233,7 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
         model_save_path = os.path.join(model_save_path, file_name)
         if self.model_selector is None:
             self.__save_model(epoch, model_save_path)
-            return True
+            return True, True, True
         else:
             is_need_save, need_reason, best_socre_models = self.model_selector.add_record(record, model_save_path)
             if is_need_save:
@@ -259,7 +269,8 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
 
     def create_experiment_record(self):
         experiment_record = self.experiment_record()
-        experiment_record.config_info = self.config_info
+        if hasattr(self, "config_info"):
+            experiment_record.config_info = self.config_info
         experiment_record.epoch_records = self.scores_history
         return experiment_record
 

@@ -424,7 +424,7 @@ def XGB_CV(train_data, train_gt, params: dict = None, scoring: str = "f1", cv=5)
             del params[key]
     grid_search = GridSearchCV(estimator=estimator, param_grid=params, scoring=scoring, n_jobs=8, iid=False, cv=cv)
     grid_search.fit(train_data, train_gt)
-    print_cv_result(grid_search)
+    print_gridcv_result(grid_search)
     # get the best estimator
     best_estimator = grid_search.best_estimator_
     return best_estimator
