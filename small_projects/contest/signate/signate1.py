@@ -33,15 +33,6 @@ def str_2_int_4_application_type(application_type: str):
         return 0
 
 
-def str_2_int_4_application_type(application_type: str):
-    if application_type == "Joint App":
-        return 1
-    elif application_type == "Individual":
-        return 2
-    else:
-        return 0
-
-
 def str_2_int_4_purpose(purpose: str):
     choices = ['small_business', 'house', 'medical', 'home_improvement', 'car', 'debt_consolidation', 'other',
                'credit_card', 'major_purchase']
@@ -208,8 +199,6 @@ def z_score(x, mean=None, std=None, axis=0):
     xr -= mean
     xr /= std
     return x, mean, std
-
-
 
 
 def ML_02(X, Y, test_X):
