@@ -160,3 +160,21 @@ def create_unique_name(save_path):
             new_save_path = new_filename + ext
             if not os.path.exists(new_save_path):
                 return new_save_path
+
+
+def get_line_number(filepath):
+    with open(filepath, 'r') as f:
+        count = len(f.readlines())
+    return count
+
+
+def count_files(folder_path, count=0):
+    for filename in os.listdir(folder_path):
+        path1 = os.path.join(folder_path, filename)
+        if os.path.isdir(path1):
+            count = count_files(path1, count)
+        else:
+            count += 1
+    return count
+
+

@@ -91,3 +91,17 @@ class MultiLabelNetConfig(BaseNetConfig):
         self.scheduler_step_size = 20
         self.optim_name = "Adam"
         self.lr = 0.001
+
+
+class VideoFeatureNetConfig(BaseNetConfig):
+    def __init__(self):
+        super(VideoFeatureNetConfig, self).__init__()
+        self.n_in = 2048
+        self.embeddings_dim = 512
+        self.n_layer = 6
+        self.heads = 8
+        self.n_out = 101
+        self.loss_func_name = "BCEWithLogitsLoss"
+        self.scheduler_step_size = 20
+        self.optim_name = "Adam"
+        self.lr = 0.001

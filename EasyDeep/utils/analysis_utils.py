@@ -1,7 +1,7 @@
 import cv2
 from PIL import Image
 from matplotlib import pyplot as plt
-
+import numpy as np
 
 def img_hist_plt(gray_image_array):
     plt.figure()
@@ -31,27 +31,6 @@ def is_same_size(image_paths):
             print("{} have different shape: {}".format(image_path, image.size))
 
 
-def show_images(images, labels=None):
-    if labels is None:
-        labels = range(len(images))
-    import math
-    row_num = int(math.sqrt(len(images)))
-    col_num = int(len(images) / row_num) + 1 if len(images) % row_num != 0 else int(len(images) / row_num)
-    fig, axs = plt.subplots(row_num, col_num)
-    if len(images) > 1:
-        import numpy as np
-        axs = np.asarray(axs)
-        axs = axs.flatten()
-        for idx in range(len(images)):
-            axs[idx].imshow(images[idx].squeeze(), cmap='gray')
-            axs[idx].set_title(labels[idx])
-            axs[idx].axis("off")
-    else:
-        axs.imshow(images[0].squeeze(), cmap='gray')
-        axs.set_title(labels[0])
-        axs.axis("off")
-    plt.show()
-
 
 def compare_images(rootpath1, rootpath2):
     import os
@@ -64,7 +43,16 @@ def compare_images(rootpath1, rootpath2):
             raise RuntimeWarning("Size is different")
 
 
-def pd_profiling(data_frame):
+def pd_profiling(data_frame, output_file="pandas_profiling.html"):
     import pandas_profiling
     profile = pandas_profiling.ProfileReport(data_frame)
-    profile.to_file(output_file="pandas_profiling.html")
+    profile.to_file(output_file=output_file)
+
+
+def analyze_num_list(data: list):
+    print(f"min : {min(data)}")
+    print(f"max : {max(data)}")
+    print(f"mean : {np.mean(data)}")
+    print(f"median : {np.median(data)}")
+    from scipy import stats
+    print(f"mode : {stats.mode(data)[0][0]}")
