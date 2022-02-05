@@ -112,7 +112,7 @@ class BaseNetConfig(BaseConfig):
         self.init_attr()
 
     def init_attr(self):
-        print("use base net config's init attr")
+        print(f"use base net config's init attr {self.__class__}")
         # initialize some attributes
         if self.scheduler_gamma is None:
             self.scheduler_gamma = 0.1

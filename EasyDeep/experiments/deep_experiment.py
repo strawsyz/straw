@@ -22,7 +22,7 @@ from utils.net_utils import save, load
 class DeepExperiment(DeepExperimentConfig, BaseExperiment):
 
     def __init__(self):
-        super(DeepExperiment, self).__init__()
+        super(BaseExperiment, self).__init__()
         self.description = "experiment"
         # tag can't include a space
         self.tag = "deep"
@@ -233,7 +233,8 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
         model_save_path = os.path.join(model_save_path, file_name)
         if self.model_selector is None:
             self.__save_model(epoch, model_save_path)
-            return True, True, True
+            is_need_save, best_socre_models, model_save_path = True, True, True
+            return is_need_save, best_socre_models, model_save_path
         else:
             is_need_save, need_reason, best_socre_models = self.model_selector.add_record(record, model_save_path)
             if is_need_save:
@@ -245,7 +246,7 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
                 return is_need_save, best_socre_models, model_save_path
 
     def __save_model(self, epoch, model_save_path):
-        self.logger.info("==============saving model data===============")
+        self.logger.debug("==============saving model data===============")
         checkpoint = self.create_checkpoint(epoch)
         save(checkpoint, model_save_path)
         self.logger.info("==============saved at {}===============".format(model_save_path))
@@ -253,7 +254,7 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
     def load(self):
         model_save_path = self.pretrain_path
         if os.path.isfile(model_save_path):
-            self.logger.info("==============loading model data===============")
+            self.logger.debug("==============loading model data===============")
             self.__load_model(model_save_path)
             self.logger.info("=> loaded checkpoint from '{}' ".format(model_save_path))
             self.load_history()
@@ -271,7 +272,8 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
         experiment_record = self.experiment_record()
         if hasattr(self, "config_info"):
             experiment_record.config_info = self.config_info
-        experiment_record.epoch_records = self.scores_history
+        if hasattr(self, "scores_history"):
+            experiment_record.epoch_records = self.scores_history
         return experiment_record
 
     def save_history(self):

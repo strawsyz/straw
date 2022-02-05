@@ -4,12 +4,14 @@ import torch
 class EpochRecord:
     """record the result of one epoch"""
 
-    def __init__(self, train_loss, valid_loss=None):
+    def __init__(self, train_loss, valid_loss=None, accuracy=None):
         self.train_loss = train_loss
         self.valid_loss = valid_loss
+        self.accuracy = accuracy
         self.model_path = None
+
         # the name of score used to estimate network
-        self.scores = ["train_loss", "valid_loss"]
+        self.scores = ["train_loss", "valid_loss", "accuracy"]
 
     def record_2_dict(self):
         record_dict = {}
