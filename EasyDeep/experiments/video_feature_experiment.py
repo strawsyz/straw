@@ -188,7 +188,9 @@ class VideoFeatureExperiment(VideoFeatureConfig, DeepExperiment):
 if __name__ == '__main__':
     # config = VideoFeatureConfig()
     import sys
-    sys.path.insert(0, "/workspace/straw/EasyDeep/")
+
+    # sys.path.insert(0, "/workspace/straw/EasyDeep/")
+    sys.path.append("/workspace/straw/EasyDeep/")
     # export PYTHONPATH="${PYTHONPATH}:/workspace/straw/EasyDeep/"
 
     os.environ["CUDA_VISIBLE_DEVICES"] = "0"
