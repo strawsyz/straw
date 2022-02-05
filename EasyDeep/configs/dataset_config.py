@@ -220,22 +220,22 @@ class VideoFeatureDatasetConfig(BaseDataSetConfig):
             self.root_path = r"C:\(lab\datasets\UCF101"
 
         self.label_filepath = os.path.join(self.root_path,
-                                           r"UCF101TrainTestSplits-RecognitionTask\ucfTrainTestlist\classInd.txt")
-        self.train_dataset_root_path = os.path.join(self.root_path, r"features\train")
-        self.test_dataset_root_path = os.path.join(self.root_path, r"features\train")
+                                           r"UCF101TrainTestSplits-RecognitionTask/ucfTrainTestlist/classInd.txt")
+        self.train_dataset_root_path = os.path.join(self.root_path, r"features/train")
+        self.test_dataset_root_path = os.path.join(self.root_path, r"features/train")
 
         if self.split_num == 1:
             self.test_annotation_filepath = os.path.join(self.root_path,
-                                                         r"UCF101TrainTestSplits-RecognitionTask\ucfTrainTestlist\testlist01.txt")
+                                                         r"UCF101TrainTestSplits-RecognitionTask/ucfTrainTestlist/testlist01.txt")
             self.train_annotation_filepath = os.path.join(self.root_path,
-                                                          r"UCF101TrainTestSplits-RecognitionTask\ucfTrainTestlist\trainlist01.txt")
+                                                          r"UCF101TrainTestSplits-RecognitionTask/ucfTrainTestlist/trainlist01.txt")
         elif self.split_num == 2:
             self.test_annotation_filepath = os.path.join(self.root_path,
-                                                         r"UCF101TrainTestSplits-RecognitionTask\ucfTrainTestlist\testlist02.txt")
+                                                         r"UCF101TrainTestSplits-RecognitionTask/ucfTrainTestlist/testlist02.txt")
             self.train_annotation_filepath = os.path.join(self.root_path,
-                                                          r"UCF101TrainTestSplits-RecognitionTask\ucfTrainTestlist\trainlist02.txt")
+                                                          r"UCF101TrainTestSplits-RecognitionTask/ucfTrainTestlist/trainlist02.txt")
         elif self.split_num == 3:
             self.test_annotation_filepath = os.path.join(self.root_path,
-                                                         r"UCF101TrainTestSplits-RecognitionTask\ucfTrainTestlist\testlist03.txt")
+                                                         r"UCF101TrainTestSplits-RecognitionTask/ucfTrainTestlist/testlist03.txt")
             self.train_annotation_filepath = os.path.join(self.root_path,
-                                                          r"UCF101TrainTestSplits-RecognitionTask\ucfTrainTestlist\trainlist03.txt")
+                                                          r"UCF101TrainTestSplits-RecognitionTask/ucfTrainTestlist/trainlist03.txt")
