@@ -211,7 +211,13 @@ class VideoFeatureDatasetConfig(BaseDataSetConfig):
         self.use_rate = 0.1
 
         self.random_state = 0
-        self.root_path = r"C:\(lab\datasets\UCF101"
+        import socket
+
+        host_name = socket.gethostname()
+        if host_name == "26d814d5923d":
+            self.root_path = r"/raid/shi/datasets/UCF101"
+        else:
+            self.root_path = r"C:\(lab\datasets\UCF101"
 
         self.label_filepath = os.path.join(self.root_path,
                                            r"UCF101TrainTestSplits-RecognitionTask\ucfTrainTestlist\classInd.txt")
