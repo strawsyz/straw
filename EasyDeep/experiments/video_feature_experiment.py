@@ -188,14 +188,9 @@ class VideoFeatureExperiment(VideoFeatureConfig, DeepExperiment):
 if __name__ == '__main__':
     # config = VideoFeatureConfig()
     import sys
-
     sys.path.insert(0, "/workspace/straw/EasyDeep/")
     # export PYTHONPATH="${PYTHONPATH}:/workspace/straw/EasyDeep/"
 
     os.environ["CUDA_VISIBLE_DEVICES"] = "0"
     experiment = VideoFeatureExperiment()
-    # experiment.test()
-    # experiment.estimate()
     experiment.train()
-    # experiment.save_history()
-    # print("end")
