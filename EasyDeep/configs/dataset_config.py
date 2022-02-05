@@ -215,7 +215,7 @@ class VideoFeatureDatasetConfig(BaseDataSetConfig):
 
         host_name = socket.gethostname()
         if host_name == "26d814d5923d":
-            self.root_path = r"/raid/shi/datasets/UCF101"
+            self.root_path = r"/workspace/datasets/UCF101"
         else:
             self.root_path = r"C:\(lab\datasets\UCF101"
 
