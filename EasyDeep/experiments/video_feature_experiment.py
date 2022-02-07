@@ -31,6 +31,7 @@ class VideoFeatureExperiment(VideoFeatureConfig, DeepExperiment):
         self.pretrain_path = None
         self.result_save_path = None
         self.selector = None
+        self.try_times = 0
 
         # super().__init__(config_instance)
         if config_instance is None:
@@ -49,6 +50,17 @@ class VideoFeatureExperiment(VideoFeatureConfig, DeepExperiment):
                 best_accuracy = accuracy
         return best_accuracy
 
+    def early_stop(self, best_accuracy, accuracy):
+        if best_accuracy < accuracy:
+            self.try_times = 0
+        else:
+            self.try_times += 1
+
+        if self.max_try_times <= self.try_times:
+            return True
+        else:
+            return False
+
     def train(self, test=False):
         if not test:
             self.prepare_dataset()
@@ -56,6 +68,7 @@ class VideoFeatureExperiment(VideoFeatureConfig, DeepExperiment):
         self.logger.info("================training start=================")
         self.net = self.net_structure
         for epoch in range(self.current_epoch, self.current_epoch + self.num_epoch):
+            pre_best_accuracy = self.get_best_accuracy()
             start_time = time.time()
             # record = self.train_one_epoch(epoch)
             record = self.train_valid_one_epoch(epoch)
@@ -65,8 +78,10 @@ class VideoFeatureExperiment(VideoFeatureConfig, DeepExperiment):
                 self.save(epoch, record)
 
             # self.test_one_batch(epoch)
-            # todo print the best score
             self.logger.info(f"Best {self.get_best_accuracy()}")
+            if self.early_stop(pre_best_accuracy, record.accuracy):
+                self.info("Stop training for over max try times")
+                break
             self.logger.info("use {} seconds in the epoch".format(int(time.time() - start_time)))
         self.logger.info("================training is over=================")
 
