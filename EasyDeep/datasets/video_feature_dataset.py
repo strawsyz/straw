@@ -38,8 +38,6 @@ def feat2clip(feat, clip_length):
 class UCF101DataSet(VideoFeatureDatasetConfig):
     def __init__(self):
         super(UCF101DataSet, self).__init__()
-        # self.train_path = r"/home/shi/Downloads/dataset/polyp/TMP/09/train/"
-        # self.test_path = r"/home/shi/Downloads/dataset/polyp/TMP/09/test/"
         self.train_dataset = VideoFeatureDataset(split="train")
         self.num_train = len(self.train_dataset)
         self.test_dataset = VideoFeatureDataset(split="test")
@@ -88,7 +86,7 @@ class VideoFeatureDataset(BaseDataSet, VideoFeatureDatasetConfig):
 
         self.Y = np.zeros((num_samples, num_classes))
 
-        for idx, line in enumerate(tqdm(open(self.annotation_filepath, 'r').readlines()[:num_samples])):
+        for idx, line in enumerate(tqdm(open(self.annotation_filepath, 'r').readlines()[:num_samples], ncols=50)):
             class_name, filename = line.strip().split(r"/")
             filepath = os.path.join(self.dataset_root_path, class_name, filename.split(".")[0] + ".npy")
             self.X.append(feat2clip(np.load(filepath), self.clip_length))

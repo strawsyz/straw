@@ -208,7 +208,7 @@ class VideoFeatureDatasetConfig(BaseDataSetConfig):
         # self.valid_num = 20
         # self.test_num = 20
         # self.set_dataset_num = True
-        self.use_rate = 0.1
+        self.use_rate = 1.0
 
         self.random_state = 0
         import socket
@@ -222,8 +222,9 @@ class VideoFeatureDatasetConfig(BaseDataSetConfig):
 
         self.label_filepath = os.path.join(self.root_path,
                                            r"UCF101TrainTestSplits-RecognitionTask/ucfTrainTestlist/classInd.txt")
-        self.train_dataset_root_path = os.path.join(self.root_path, r"features/train")
-        self.test_dataset_root_path = os.path.join(self.root_path, r"features/train")
+        # self.train_dataset_root_path = os.path.join(self.root_path, r"features/train")
+        self.train_dataset_root_path = os.path.join(self.root_path, r"features/train-4FPS-ResNet152")
+        self.test_dataset_root_path = self.train_dataset_root_path
 
         if self.split_num == 1:
             self.test_annotation_filepath = os.path.join(self.root_path,

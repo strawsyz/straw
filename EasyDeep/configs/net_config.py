@@ -99,7 +99,7 @@ class VideoFeatureNetConfig(BaseNetConfig):
         self.n_in = 2048
         self.embeddings_dim = 512
         self.n_layer = 6
-        self.heads = 8
+        self.heads = 1
         self.n_out = 101
         self.loss_func_name = "BCEWithLogitsLoss"
         self.scheduler_step_size = 20

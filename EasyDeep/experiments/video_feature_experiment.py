@@ -1,3 +1,5 @@
+from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+
 from torch.autograd import Variable
 import os
 import pickle
@@ -96,7 +98,7 @@ class VideoFeatureExperiment(VideoFeatureConfig, DeepExperiment):
         train_loss = 0
         self.net.train()
         global data
-        for sample, label in tqdm(self.train_loader):
+        for sample, label in tqdm(self.train_loader, ncols=50):
             sample = self.prepare_data(sample)
             label = self.prepare_data(label)
             self.optimizer.zero_grad()
@@ -202,6 +204,10 @@ class VideoFeatureExperiment(VideoFeatureConfig, DeepExperiment):
 
 if __name__ == '__main__':
     # config = VideoFeatureConfig()
+    # 据说有用，实际没什么用,反而限制只能使用cpu
+    # os.system("taskset -p 0xff %d" % os.getpid())
+
+
     import sys
 
     # sys.path.insert(0, "/workspace/straw/EasyDeep/")
