@@ -202,18 +202,26 @@ class VideoFeatureExperiment(VideoFeatureConfig, DeepExperiment):
             return data
 
 
+def set_GPU(gpu_ids: str):
+    if gpu_ids != "-1":
+        os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+        os.environ["CUDA_VISIBLE_DEVICES"] = gpu_ids
+
+
 if __name__ == '__main__':
     # config = VideoFeatureConfig()
     # 据说有用，实际没什么用,反而限制只能使用cpu
     # os.system("taskset -p 0xff %d" % os.getpid())
 
-
     import sys
+    from Args.video_args import get_args
+
+    args = get_args()
+    set_GPU(args.GPU)
 
     # sys.path.insert(0, "/workspace/straw/EasyDeep/")
     sys.path.append("/workspace/straw/EasyDeep/")
     # export PYTHONPATH="${PYTHONPATH}:/workspace/straw/EasyDeep/"
-
-    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+    # os.environ["CUDA_VISIBLE_DEVICES"] = "0"
     experiment = VideoFeatureExperiment()
     experiment.train()

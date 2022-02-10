@@ -379,26 +379,6 @@ class VideoFeatureConfig(DeepExperimentConfig):
 
     def __init__(self):
         super(VideoFeatureConfig, self).__init__()
-        # super().__init__()
-        random_state = 0
-
-        parser = ArgumentParser(description='transformer for soccernet', formatter_class=ArgumentDefaultsHelpFormatter)
-
-        parser.add_argument('--GPU', required=False, type=str, default=0, help='ID of the GPU to use')
-        # parser.add_argument("--split_data", required=False, type=int, default=1,
-        #                     help='split_data')
-        # parser.add_argument("--model_names_in_type1", nargs='+', required=False, type=str,
-        #                     default=["MyOptimizeTransformer6", "MyOptimizeTransformer7", "MyOptimizeTransformer8",
-        #                              "MyOptimizeTransformer61"],
-        #                     help='spot_model_path')
-        # parser.add_argument("--test_4_highlights", required=False, type=bool, default=False,
-        #                     help='test_4_highlights')
-        # parser.add_argument("--loss_weight", required=False, type=float, default=False,
-        #                     help='loss_weight')
-
-        args = parser.parse_args()
-        self.args = args
-
         self.is_use_gpu = True
         self.num_iter = 3000
         self.root_path = os.path.join(r"C:\(lab\models",

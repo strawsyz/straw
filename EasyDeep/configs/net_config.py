@@ -1,4 +1,5 @@
 # need to rename db_config_example.py to db_config.py
+from Args.video_args import get_args
 from base.base_config import BaseNetConfig
 
 
@@ -105,3 +106,11 @@ class VideoFeatureNetConfig(BaseNetConfig):
         self.scheduler_step_size = 20
         self.optim_name = "Adam"
         self.lr = 0.001
+
+        # set According to the Args
+        args = get_args()
+        self.lr = args.lr
+        self.n_layer = args.n_layer
+        self.heads = args.heads
+        self.embeddings_dim = args.embeddings_dim
+        self.model_name = ""
