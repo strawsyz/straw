@@ -19,6 +19,7 @@ class VideoArgs():
         parser.add_argument('--heads', required=False, type=int, default=1, help='Heads')
         parser.add_argument('--n_layer', required=False, type=int, default=1, help='Num of Layers')
         parser.add_argument('--lr', required=False, type=float, default=0.001, help='Learning Rate')
+        parser.add_argument('--max_try_times', required=False, type=int, default=8, help='Learning Rate')
 
         # parser.add_argument("--split_data", required=False, type=int, default=1,
         #                     help='split_data')

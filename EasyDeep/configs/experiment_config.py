@@ -1,6 +1,7 @@
 import os
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 
+from Args.video_args import get_args
 from base.base_config import BaseExperimentConfig
 from base.base_recorder import EpochRecord
 from base.base_recorder import ExperimentRecord
@@ -397,6 +398,9 @@ class VideoFeatureConfig(DeepExperimentConfig):
         self.set_dataset()
         self.set_net()
         self.set_model_selector()
+
+        args = get_args()
+        self.max_try_times = args.max_try_times
 
     def set_dataset(self):
         from configs.dataset_config import VideoFeatureDatasetConfig
