@@ -391,7 +391,7 @@ class VideoFeatureConfig(DeepExperimentConfig):
         self.result_save_path = os.path.join(self.root_path, "result")
         self.num_epoch = 500
         self.is_pretrain = False
-        self.max_try_times = 3
+        # self.max_try_times = 3
 
         self.recorder = EpochRecord
         self.experiment_record = ExperimentRecord

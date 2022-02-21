@@ -293,7 +293,7 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
         if hasattr(self, "history_save_path") and self.history_save_path is not None and self.history_save_path != "":
             if os.path.exists(self.history_save_path):
                 if os.path.isfile(self.history_save_path):
-                    self.logger.info("loading history")
+                    self.logger.info("Loading History")
                     experiment_record = self.create_experiment_record()
                     experiment_record = experiment_record.load(self.history_save_path)
                     self.scores_history = experiment_record.epoch_records

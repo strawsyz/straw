@@ -99,7 +99,7 @@ class VideoFeatureExperiment(VideoFeatureConfig, DeepExperiment):
     def train_one_epoch(self, epoch) -> float:
         train_loss = 0
         self.net.train()
-        global data
+        # global data
         for sample, label in tqdm(self.train_loader, ncols=50):
             sample = self.prepare_data(sample)
             label = self.prepare_data(label)
@@ -143,7 +143,7 @@ class VideoFeatureExperiment(VideoFeatureConfig, DeepExperiment):
                 predict = self.net(sample)
                 valid_loss += self.loss_function(predict, label)
                 predict_result = torch.argmax(sigmoid(predict), dim=1)
-                label_result = torch.argmax(sigmoid(label), dim=1)
+                label_result = torch.argmax(label, dim=1)
                 correct = torch.eq(label_result, predict_result)
                 correct_sum += correct.sum().float().item()
                 sum += label.shape[0]

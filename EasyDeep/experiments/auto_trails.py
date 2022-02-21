@@ -7,6 +7,7 @@
 import os
 import threading
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+import torch
 from concurrent.futures import ThreadPoolExecutor
 
 from utils.print_utils import print_red
@@ -32,7 +33,6 @@ def run_command(command):
 
 
 def run_thread(command_):
-    print(threading.current_thread().name)
     GPU_id = useable_GPU_ids[int(threading.current_thread().name.split("_")[-1])]
     command_ = f"{command_} --GPU {GPU_id}"
 
@@ -45,6 +45,7 @@ def run_thread(command_):
         result = "ERROR" + str(e)
         result = f"{command_}:\t{result}\n"
         add_record(RECORD_FILEPATH, result)
+
     print("END\t", command_)
     print("=========================================")
     return result
@@ -129,7 +130,6 @@ if __name__ == '__main__':
     RECORD_FILEPATH = fr"{DIR_PATH}/{int(time.time())}"
     # 用于解决一个error，不知道原因
     os.environ['MKL_THREADING_LAYER'] = 'GNU'
-    import torch
 
     useable_GPU_ids = [str(i) for i in range(torch.cuda.device_count())]
     num_workers = len(useable_GPU_ids)
@@ -148,30 +148,9 @@ if __name__ == '__main__':
     commands = create_commands(main_command)
 
     # create threadpool
-    pool = ThreadPoolExecutor(max_workers=num_workers)
+    # pool = ThreadPoolExecutor(max_workers=num_workers)
 
-    for command_ in commands:
-        # run_thread(command_)
-        # 提交任务
-        future1 = pool.submit(run_thread, command_)
-        time.sleep(3)
-        # print(future1.result())
-    # import threading
-    # import time
-    #
-    # # 创建一个包含2条线程的线程池
-    # # 向线程池提交一个task, 50会作为action()函数的参数
-    # future1 = pool.submit(action, 50)
-    # # 向线程池再提交一个task, 100会作为action()函数的参数
-    # future2 = pool.submit(action, 100)
-    # # 判断future1代表的任务是否结束
-    # print(future1.done())
-    # time.sleep(3)
-    # # 判断future2代表的任务是否结束
-    # print(future2.done())
-    # # 查看future1代表的任务返回的结果
-    # print(future1.result())
-    # # 查看future2代表的任务返回的结果
-    # print(future2.result())
-    # # 关闭线程池
-    # pool.shutdown()
+    with ThreadPoolExecutor(max_workers=num_workers) as pool:
+        for command_ in commands:
+            future1 = pool.submit(run_thread, command_)
+            time.sleep(3)
