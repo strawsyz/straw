@@ -21,8 +21,9 @@ class Logger:
         if logger_name is not None:
             cls.log_path = os.path.join(cls.log_path, logger_name)
         cls.log_path = config.log_path
+        cls.log_path = os.path.join(cls.log_path, "2022")
         make_directory(cls.log_path)
-        cls.log_filename = os.path.join(cls.log_path, '{}.log'.format(time.strftime("%Y_%m_%d")))
+        cls.log_filename = os.path.join(cls.log_path, '{}.log'.format(time.strftime("%m_%d-%H_%M_%S")))
 
         if config.console_output:
             console = logging.StreamHandler()

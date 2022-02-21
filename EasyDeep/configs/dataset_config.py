@@ -232,7 +232,7 @@ class VideoFeatureDatasetConfig(BaseDataSetConfig):
         elif self.FPS == 2:
             self.train_dataset_root_path = os.path.join(self.root_path, r"features/train")
         else:
-            raise NotImplementedError("No such ")
+            raise NotImplementedError("No such FPS")
         self.test_dataset_root_path = self.train_dataset_root_path
 
         if self.split_num == 1:
