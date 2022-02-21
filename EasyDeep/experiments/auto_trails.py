@@ -155,7 +155,7 @@ if __name__ == '__main__':
         # 提交任务
         future1 = pool.submit(run_thread, command_)
         # time.sleep(30)
-        print(future1.result())
+        # print(future1.result())
     # import threading
     # import time
     #
