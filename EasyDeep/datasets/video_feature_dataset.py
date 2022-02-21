@@ -68,7 +68,6 @@ class VideoFeatureDataset(BaseDataSet, VideoFeatureDatasetConfig):
         self.split = split
         self.X = []
         self.Y = []
-        self.clip_length = 10
         if self.split == "train":
             self.annotation_filepath = self.train_annotation_filepath
             self.dataset_root_path = self.train_dataset_root_path

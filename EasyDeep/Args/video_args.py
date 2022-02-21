@@ -17,9 +17,11 @@ class VideoArgs():
         parser.add_argument('--GPU', required=False, type=str, default=GPU, help='ID of the GPU to use')
         parser.add_argument('--embeddings_dim', required=False, type=int, default=512, help='Embedding Size')
         parser.add_argument('--heads', required=False, type=int, default=1, help='Heads')
-        parser.add_argument('--n_layer', required=False, type=int, default=1, help='Num of Layers')
+        parser.add_argument('--n_layers', required=False, type=int, default=1, help='Num of Layers')
+        parser.add_argument('--batch_size', required=False, type=int, default=64, help='Batch Size')
         parser.add_argument('--lr', required=False, type=float, default=0.001, help='Learning Rate')
-        parser.add_argument('--max_try_times', required=False, type=int, default=8, help='Learning Rate')
+        parser.add_argument('--max_try_times', required=False, type=int, default=8, help='Max Try Times')
+        parser.add_argument('--clip_length', required=False, type=int, default=18, help='Number of frames in Clip')
 
         # parser.add_argument("--split_data", required=False, type=int, default=1,
         #                     help='split_data')

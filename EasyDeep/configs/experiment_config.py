@@ -5,6 +5,7 @@ from Args.video_args import get_args
 from base.base_config import BaseExperimentConfig
 from base.base_recorder import EpochRecord
 from base.base_recorder import ExperimentRecord
+from utils.other_utils import set_GPU
 from utils.time_utils import get_date
 from utils.time_utils import get_time_4_filename
 
@@ -381,6 +382,7 @@ class VideoFeatureConfig(DeepExperimentConfig):
     def __init__(self):
         super(VideoFeatureConfig, self).__init__()
         self.is_use_gpu = True
+        self.GPU = "0"
         self.num_iter = 3000
         self.root_path = os.path.join(r"C:\(lab\models",
                                       self.create_experiment_name(__class__.name))
@@ -394,13 +396,15 @@ class VideoFeatureConfig(DeepExperimentConfig):
         self.recorder = EpochRecord
         self.experiment_record = ExperimentRecord
 
+        args = get_args()
+        self.max_try_times = args.max_try_times
+        self.GPU = args.GPU
+
         self.init_attr()
         self.set_dataset()
         self.set_net()
         self.set_model_selector()
-
-        args = get_args()
-        self.max_try_times = args.max_try_times
+        set_GPU(self.GPU)
 
     def set_dataset(self):
         from configs.dataset_config import VideoFeatureDatasetConfig

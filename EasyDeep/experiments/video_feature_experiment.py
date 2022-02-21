@@ -10,6 +10,7 @@ from tqdm import tqdm
 
 from configs.experiment_config import VideoFeatureConfig
 from experiments import DeepExperiment
+from utils.other_utils import set_GPU
 
 
 class VideoFeatureExperiment(VideoFeatureConfig, DeepExperiment):
@@ -86,6 +87,7 @@ class VideoFeatureExperiment(VideoFeatureConfig, DeepExperiment):
                 break
             self.logger.info("use {} seconds in the epoch".format(int(time.time() - start_time)))
         self.logger.info("================training is over=================")
+        # return self.get_best_accuracy()
 
     def init(self):
         # 初始化所有的内容。只要有一个没有设置就使用默认的设置内容
@@ -187,7 +189,6 @@ class VideoFeatureExperiment(VideoFeatureConfig, DeepExperiment):
     def sample_test(self, n_sample=3, epoch=3):
         cur_epoch = self.num_epoch
         self.dataset.get_samle_dataloader(num_samples=n_sample, target=self)
-        # self.dataset.get_dataloader(self)
         self.num_epoch = epoch
         self.train(test=True)
         self.before_test(test=True)
@@ -202,22 +203,9 @@ class VideoFeatureExperiment(VideoFeatureConfig, DeepExperiment):
             return data
 
 
-def set_GPU(gpu_ids: str):
-    if gpu_ids != "-1":
-        os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-        os.environ["CUDA_VISIBLE_DEVICES"] = gpu_ids
-
 
 if __name__ == '__main__':
-    # config = VideoFeatureConfig()
-    # 据说有用，实际没什么用,反而限制只能使用cpu
-    # os.system("taskset -p 0xff %d" % os.getpid())
-
     import sys
-    from Args.video_args import get_args
-
-    args = get_args()
-    set_GPU(args.GPU)
 
     # sys.path.insert(0, "/workspace/straw/EasyDeep/")
     sys.path.append("/workspace/straw/EasyDeep/")
@@ -225,3 +213,4 @@ if __name__ == '__main__':
     # os.environ["CUDA_VISIBLE_DEVICES"] = "0"
     experiment = VideoFeatureExperiment()
     experiment.train()
+    print(experiment.get_best_accuracy())

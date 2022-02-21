@@ -2,6 +2,7 @@ import os
 
 from torchvision import transforms
 
+from Args.video_args import get_args
 from base.base_config import BaseDataSetConfig
 
 
@@ -202,6 +203,9 @@ class VideoFeatureDatasetConfig(BaseDataSetConfig):
         self.batch_size = 8
         self.batch_size_4_test = 32
         self.split_num = 3
+        self.FPS = 4
+        args = get_args()
+        self.clip_length = args.clip_length
 
         # self.valid_rate = 0.2
         # self.train_num = 100
@@ -223,7 +227,12 @@ class VideoFeatureDatasetConfig(BaseDataSetConfig):
         self.label_filepath = os.path.join(self.root_path,
                                            r"UCF101TrainTestSplits-RecognitionTask/ucfTrainTestlist/classInd.txt")
         # self.train_dataset_root_path = os.path.join(self.root_path, r"features/train")
-        self.train_dataset_root_path = os.path.join(self.root_path, r"features/train-4FPS-ResNet152")
+        if self.FPS == 4:
+            self.train_dataset_root_path = os.path.join(self.root_path, r"features/train-4FPS-ResNet152")
+        elif self.FPS == 2:
+            self.train_dataset_root_path = os.path.join(self.root_path, r"features/train")
+        else:
+            raise NotImplementedError("No such ")
         self.test_dataset_root_path = self.train_dataset_root_path
 
         if self.split_num == 1:
