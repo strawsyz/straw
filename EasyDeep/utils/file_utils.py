@@ -178,3 +178,7 @@ def count_files(folder_path, count=0):
     return count
 
 
+def delete_all_files(dir_path: str):
+    for filename in os.listdir(dir_path):
+        filepath = os.path.join(dir_path, filename)
+        os.remove(filepath)

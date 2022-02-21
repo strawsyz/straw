@@ -10,6 +10,7 @@ from tqdm import tqdm
 
 from configs.experiment_config import VideoFeatureConfig
 from experiments import DeepExperiment
+from utils import file_utils
 from utils.other_utils import set_GPU
 
 
@@ -44,6 +45,8 @@ class VideoFeatureExperiment(VideoFeatureConfig, DeepExperiment):
             super(DeepExperiment, self).__init__(config_instance)
 
         self.show_config()
+        # set init parameters into history
+        self.init_history()
 
     def get_best_accuracy(self):
         best_accuracy = 0
@@ -64,23 +67,44 @@ class VideoFeatureExperiment(VideoFeatureConfig, DeepExperiment):
         else:
             return False
 
-    def train(self, test=False):
-        if not test:
-            self.prepare_dataset()
+    def init_history(self):
+        file_utils.make_directory(self.history_save_dir)
+        # experiment_record = self.experiment_record()
+        # experiment_record.config_info = self.config_info
+        config_dict = {}
+        for attr in sorted(self.dataset_config.__dict__):
+            config_dict[attr + "_dataset"] = getattr(self.dataset_config, attr)
+        if hasattr(self, "net_config") and self.net_config is not None:
+            for attr in sorted(self.net_config.__dict__):
+                config_dict[attr + "_network"] = getattr(self.net_config, attr)
+        if hasattr(self, "net") and self.net is not None:
+            for attr in sorted(self.net.__dict__):
+                config_dict[attr + "_network"] = getattr(self.net, attr)
+        for attr in sorted(self.__dict__):
+            config_dict[attr + "_experiment"] = getattr(self, attr)
+        self.experiment_record.config_info = config_dict
+        self.save_history()
+
+    def save_history(self):
+        self.experiment_record.save(self.history_save_path)
+        self.logger.info("=" * 10 + " saved experiment history at {}".format(self.history_save_path) + "=" * 10)
+
+
+    def train(self):
+        self.prepare_dataset()
         self.prepare_net()
-        self.logger.info("================training start=================")
         self.net = self.net_structure
+
+        self.logger.info("================training start=================")
         for epoch in range(self.current_epoch, self.current_epoch + self.num_epoch):
             pre_best_accuracy = self.get_best_accuracy()
             start_time = time.time()
-            # record = self.train_one_epoch(epoch)
             record = self.train_valid_one_epoch(epoch)
 
             if record is not None:
                 self.history[epoch] = record
                 self.save(epoch, record)
 
-            # self.test_one_batch(epoch)
             self.logger.info(f"Best {self.get_best_accuracy()}")
             if self.early_stop(pre_best_accuracy, record.accuracy):
                 self.info("Stop training for over max try times")

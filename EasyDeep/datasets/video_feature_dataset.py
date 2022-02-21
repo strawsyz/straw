@@ -38,6 +38,8 @@ def feat2clip(feat, clip_length):
 class UCF101DataSet(VideoFeatureDatasetConfig):
     def __init__(self):
         super(UCF101DataSet, self).__init__()
+
+    def create_dataset(self):
         self.train_dataset = VideoFeatureDataset(split="train")
         self.num_train = len(self.train_dataset)
         self.test_dataset = VideoFeatureDataset(split="test")
@@ -48,18 +50,23 @@ class UCF101DataSet(VideoFeatureDatasetConfig):
         pass
 
     def get_dataloader(self, target):
+        self.create_dataset()
+        if self.test_model:
+            self.train_dataset.test()
+            self.test_dataset.test()
+        else:
+            self.train_dataset.train()
+            self.test_dataset.train()
         self.train_loader = DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=True)
         self.valid_loader = DataLoader(self.test_dataset, batch_size=self.batch_size_4_test, shuffle=False)
         self.test_loader = DataLoader(self.test_dataset, batch_size=self.batch_size_4_test, shuffle=False)
         copy_need_attr(self, target, ["valid_loader", "train_loader", "test_loader"])
 
     def train(self):
-        self.train_dataset.train()
-        self.test_dataset.train()
+        self.test_model = False
 
     def test(self):
-        self.train_dataset.test()
-        self.test_dataset.test()
+        self.test_model = True
 
 
 class VideoFeatureDataset(BaseDataSet, VideoFeatureDatasetConfig):

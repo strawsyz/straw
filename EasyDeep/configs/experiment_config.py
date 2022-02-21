@@ -53,9 +53,11 @@ class DeepExperimentConfig(BaseExperimentConfig):
             from prettytable import PrettyTable
             config_view = PrettyTable()
             config_view.field_names = ["name", "value"]
+
             config_view.add_row(["dataset config", delimiter])
             for attr in sorted(self.dataset_config.__dict__):
                 config_view.add_row([attr, getattr(self.dataset_config, attr)])
+
             config_view.add_row(["network config", delimiter])
             if hasattr(self, "net_config") and self.net_config is not None:
                 net_config = self.net_config
@@ -63,9 +65,11 @@ class DeepExperimentConfig(BaseExperimentConfig):
                 net_config = self.net
             for attr in sorted(net_config.__dict__):
                 config_view.add_row([attr, getattr(net_config, attr)])
+            #
             config_view.add_row(["experiment config", delimiter])
             for attr in sorted(self.__dict__):
                 config_view.add_row([attr, getattr(self, attr)])
+
             return "\n{}".format(str(config_view))
         elif self.system == 'Linux' or (self.system == 'Windows' and self.use_prettytable == False):
             config_items = []
@@ -116,9 +120,7 @@ class DeepExperimentConfig(BaseExperimentConfig):
             self.logger.info(self.config_info)
             return self.config_info
         else:
-            # TODO print config
-            self.logger.warning("Need to Print Config")
-            pass
+            self.info(self)
 
     def set_model_selector(self):
         from base.base_model_selector import BaseModelSelector
@@ -384,17 +386,25 @@ class VideoFeatureConfig(DeepExperimentConfig):
         self.is_use_gpu = True
         self.GPU = "0"
         self.num_iter = 3000
-        self.root_path = os.path.join(r"C:\(lab\models",
-                                      self.create_experiment_name(__class__.name))
+
+        import platform
+        _system = platform.system()
+        if _system == "Windows":
+            self.root_path = os.path.join(r"C:\(lab\models", self.create_experiment_name(__class__.name))
+        elif _system == "Linux":
+            self.root_path = os.path.join(r"Results", self.create_experiment_name(__class__.name))
+        else:
+            raise NotImplementedError("No Such Platform")
+
         self.history_save_dir = os.path.join(self.root_path, "history")
         self.model_save_path = os.path.join(self.root_path, "model")
         self.result_save_path = os.path.join(self.root_path, "result")
         self.num_epoch = 500
         self.is_pretrain = False
-        # self.max_try_times = 3
+        self.max_try_times = 3
 
         self.recorder = EpochRecord
-        self.experiment_record = ExperimentRecord
+        self.experiment_record = ExperimentRecord()
 
         args = get_args()
         self.max_try_times = args.max_try_times
@@ -405,6 +415,7 @@ class VideoFeatureConfig(DeepExperimentConfig):
         self.set_net()
         self.set_model_selector()
         set_GPU(self.GPU)
+        self.use_prettytable = True
 
     def set_dataset(self):
         from configs.dataset_config import VideoFeatureDatasetConfig

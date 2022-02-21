@@ -13,6 +13,7 @@ from base.base_recorder import EpochRecord
 from configs.experiment_config import DeepExperimentConfig
 from utils import file_utils
 from utils import time_utils
+from utils.file_utils import delete_all_files
 from utils.matplotlib_utils import lineplot
 from utils.matplotlib_utils import save as img_save
 from utils.matplotlib_utils import show
@@ -227,23 +228,30 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
 
     def save(self, epoch, record: EpochRecord):
         self.save_history()
-        model_save_path = os.path.join(self.model_save_path, time_utils.get_date())
-        file_utils.make_directory(model_save_path)
+
+        model_save_dir_path = os.path.join(self.model_save_path)
+        file_utils.make_directory(model_save_dir_path)
         file_name = 'ep{}_{}.pkl'.format(epoch, time_utils.get_time("%H-%M-%S"))
-        model_save_path = os.path.join(model_save_path, file_name)
+        model_save_path = os.path.join(model_save_dir_path, file_name)
+
         if self.model_selector is None:
             self.__save_model(epoch, model_save_path)
             is_need_save, best_socre_models, model_save_path = True, True, True
             return is_need_save, best_socre_models, model_save_path
         else:
+            record = self.history[epoch]
             is_need_save, need_reason, best_socre_models = self.model_selector.add_record(record, model_save_path)
-            if is_need_save:
-                self.logger.info("save this model for {} is better".format(need_reason))
-                self.__save_model(epoch, model_save_path)
-                return is_need_save, best_socre_models, model_save_path
-            else:
-                self.logger.info("the eppoch's result is not good, not save")
-                return is_need_save, best_socre_models, model_save_path
+
+        if is_need_save:
+            # delete other useless models
+            delete_all_files(model_save_dir_path)
+            self.logger.info("save this model for {} is better".format(need_reason))
+            self.__save_model(epoch, model_save_path)
+
+            return is_need_save, best_socre_models, model_save_path
+        else:
+            self.logger.info("the epoch's result is not good, not save")
+            return is_need_save, best_socre_models, model_save_path
 
     def __save_model(self, epoch, model_save_path):
         self.logger.debug("==============saving model data===============")
