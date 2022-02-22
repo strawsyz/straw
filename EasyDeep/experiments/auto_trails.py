@@ -68,6 +68,7 @@ def create_commands(main_command):
     # params_commands.append(" --chunk_size 10")
     # params_commands.append(" --chunk_size 15")
     # params_commands.append(" --chunk_size 20")
+    params_commands.append(" --model_name FIE2")
     params_commands.append(" --clip_length 5")
     params_commands.append(" --clip_length 10")
     params_commands.append(" --clip_length 15")

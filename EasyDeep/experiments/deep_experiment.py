@@ -227,8 +227,6 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
             return CustomCheckPoint(experiment_data.keys())(experiment_data)
 
     def save(self, epoch, record: EpochRecord):
-        self.save_history()
-
         model_save_dir_path = os.path.join(self.model_save_path)
         file_utils.make_directory(model_save_dir_path)
         file_name = 'ep{}_{}.pkl'.format(epoch, time_utils.get_time("%H-%M-%S"))
@@ -241,6 +239,9 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
         else:
             record = self.history[epoch]
             is_need_save, need_reason, best_socre_models = self.model_selector.add_record(record, model_save_path)
+
+        self.save_history()
+
 
         if is_need_save:
             # delete other useless models

@@ -41,10 +41,17 @@ class ExperimentRecord:
         self.epoch_records[epoch] = epoch_record
 
     def save(self, save_path):
-        torch.save(self, save_path)
+        # torch.save(self, save_path)
+        torch.save({"epoch_records": self.epoch_records, "config_info": self.config_info,
+                    "best_model_paths": self.best_model_paths}, save_path)
 
     def load(self, save_path):
-        return torch.load(save_path)
+        te = torch.load(save_path)
+        self.epoch_records = te["epoch_records"]
+        self.config_info = te["config_info"]
+        self.best_model_paths = te["best_model_paths"]
+        return self
+        # return torch.load(save_path)
 
     def __str__(self):
         return "ExperimentRecord"

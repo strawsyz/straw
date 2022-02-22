@@ -73,15 +73,15 @@ class VideoFeatureExperiment(VideoFeatureConfig, DeepExperiment):
         # experiment_record.config_info = self.config_info
         config_dict = {}
         for attr in sorted(self.dataset_config.__dict__):
-            config_dict[attr + "_dataset"] = getattr(self.dataset_config, attr)
+            config_dict[attr + "_dataset"] = str(getattr(self.dataset_config, attr))
         if hasattr(self, "net_config") and self.net_config is not None:
             for attr in sorted(self.net_config.__dict__):
-                config_dict[attr + "_network"] = getattr(self.net_config, attr)
+                config_dict[attr + "_network"] = str(getattr(self.net_config, attr))
         if hasattr(self, "net") and self.net is not None:
             for attr in sorted(self.net.__dict__):
-                config_dict[attr + "_network"] = getattr(self.net, attr)
+                config_dict[attr + "_network"] = str(getattr(self.net, attr))
         for attr in sorted(self.__dict__):
-            config_dict[attr + "_experiment"] = getattr(self, attr)
+            config_dict[attr + "_experiment"] = str(getattr(self, attr))
         self.experiment_record.config_info = config_dict
         self.save_history()
 
@@ -102,7 +102,7 @@ class VideoFeatureExperiment(VideoFeatureConfig, DeepExperiment):
             record = self.train_valid_one_epoch(epoch)
 
             if record is not None:
-                self.history[epoch] = record
+                self.experiment_record.epoch_records[epoch] = record
                 self.save(epoch, record)
 
             self.logger.info(f"Best {self.get_best_accuracy()}")

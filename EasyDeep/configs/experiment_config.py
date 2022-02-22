@@ -428,8 +428,12 @@ class VideoFeatureConfig(DeepExperimentConfig):
         from nets.F2E import FIE2Net
         from configs.net_config import VideoFeatureNetConfig
         self.net_config = VideoFeatureNetConfig()
-        # self.net = FIE2Net()
-        self.net = TranformerNet()
+        if self.net_config.model_name == "Transformer":
+            self.net = TranformerNet()
+        elif self.net_config.model_name == "FIE2":
+            self.net = FIE2Net()
+        else:
+            raise NotImplementedError("No Such  Model")
 
     def set_model_selector(self):
         from base.base_model_selector import BaseModelSelector

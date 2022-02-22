@@ -113,4 +113,4 @@ class VideoFeatureNetConfig(BaseNetConfig):
         self.n_layer = args.n_layers
         self.heads = args.heads
         self.embeddings_dim = args.embeddings_dim
-        self.model_name = ""
+        self.model_name = args.model_name
