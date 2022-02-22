@@ -237,7 +237,7 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
             is_need_save, best_socre_models, model_save_path = True, True, True
             return is_need_save, best_socre_models, model_save_path
         else:
-            record = self.history[epoch]
+            record = self.experiment_record.epoch_records[epoch]
             is_need_save, need_reason, best_socre_models = self.model_selector.add_record(record, model_save_path)
 
         self.save_history()
