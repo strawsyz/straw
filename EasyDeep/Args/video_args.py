@@ -19,7 +19,7 @@ class VideoArgs():
         parser.add_argument('--heads', required=False, type=int, default=1, help='Heads')
         parser.add_argument('--n_layers', required=False, type=int, default=1, help='Num of Layers')
         parser.add_argument('--batch_size', required=False, type=int, default=64, help='Batch Size')
-        parser.add_argument('--lr', required=False, type=float, default=0.001, help='Learning Rate')
+        parser.add_argument('--LR', required=False, type=float, default=0.001, help='Learning Rate')
         parser.add_argument('--max_try_times', required=False, type=int, default=8, help='Max Try Times')
         parser.add_argument('--clip_length', required=False, type=int, default=18, help='Number of frames in Clip')
 
