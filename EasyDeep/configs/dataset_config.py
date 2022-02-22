@@ -206,6 +206,7 @@ class VideoFeatureDatasetConfig(BaseDataSetConfig):
         self.FPS = 4
         args = get_args()
         self.clip_length = args.clip_length
+        self.FPS = args.FPS
 
         # self.valid_rate = 0.2
         # self.train_num = 100
