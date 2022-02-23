@@ -231,6 +231,18 @@ class VideoFeatureExperiment(VideoFeatureConfig, DeepExperiment):
 
 if __name__ == '__main__':
     import sys
+    import numpy as np
+    import random
+
+    random_state = 0
+    torch.manual_seed(random_state)  # cpu
+    torch.cuda.manual_seed(random_state)  # gpu
+    torch.cuda.manual_seed_all(random_state)
+    np.random.seed(random_state)  # numpy
+    random.seed(random_state)  # random and transforms
+    torch.backends.cudnn.deterministic = True  # cudnn
+    torch.backends.cudnn.benchmark = True
+    os.environ['PYTHONHASHSEED'] = str(random_state)
 
     # sys.path.insert(0, "/workspace/straw/EasyDeep/")
     sys.path.append("/workspace/straw/EasyDeep/")

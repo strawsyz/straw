@@ -198,6 +198,7 @@ class MultiLabelDatasetConfig(BaseDataSetConfig):
 
 class VideoFeatureDatasetConfig(BaseDataSetConfig):
     def __init__(self):
+        self.random_state = 0
         super(VideoFeatureDatasetConfig, self).__init__()
         # self.dataset_path = r""
         self.batch_size = 8
@@ -215,7 +216,6 @@ class VideoFeatureDatasetConfig(BaseDataSetConfig):
         # self.set_dataset_num = True
         self.use_rate = 1.0
 
-        self.random_state = 0
         import socket
 
         host_name = socket.gethostname()
