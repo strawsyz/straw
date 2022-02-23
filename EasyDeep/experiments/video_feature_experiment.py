@@ -12,6 +12,7 @@ from configs.experiment_config import VideoFeatureConfig
 from experiments import DeepExperiment
 from utils import file_utils
 from utils.other_utils import set_GPU
+from utils.print_utils import red
 
 
 class VideoFeatureExperiment(VideoFeatureConfig, DeepExperiment):
@@ -105,7 +106,7 @@ class VideoFeatureExperiment(VideoFeatureConfig, DeepExperiment):
                 self.experiment_record.epoch_records[epoch] = record
                 self.save(epoch, record)
 
-            self.logger.info(f"Best {self.get_best_accuracy()}")
+            self.logger.info(red(f"Best accuracy is {self.get_best_accuracy()}"))
             if self.early_stop(pre_best_accuracy, record.accuracy):
                 self.info("Stop training for over max try times")
                 break
