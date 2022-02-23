@@ -51,7 +51,7 @@ class VideoFeatureExperiment(VideoFeatureConfig, DeepExperiment):
 
     def get_best_accuracy(self):
         best_accuracy = 0
-        for epoch_record in self.history.values():
+        for epoch_record in self.experiment_record.epoch_records.values():
             accuracy = epoch_record.accuracy
             if best_accuracy < accuracy:
                 best_accuracy = accuracy
@@ -177,7 +177,7 @@ class VideoFeatureExperiment(VideoFeatureConfig, DeepExperiment):
             self.logger.info("Epoch:{}\t valid_loss:{:.6f}".format(epoch, valid_loss))
 
         correct_rate = correct_sum / sum
-        self.logger.info(correct_rate)
+        self.logger.info(f"Accuracy : {correct_rate}")
         return valid_loss, correct_rate
 
     def before_test(self):
