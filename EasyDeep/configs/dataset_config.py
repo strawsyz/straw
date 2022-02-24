@@ -233,6 +233,8 @@ class VideoFeatureDatasetConfig(BaseDataSetConfig):
             self.train_dataset_root_path = os.path.join(self.root_path, r"features/train-4FPS-ResNet152")
         elif self.FPS == 2:
             self.train_dataset_root_path = os.path.join(self.root_path, r"features/train")
+        elif self.FPS == 16:
+            self.train_dataset_root_path = r"/workspace/datasets/features/UCF101/val/16FPS-i3d"
         else:
             raise NotImplementedError("No such FPS")
         self.test_dataset_root_path = self.train_dataset_root_path
