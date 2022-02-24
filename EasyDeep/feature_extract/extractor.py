@@ -37,7 +37,7 @@ def get_resnet152(model_name):
 # torch
 def get_i3d_model(model_path=r"C:\(lab\OtherProjects\pytorch-i3d-master\models\rgb_imagenet.pt"):
     import platform
-    if platform.system() == "linux":
+    if platform.system() == "Linux":
         model_path = r"/workspace/datasets/rgb_imagenet.pt"
 
     i3d = InceptionI3d(400, in_channels=3)
