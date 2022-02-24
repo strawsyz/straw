@@ -31,7 +31,7 @@ def extract_sample(video_path, feature_path, model, start=None, duration=None, o
     frames = frames.transpose(3, 0, 1, 2)
     frames = frames[None, :]
     # b, c, t, h, w = frames.shape
-    print(frames.shape)
+    print(f"frames : {frames.shape}")
     features = []
     # for start in range(1, t - 56, 1600):
     #     end = min(t - 1, start + 1600 + 56)
@@ -87,7 +87,7 @@ def extract_feature_dataset():
             feature_folder_path = os.path.join(feature_path, label)
             feature_sample_path = os.path.join(feature_folder_path, filename.split(".")[0])
             make_directory(video_sample_path)
-            make_directory(feature_sample_path)
+            make_directory(feature_folder_path)
 
             if os.path.exists(feature_sample_path + ".npy"):
                 print(f"already have {feature_sample_path}")
@@ -95,7 +95,7 @@ def extract_feature_dataset():
 
             print(f"video path : {video_sample_path}")
             print(f"feature path : {feature_sample_path}")
-            # make_directory(feature_folder_path)
+
             num_frames = extract_sample(video_path=video_sample_path, feature_path=feature_sample_path,
                                         model=model, FPS=FPS)
 
