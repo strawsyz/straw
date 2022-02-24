@@ -120,7 +120,7 @@ if __name__ == '__main__':
     # num_frames = extract_sample(video_path=video_sample_path, feature_path=feature_sample_path,
     #                             model=model, FPS=FPS)
     extract_feature_dataset()
-    analyze(all_num_frames)
+    # analyze(all_num_frames)
 
     # extract_sample()
     # video_extractor()
