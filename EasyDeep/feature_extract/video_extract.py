@@ -30,7 +30,8 @@ def extract_sample(video_path, feature_path, model, start=None, duration=None, o
     #     frames = preprocess_input(videoLoader.frames)
     frames = frames.transpose(3, 0, 1, 2)
     frames = frames[None, :]
-    b, c, t, h, w = frames.shape
+    # b, c, t, h, w = frames.shape
+    print(frames.shape)
     features = []
     # for start in range(1, t - 56, 1600):
     #     end = min(t - 1, start + 1600 + 56)
