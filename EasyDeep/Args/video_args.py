@@ -21,7 +21,7 @@ class VideoArgs():
         parser.add_argument('--batch_size', required=False, type=int, default=64, help='Batch Size')
         parser.add_argument('--LR', required=False, type=float, default=0.001, help='Learning Rate')
         parser.add_argument('--FPS', required=False, type=int, default=4, help='Frame Rate')
-        parser.add_argument('--split_num', required=False, type=int, default=4, help='Split Num')
+        parser.add_argument('--split_num', required=False, type=int, default=3, help='Split Num')
         parser.add_argument('--max_try_times', required=False, type=int, default=8, help='Max Try Times')
         parser.add_argument('--clip_length', required=False, type=int, default=18, help='Number of frames in Clip')
         parser.add_argument('--model_name', required=False, type=str, default="Transformer", help='Model Name')
