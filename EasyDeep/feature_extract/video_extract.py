@@ -15,7 +15,7 @@ from utils.feature_resnet_utils import analyze
 from utils.file_utils import make_directory
 
 
-def extract_sample(video_path, feature_path, model, start=None, duration=None, overwrite=True, FPS=2,
+def extract_sample(video_path, feature_path, model, start=None, duration=None, overwrite=False, FPS=2,
                    transform="crop"):
     print("extract video", video_path, "from", start, duration)
     if os.path.exists(feature_path) and not overwrite:
