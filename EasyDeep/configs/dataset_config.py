@@ -209,7 +209,7 @@ class VideoFeatureDatasetConfig(BaseDataSetConfig):
         self.clip_length = args.clip_length
         self.FPS = args.FPS
         self.batch_size = args.batch_size
-
+        self.split_num = args.split_num
         # self.valid_rate = 0.2
         # self.train_num = 100
         # self.valid_num = 20
@@ -252,3 +252,5 @@ class VideoFeatureDatasetConfig(BaseDataSetConfig):
                                                          r"UCF101TrainTestSplits-RecognitionTask/ucfTrainTestlist/testlist03.txt")
             self.train_annotation_filepath = os.path.join(self.root_path,
                                                           r"UCF101TrainTestSplits-RecognitionTask/ucfTrainTestlist/trainlist03.txt")
+        else:
+            raise NotImplementedError("No such split_num")
