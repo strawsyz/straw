@@ -72,10 +72,10 @@ def set_path():
 
     hostname = socket.gethostname()
     if hostname == "26d814d5923d":
-        # video_path = r"/workspace/datasets/UCF101/val"
-        # feature_path = f"/workspace/datasets/features/UCF101/val/{FPS}FPS-{model_name}"
-        video_path = "/workspace/datasets/kinetics400/val_256"
-        feature_path = f"/workspace/datasets/features/kinetics400/val_256/{FPS}FPS-{model_name}"
+        video_path = r"/workspace/datasets/UCF101/val"
+        feature_path = f"/workspace/datasets/features/UCF101/val/{FPS}FPS-{model_name}"
+        # video_path = "/workspace/datasets/kinetics400/val_256"
+        # feature_path = f"/workspace/datasets/features/kinetics400/val_256/{FPS}FPS-{model_name}"
     else:
         video_path = r"C:\(lab\datasets\UCF101\val"
         feature_path = rf"C:\(lab\datasets\UCF101\features\{FPS}FPS-{model_name}"
@@ -134,7 +134,7 @@ class Args():
 
 if __name__ == '__main__':
     model_name = "i3d"
-    FPS = 16
+    FPS = 8
     args = Args().args
     video_path, feature_path = set_path()
     if args.video_path is not None:
