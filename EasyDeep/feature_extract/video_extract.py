@@ -29,11 +29,10 @@ def extract_sample(video_path, feature_path, model, start=None, duration=None, o
     # 用于resnet152的预处理
     # if model_name == "resnet152":
     #     frames = preprocess_input(videoLoader.frames)
-    print(f"frames : {frames.shape}")
     frames = frames.transpose(3, 0, 1, 2)
     frames = frames[None, :]
     # b, c, t, h, w = frames.shape
-    # print(f"frames : {frames.shape}")
+    print(f"frames : {frames.shape}")
     features = []
     # for start in range(1, t - 56, 1600):
     #     end = min(t - 1, start + 1600 + 56)
@@ -87,6 +86,9 @@ def extract_feature_dataset():
     for label in os.listdir(video_path):
         for filename in os.listdir(os.path.join(video_path, label)):
             video_sample_path = os.path.join(video_path, label, filename)
+            if filename.endswith("mkv"):
+                print(f"skip {video_sample_path}")
+                continue
             feature_folder_path = os.path.join(feature_path, label)
             feature_sample_path = os.path.join(feature_folder_path, filename.split(".")[0])
             make_directory(video_sample_path)
