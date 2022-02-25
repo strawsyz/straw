@@ -71,9 +71,10 @@ def set_path():
 
     hostname = socket.gethostname()
     if hostname == "26d814d5923d":
-        video_path = r"/workspace/datasets/UCF101/val"
+        # video_path = r"/workspace/datasets/UCF101/val"
+        # feature_path = f"/workspace/datasets/features/UCF101/val/{FPS}FPS-{model_name}"
         # video_path = "/workspace/datasets/kinetics400/train_256"
-        feature_path = f"/workspace/datasets/features/UCF101/val/{FPS}FPS-{model_name}"
+        feature_path = f"/workspace/datasets/features/kinetics400/train_256/{FPS}FPS-{model_name}"
     else:
         video_path = r"C:\(lab\datasets\UCF101\val"
         feature_path = rf"C:\(lab\datasets\UCF101\features\{FPS}FPS-{model_name}"
