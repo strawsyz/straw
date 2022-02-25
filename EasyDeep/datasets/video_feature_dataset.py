@@ -74,7 +74,8 @@ class VideoFeatureDataset(BaseDataSet, VideoFeatureDatasetConfig):
         super(VideoFeatureDataset, self).__init__()
         self.split = split
         self.X = []
-        self.Y = []
+        # self.Y = []
+
         if self.split == "train":
             self.annotation_filepath = self.train_annotation_filepath
             self.dataset_root_path = self.train_dataset_root_path
@@ -84,19 +85,40 @@ class VideoFeatureDataset(BaseDataSet, VideoFeatureDatasetConfig):
         else:
             raise NotImplementedError('No Such split')
 
-        labels = load_annotations(self.label_filepath)
-        num_classes = len(labels)
-        from utils.file_utils import get_line_number
-        num_samples = get_line_number(self.annotation_filepath)
-        num_samples = int(num_samples * self.use_rate)
 
-        self.Y = np.zeros((num_samples, num_classes))
+        if self.annotation_filepath is None:
+            labels = os.listdir(self.dataset_root_path)
+            label_dict = {}
+            for idx, label in enumerate(labels):
+                label_dict[label] = idx
+            if self.split == "train":
+                num_samples = 240618
+            elif self.split == "test":
+                num_samples = 19404
+            num_classes = len(labels)
+            self.Y = np.zeros((num_samples, num_classes))
+            idx = 0
+            for dir_name in os.listdir(self.dataset_root_path):
+                feature_dirpath = os.path.join(self.dataset_root_path, dir_name)
+                for filename in os.listdir(feature_dirpath):
+                    filepath = os.path.join(feature_dirpath, filename)
+                    self.X.append(feat2clip(np.load(filepath), self.clip_length))
+                    self.Y[idx][label_dict[dir_name]] = 1
+                    idx += 1
+        else:
+            labels = load_annotations(self.label_filepath)
+            num_classes = len(labels)
+            from utils.file_utils import get_line_number
+            num_samples = get_line_number(self.annotation_filepath)
+            num_samples = int(num_samples * self.use_rate)
 
-        for idx, line in enumerate(tqdm(open(self.annotation_filepath, 'r').readlines()[:num_samples], ncols=50)):
-            class_name, filename = line.strip().split(r"/")
-            filepath = os.path.join(self.dataset_root_path, class_name, filename.split(".")[0] + ".npy")
-            self.X.append(feat2clip(np.load(filepath), self.clip_length))
-            self.Y[idx][labels[class_name]] = 1
+            self.Y = np.zeros((num_samples, num_classes))
+
+            for idx, line in enumerate(tqdm(open(self.annotation_filepath, 'r').readlines()[:num_samples], ncols=50)):
+                class_name, filename = line.strip().split(r"/")
+                filepath = os.path.join(self.dataset_root_path, class_name, filename.split(".")[0] + ".npy")
+                self.X.append(feat2clip(np.load(filepath), self.clip_length))
+                self.Y[idx][labels[class_name]] = 1
 
         self.X = self.X[:num_samples]
         self.Y = self.Y[:num_samples]
@@ -106,6 +128,40 @@ class VideoFeatureDataset(BaseDataSet, VideoFeatureDatasetConfig):
 
     def __len__(self):
         return len(self.X)
+
+
+class K400DataSet(VideoFeatureDatasetConfig):
+    def __init__(self):
+        super(K400DataSet, self).__init__()
+
+    def create_dataset(self):
+        self.train_dataset = VideoFeatureDataset(split="train")
+        self.num_train = len(self.train_dataset)
+        self.test_dataset = VideoFeatureDataset(split="test")
+        self.num_valid = self.num_test = len(self.test_dataset)
+        print("num train : {}, num_test : {}, num valid : {}".format(self.num_train, self.num_test, self.num_valid))
+
+    def load_data(self):
+        pass
+
+    def get_dataloader(self, target):
+        self.create_dataset()
+        if self.test_model:
+            self.train_dataset.test()
+            self.test_dataset.test()
+        else:
+            self.train_dataset.train()
+            self.test_dataset.train()
+        self.train_loader = DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=True)
+        self.valid_loader = DataLoader(self.test_dataset, batch_size=self.batch_size_4_test, shuffle=False)
+        self.test_loader = DataLoader(self.test_dataset, batch_size=self.batch_size_4_test, shuffle=False)
+        copy_need_attr(self, target, ["valid_loader", "train_loader", "test_loader"])
+
+    def train(self):
+        self.test_model = False
+
+    def test(self):
+        self.test_model = True
 
 
 if __name__ == '__main__':

@@ -173,8 +173,10 @@ def count_files(folder_path, count=0):
         path1 = os.path.join(folder_path, filename)
         if os.path.isdir(path1):
             count = count_files(path1, count)
-        else:
+        elif os.path.isfile(path1):
             count += 1
+        else:
+            raise NotImplementedError("No such file type")
     return count
 
 

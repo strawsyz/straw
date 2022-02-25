@@ -5,6 +5,7 @@
 # @File    : video_extractor.py
 # @desc:
 import os
+from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 
 import torch
 from torch.autograd import Variable
@@ -73,8 +74,8 @@ def set_path():
     if hostname == "26d814d5923d":
         # video_path = r"/workspace/datasets/UCF101/val"
         # feature_path = f"/workspace/datasets/features/UCF101/val/{FPS}FPS-{model_name}"
-        video_path = "/workspace/datasets/kinetics400/train_256"
-        feature_path = f"/workspace/datasets/features/kinetics400/train_256/{FPS}FPS-{model_name}"
+        video_path = "/workspace/datasets/kinetics400/val_256"
+        feature_path = f"/workspace/datasets/features/kinetics400/val_256/{FPS}FPS-{model_name}"
     else:
         video_path = r"C:\(lab\datasets\UCF101\val"
         feature_path = rf"C:\(lab\datasets\UCF101\features\{FPS}FPS-{model_name}"
@@ -104,15 +105,45 @@ def extract_feature_dataset():
             print("======================================")
 
 
+class Args():
+    def __init__(self):
+        GPU = "0"
+
+        parser = ArgumentParser(description='transformer for soccernet', formatter_class=ArgumentDefaultsHelpFormatter)
+
+        parser.add_argument('--GPU', required=False, type=str, default=GPU, help='ID of the GPU to use')
+        parser.add_argument('--video_path', required=False, type=str, default=None, help='Video(Source) Dir Path')
+        parser.add_argument('--feature_path', required=False, type=str, default=None, help='Feature(Traget) Dir Path')
+
+        # parser.add_argument("--split_data", required=False, type=int, default=1,
+        #                     help='split_data')
+        # parser.add_argument("--model_names_in_type1", nargs='+', required=False, type=str,
+        #                     default=["MyOptimizeTransformer6", "MyOptimizeTransformer7", "MyOptimizeTransformer8",
+        #                              "MyOptimizeTransformer61"],
+        #                     help='spot_model_path')
+        # parser.add_argument("--test_4_highlights", required=False, type=bool, default=False,
+        #                     help='test_4_highlights')
+        # parser.add_argument("--loss_weight", required=False, type=float, default=False,
+        #                     help='loss_weight')
+
+        self.args = parser.parse_args()
+
+
 if __name__ == '__main__':
-    use_gpu = True
     model_name = "i3d"
     FPS = 16
-
+    args = Args().args
     video_path, feature_path = set_path()
+    if args.video_path is not None:
+        video_path = args.video_path
+    if args.feature_path is not None:
+        feature_path = args.feature_path
 
-    if use_gpu:
-        set_gpu("0")
+    set_gpu(args.GPU)
+
+    # if use_gpu:
+    #     set_gpu("0")
+
     # model = get_feature_extractor("ResNet152")
     model = get_extractor(model_name)
 
