@@ -86,12 +86,12 @@ def extract_feature_dataset():
     for label in os.listdir(video_path):
         for filename in os.listdir(os.path.join(video_path, label)):
             video_sample_path = os.path.join(video_path, label, filename)
+            print(filename)
             if filename.endswith("mkv"):
                 print(f"skip {video_sample_path}")
                 continue
             feature_folder_path = os.path.join(feature_path, label)
             feature_sample_path = os.path.join(feature_folder_path, filename.split(".")[0])
-            make_directory(video_sample_path)
             make_directory(feature_folder_path)
 
             if os.path.exists(feature_sample_path + ".npy"):
