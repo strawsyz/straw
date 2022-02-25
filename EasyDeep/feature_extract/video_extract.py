@@ -117,11 +117,11 @@ if __name__ == '__main__':
     model = get_extractor(model_name)
 
     all_num_frames = []
-    video_sample_path = r"C:\(lab\OtherProjects\pytorch-i3d-master\models\c6F3ucU4gn0_000010_000020.mp4"
-    feature_sample_path = r"C:\(lab\datasets\tmp.npy"
-    num_frames = extract_sample(video_path=video_sample_path, feature_path=feature_sample_path,
-                                model=model, FPS=FPS)
-    # extract_feature_dataset()
+    # video_sample_path = r"C:\(lab\OtherProjects\pytorch-i3d-master\models\c6F3ucU4gn0_000010_000020.mp4"
+    # feature_sample_path = r"C:\(lab\datasets\tmp.npy"
+    # num_frames = extract_sample(video_path=video_sample_path, feature_path=feature_sample_path,
+    #                             model=model, FPS=FPS)
+    extract_feature_dataset()
     # analyze(all_num_frames)
 
     # extract_sample()
