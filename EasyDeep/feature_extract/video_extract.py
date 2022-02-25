@@ -29,10 +29,11 @@ def extract_sample(video_path, feature_path, model, start=None, duration=None, o
     # 用于resnet152的预处理
     # if model_name == "resnet152":
     #     frames = preprocess_input(videoLoader.frames)
+    print(f"frames : {frames.shape}")
     frames = frames.transpose(3, 0, 1, 2)
     frames = frames[None, :]
     # b, c, t, h, w = frames.shape
-    print(f"frames : {frames.shape}")
+    # print(f"frames : {frames.shape}")
     features = []
     # for start in range(1, t - 56, 1600):
     #     end = min(t - 1, start + 1600 + 56)
@@ -148,11 +149,11 @@ if __name__ == '__main__':
     model = get_extractor(model_name)
 
     all_num_frames = []
-    # video_sample_path = r"C:\(lab\OtherProjects\pytorch-i3d-master\models\c6F3ucU4gn0_000010_000020.mp4"
-    # feature_sample_path = r"C:\(lab\datasets\tmp.npy"
-    # num_frames = extract_sample(video_path=video_sample_path, feature_path=feature_sample_path,
-    #                             model=model, FPS=FPS)
-    extract_feature_dataset()
+    video_sample_path = r"C:\(lab\OtherProjects\pytorch-i3d-master\models\9vOJ_EAXmhY.mkv"
+    feature_sample_path = r"C:\(lab\datasets\tmp1.npy"
+    num_frames = extract_sample(video_path=video_sample_path, feature_path=feature_sample_path,
+                                model=model, FPS=FPS)
+    # extract_feature_dataset()
     # analyze(all_num_frames)
 
     # extract_sample()
