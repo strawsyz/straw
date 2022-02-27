@@ -73,16 +73,16 @@ def set_path():
     hostname = socket.gethostname()
     if hostname == "26d814d5923d":
         video_path = r"/workspace/datasets/UCF101/val"
-        feature_path = f"/workspace/datasets/features/UCF101/val/{FPS}FPS-{model_name}"
+        feature_path = f"/workspace/datasets/features/UCF101/val/{FPS}FPS-{model_name}-{transform}"
         # video_path = "/workspace/datasets/kinetics400/val_256"
         # feature_path = f"/workspace/datasets/features/kinetics400/val_256/{FPS}FPS-{model_name}"
     else:
         video_path = r"C:\(lab\datasets\UCF101\val"
-        feature_path = rf"C:\(lab\datasets\UCF101\features\{FPS}FPS-{model_name}"
+        feature_path = rf"C:\(lab\datasets\UCF101\features\{FPS}FPS-{model_name}-{transform}"
     return video_path, feature_path
 
 
-def extract_feature_dataset():
+def extract_feature_dataset(transform="resize"):
     for label in os.listdir(video_path):
         for filename in os.listdir(os.path.join(video_path, label)):
             video_sample_path = os.path.join(video_path, label, filename)
@@ -102,7 +102,7 @@ def extract_feature_dataset():
             print(f"feature path : {feature_sample_path}")
 
             num_frames = extract_sample(video_path=video_sample_path, feature_path=feature_sample_path,
-                                        model=model, FPS=FPS)
+                                        model=model, FPS=FPS, transform=transform)
 
             all_num_frames.append(num_frames)
             print("======================================")
@@ -133,15 +133,16 @@ class Args():
 
 
 if __name__ == '__main__':
-    model_name = "i3d"
-    FPS = 8
+    model_name = "resnet152"
+    FPS = 4
+    transform = "resize"
+
     args = Args().args
     video_path, feature_path = set_path()
     if args.video_path is not None:
         video_path = args.video_path
     if args.feature_path is not None:
         feature_path = args.feature_path
-
     set_gpu(args.GPU)
 
     # if use_gpu:
@@ -155,7 +156,7 @@ if __name__ == '__main__':
     # feature_sample_path = r"C:\(lab\datasets\tmp1.npy"
     # num_frames = extract_sample(video_path=video_sample_path, feature_path=feature_sample_path,
     #                             model=model, FPS=FPS)
-    extract_feature_dataset()
+    extract_feature_dataset(transform)
     # analyze(all_num_frames)
 
     # extract_sample()
