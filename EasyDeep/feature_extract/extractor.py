@@ -17,7 +17,7 @@ def get_extractor(model_name: str):
 
 
 # tensorflow
-def get_resnet152(model_name):
+def get_resnet152():
     import keras
     from tensorflow.keras.models import Model  # pip install tensorflow (==2.3.0)
     base_model = keras.applications.resnet.ResNet152(include_top=True,
