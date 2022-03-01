@@ -82,7 +82,7 @@ def set_path():
     return video_path, feature_path
 
 
-def extract_feature_dataset(transform="resize"):
+def extract_feature_dataset(transform="resize", overwrite=False):
     for label in os.listdir(video_path):
         for filename in os.listdir(os.path.join(video_path, label)):
             video_sample_path = os.path.join(video_path, label, filename)
@@ -102,7 +102,7 @@ def extract_feature_dataset(transform="resize"):
             print(f"feature path : {feature_sample_path}")
 
             num_frames = extract_sample(video_path=video_sample_path, feature_path=feature_sample_path,
-                                        model=model, FPS=FPS, transform=transform)
+                                        model=model, FPS=FPS, transform=transform, overwrite=overwrite)
 
             all_num_frames.append(num_frames)
             print("======================================")
@@ -133,8 +133,8 @@ class Args():
 
 
 if __name__ == '__main__':
-    model_name = "resnet152"
-    FPS = 4
+    model_name = "i3d"
+    FPS = 8
     transform = "resize"
 
     args = Args().args
