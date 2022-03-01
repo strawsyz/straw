@@ -134,7 +134,7 @@ class Args():
 
 if __name__ == '__main__':
     model_name = "i3d"
-    FPS = 1
+    FPS = 16
     transform = "resize"
 
     args = Args().args
