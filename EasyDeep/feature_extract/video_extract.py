@@ -21,7 +21,7 @@ def extract_sample(video_path, feature_path, model, start=None, duration=None, o
     print("extract video", video_path, "from", start, duration)
     if os.path.exists(feature_path) and not overwrite:
         return None
-    # 读取视频
+    # load videos
     videoLoader = FrameCV(video_path, FPS=FPS, transform=transform, start=start,
                           duration=duration)
     frames = videoLoader.frames
@@ -134,7 +134,7 @@ class Args():
 
 if __name__ == '__main__':
     model_name = "i3d"
-    FPS = 8
+    FPS = 1
     transform = "resize"
 
     args = Args().args
