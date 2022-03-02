@@ -221,7 +221,7 @@ class VideoFeatureExperiment(VideoFeatureConfig, DeepExperiment):
         self.num_epoch = cur_epoch
 
     def prepare_data(self, data, data_type=None):
-        data = Variable(data)
+        data = Variable(data).float()
         if self.is_use_gpu and torch.cuda.is_available():
             return data.cuda()
         else:
