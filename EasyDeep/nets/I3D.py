@@ -16,7 +16,7 @@ class PretrainedI3DNet(VideoFeatureNetConfig, BaseNet):
     def __init__(self):
         super(PretrainedI3DNet, self).__init__()
         if get_args().system == "Linux":
-            self.net_structure = get_i3d_model(r"/workspace/pytorch-i3d/models/rbg_imagenet.pt")
+            self.net_structure = get_i3d_model(r"/workspace/pytorch-i3d/models/rgb_imagenet.pt")
         else:
             self.net_structure = get_i3d_model()
 
