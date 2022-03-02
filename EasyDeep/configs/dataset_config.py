@@ -210,12 +210,12 @@ class VideoFeatureDatasetConfig(BaseDataSetConfig):
         self.FPS = args.FPS
         self.batch_size = args.batch_size
         self.split_num = args.split_num
-        # self.valid_rate = 0.2
-        # self.train_num = 100
-        # self.valid_num = 20
-        # self.test_num = 20
-        # self.set_dataset_num = True
         self.use_rate = 1.0
+
+        self.duration = None
+        self.start = None
+        self.FPS = 2
+        self.transform = "resize"
 
         import socket
 
@@ -228,18 +228,21 @@ class VideoFeatureDatasetConfig(BaseDataSetConfig):
 
         self.label_filepath = os.path.join(self.root_path,
                                            r"UCF101TrainTestSplits-RecognitionTask/ucfTrainTestlist/classInd.txt")
-        # self.train_dataset_root_path = os.path.join(self.root_path, r"features/train")
-        if self.FPS == 4:
-            self.train_dataset_root_path = os.path.join(self.root_path, r"features/train-4FPS-ResNet152")
-            # self.train_dataset_root_path = os.path.join(self.root_path, r"features/resize-4FPS-ResNet152")
-        elif self.FPS == 2:
-            self.train_dataset_root_path = os.path.join(self.root_path, r"features/train")
-        elif self.FPS == 16:
-            self.train_dataset_root_path = r"/workspace/datasets/features/UCF101/val/16FPS-i3d"
-            self.train_dataset_root_path = r"/workspace/datasets/features/UCF101/val/16FPS-i3d"
 
-        else:
-            raise NotImplementedError("No such FPS")
+        self.train_dataset_root_path = os.path.join(self.root_path, "all")
+
+        # self.train_dataset_root_path = os.path.join(self.root_path, r"features/train")
+        # if self.FPS == 4:
+        #     self.train_dataset_root_path = os.path.join(self.root_path, r"features/train-4FPS-ResNet152")
+        #     # self.train_dataset_root_path = os.path.join(self.root_path, r"features/resize-4FPS-ResNet152")
+        # elif self.FPS == 2:
+        #     self.train_dataset_root_path = os.path.join(self.root_path, r"features/train")
+        # elif self.FPS == 16:
+        #     self.train_dataset_root_path = r"/workspace/datasets/features/UCF101/val/16FPS-i3d"
+        #     self.train_dataset_root_path = r"/workspace/datasets/features/UCF101/val/16FPS-i3d"
+        #
+        # else:
+        #     raise NotImplementedError("No such FPS")
         self.test_dataset_root_path = self.train_dataset_root_path
 
         if self.split_num == 1:
