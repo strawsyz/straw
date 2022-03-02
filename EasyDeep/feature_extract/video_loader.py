@@ -45,90 +45,99 @@ class FrameCV():
         self.fps_video = vidcap.get(cv2.CAP_PROP_FPS)
         # read duration
         self.time_second = getDuration(video_path)
+        # read video
+        vidcap = cv2.VideoCapture(video_path)
 
-        # loop until the number of frame is consistent with the expected number of frame,
-        # given the duration and the FPS
-        good_number_of_frames = False
-        while not good_number_of_frames:
+        # get number of frames
+        self.numframe = int(self.time_second * self.fps_video)
 
-            # read video
-            vidcap = cv2.VideoCapture(video_path)
+        ret, frame = vidcap.read()
+        if not ret:
+            self.frames = None
+        else:
+            # loop until the number of frame is consistent with the expected number of frame,
+            # given the duration and the FPS
+            good_number_of_frames = False
+            while not good_number_of_frames:
 
-            # get number of frames
-            self.numframe = int(self.time_second * self.fps_video)
+                # read video
+                vidcap = cv2.VideoCapture(video_path)
 
-            # frame drop ratio
-            drop_extra_frames = self.fps_video / self.FPS
+                # get number of frames
+                self.numframe = int(self.time_second * self.fps_video)
 
-            # init list of frames
-            self.frames = []
+                # frame drop ratio
+                drop_extra_frames = self.fps_video / self.FPS
 
-            # TQDM progress bar
-            pbar = tqdm(range(self.numframe), desc='Grabbing Video Frames', unit='frame')
-            i_frame = 0
-            ret, frame = vidcap.read()
+                # init list of frames
+                self.frames = []
 
-            # loop until no frame anymore
-            while ret:
-                # update TQDM
-                pbar.update(1)
-                i_frame += 1
-
-                # skip until starting time
-                # if self.start is not None:
-                #     if i_frame < self.fps_video * self.start:
-                #         ret, frame = vidcap.read()
-                #         continue
-
-                # skip after duration time
-                # if self.duration is not None:
-                #     if i_frame > self.fps_video * (self.start + self.duration):
-                #         ret, frame = vidcap.read()
-                #         continue
-
-                if (i_frame % drop_extra_frames < 1):
-
-                    # crop keep the central square of the frame
-                    if self.transform == "resize256crop224":
-                        frame = imutils.resize(frame, height=256)  # keep aspect ratio
-                        # number of pixel to remove per side
-                        off_h = int((frame.shape[0] - 224) / 2)
-                        off_w = int((frame.shape[1] - 224) / 2)
-                        frame = frame[off_h:-off_h,
-                                off_w:-off_w, :]  # remove pixel at each side
-
-                    # crop remove the side of the frame
-                    elif self.transform == "crop":
-                        frame = imutils.resize(frame, height=224)  # keep aspect ratio
-                        # number of pixel to remove per side
-                        off_side = int((frame.shape[1] - 224) / 2)
-                        frame = frame[:, off_side:-
-                        off_side, :]  # remove them
-
-                    # resize change the aspect ratio
-                    elif self.transform == "resize":
-                        # lose aspect ratio
-                        frame = cv2.resize(frame, (224, 224),
-                                           interpolation=cv2.INTER_CUBIC)
-
-                    # append the frame to the list
-                    self.frames.append(frame)
-
-                # read next frame
+                # TQDM progress bar
+                pbar = tqdm(range(self.numframe), desc='Grabbing Video Frames', unit='frame')
+                i_frame = 0
                 ret, frame = vidcap.read()
 
-            # check if the expected number of frames were read
-            if self.numframe - (i_frame + 1) <= 1:
-                logging.debug("Video read properly")
-                # print("Video read properly")
-                good_number_of_frames = True
-            else:
-                logging.debug("Video NOT read properly, adjusting fps and read again")
-                print("Video NOT read properly, adjusting fps and read again")
-                self.fps_video = (i_frame + 1) / self.time_second
+                # loop until no frame anymore
+                while ret:
+                    # update TQDM
+                    pbar.update(1)
+                    i_frame += 1
 
-        # convert frame from list to numpy array
-        self.frames = np.array(self.frames)
+                    # skip until starting time
+                    # if self.start is not None:
+                    #     if i_frame < self.fps_video * self.start:
+                    #         ret, frame = vidcap.read()
+                    #         continue
+
+                    # skip after duration time
+                    # if self.duration is not None:
+                    #     if i_frame > self.fps_video * (self.start + self.duration):
+                    #         ret, frame = vidcap.read()
+                    #         continue
+
+                    if (i_frame % drop_extra_frames < 1):
+
+                        # crop keep the central square of the frame
+                        if self.transform == "resize256crop224":
+                            frame = imutils.resize(frame, height=256)  # keep aspect ratio
+                            # number of pixel to remove per side
+                            off_h = int((frame.shape[0] - 224) / 2)
+                            off_w = int((frame.shape[1] - 224) / 2)
+                            frame = frame[off_h:-off_h,
+                                    off_w:-off_w, :]  # remove pixel at each side
+
+                        # crop remove the side of the frame
+                        elif self.transform == "crop":
+                            frame = imutils.resize(frame, height=224)  # keep aspect ratio
+                            # number of pixel to remove per side
+                            off_side = int((frame.shape[1] - 224) / 2)
+                            frame = frame[:, off_side:-
+                            off_side, :]  # remove them
+
+                        # resize change the aspect ratio
+                        elif self.transform == "resize":
+                            # lose aspect ratio
+                            frame = cv2.resize(frame, (224, 224),
+                                               interpolation=cv2.INTER_CUBIC)
+
+                        # append the frame to the list
+                        self.frames.append(frame)
+
+                    # read next frame
+                    ret, frame = vidcap.read()
+
+                # check if the expected number of frames were read
+                if self.numframe - (i_frame + 1) <= 1:
+                    logging.debug("Video read properly")
+                    # print("Video read properly")
+                    good_number_of_frames = True
+                else:
+                    logging.debug("Video NOT read properly, adjusting fps and read again")
+                    print("Video NOT read properly, adjusting fps and read again")
+                    self.fps_video = (i_frame + 1) / self.time_second
+
+            # convert frame from list to numpy array
+            self.frames = np.array(self.frames)
 
     def __len__(self):
         """Return number of frames."""

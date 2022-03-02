@@ -89,10 +89,12 @@ class VideoFeatureDataset(BaseDataSet, VideoFeatureDatasetConfig):
             class_name, filename = line.strip().split(r"/")
             video_filepath = os.path.join(self.dataset_root_path, class_name, filename.split(".")[0] + ".avi")
             # self.X.append(feat2clip(np.load(video_filepath), self.clip_length))
-            print(f"loading video {video_filepath}")
             videoLoader = FrameCV(video_filepath, FPS=self.FPS, transform=self.transform, start=self.start,
                                   duration=self.duration)
             frames = videoLoader.frames
+            if frames is None:
+                print(f"loading video Failed{video_filepath}")
+                continue
             # num_frames = frames.shape[0]
             frames = frames.transpose(3, 0, 1, 2)
             self.Y[idx][labels[class_name]] = 1
@@ -123,4 +125,24 @@ def test():
 
 
 if __name__ == '__main__':
-    test()
+    import cv2
+
+    video_path = r"C:\(lab\datasets\UCF101\val\ApplyEyeMakeup\v_ApplyEyeMakeup_g01_c03.avi"
+    vidcap = cv2.VideoCapture(video_path)
+    print(os.path.exists(video_path))
+    # get number of frames
+    # self.numframe = int(self.time_second * self.fps_video)
+
+    # frame drop ratio
+    # drop_extra_frames = self.fps_video / self.FPS
+
+    # init list of frames
+    # self.frames = []
+
+    # TQDM progress bar
+    # pbar = tqdm(range(self.numframe), desc='Grabbing Video Frames', unit='frame')
+    # i_frame = 0
+    ret, frame = vidcap.read()
+    print(ret)
+
+    # test()
