@@ -128,7 +128,7 @@ class VideoFeatureDataset(BaseDataSet, VideoFeatureDatasetConfig):
 
                 self.X.append(features)
                 self.Y[idx][labels[class_name]] = 1
-                break
+
         self.X = self.X[:num_samples]
         self.Y = self.Y[:num_samples]
 
