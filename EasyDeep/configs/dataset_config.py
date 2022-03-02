@@ -229,7 +229,7 @@ class VideoFeatureDatasetConfig(BaseDataSetConfig):
         self.label_filepath = os.path.join(self.root_path,
                                            r"UCF101TrainTestSplits-RecognitionTask/ucfTrainTestlist/classInd.txt")
 
-        self.train_dataset_root_path = os.path.join(self.root_path, "all")
+        self.train_dataset_root_path = os.path.join(self.root_path, "features/RGB")
 
         # self.train_dataset_root_path = os.path.join(self.root_path, r"features/train")
         # if self.FPS == 4:

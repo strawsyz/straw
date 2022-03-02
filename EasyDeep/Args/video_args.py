@@ -23,7 +23,7 @@ class VideoArgs():
         parser.add_argument('--FPS', required=False, type=int, default=4, help='Frame Rate')
         parser.add_argument('--split_num', required=False, type=int, default=3, help='Split Num')
         parser.add_argument('--max_try_times', required=False, type=int, default=8, help='Max Try Times')
-        parser.add_argument('--clip_length', required=False, type=int, default=18, help='Number of frames in Clip')
+        parser.add_argument('--clip_length', required=False, type=int, default=15, help='Number of frames in Clip')
         parser.add_argument('--model_name', required=False, type=str, default="I3D", help='Model Name')
 
         # parser.add_argument("--split_data", required=False, type=int, default=1,
@@ -36,9 +36,10 @@ class VideoArgs():
         #                     help='test_4_highlights')
         # parser.add_argument("--loss_weight", required=False, type=float, default=False,
         #                     help='loss_weight')
-
+        import platform
         self.args = parser.parse_args()
 
+        self.args.system = print(platform.system())
     def get_args(self):
         return self.args
 

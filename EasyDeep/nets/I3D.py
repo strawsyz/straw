@@ -6,6 +6,7 @@
 # @desc:
 import torch
 
+from Args.video_args import get_args
 from base.base_net import BaseNet
 from configs.net_config import VideoFeatureNetConfig
 from pytorch_i3d import InceptionI3d
@@ -14,7 +15,10 @@ from pytorch_i3d import InceptionI3d
 class PretrainedI3DNet(VideoFeatureNetConfig, BaseNet):
     def __init__(self):
         super(PretrainedI3DNet, self).__init__()
-        self.net_structure = get_i3d_model()
+        if get_args().system == "Linux":
+            self.net_structure = get_i3d_model(r"/workspace/pytorch-i3d/models/rbg_imagenet.pt")
+        else:
+            self.net_structure = get_i3d_model()
 
 
 def get_i3d_model(model_path=r"C:\(lab\OtherProjects\pytorch-i3d-master\models\rgb_imagenet.pt"):
