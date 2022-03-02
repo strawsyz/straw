@@ -117,13 +117,18 @@ class VideoFeatureDataset(BaseDataSet, VideoFeatureDatasetConfig):
             for idx, line in enumerate(tqdm(open(self.annotation_filepath, 'r').readlines()[:num_samples], ncols=50)):
                 class_name, filename = line.strip().split(r"/")
                 filepath = os.path.join(self.dataset_root_path, class_name, filename.split(".")[0] + ".npy")
-                features = np.load(filepath)
-                features = features.transpose(1, 0, 2, 3)
-                features = feat2clip(features, self.clip_length)
-                features = features.transpose(1, 0, 2, 3)
+                if self.dataset_name == "RGB":
+                    features = np.load(filepath)
+                    features = features.transpose(1, 0, 2, 3)
+                    features = feat2clip(features, self.clip_length)
+                    features = features.transpose(1, 0, 2, 3)
+                else:
+                    features = np.load(filepath)
+                    features = feat2clip(features, self.clip_length)
+
                 self.X.append(features)
                 self.Y[idx][labels[class_name]] = 1
-                # break
+                break
         self.X = self.X[:num_samples]
         self.Y = self.Y[:num_samples]
 

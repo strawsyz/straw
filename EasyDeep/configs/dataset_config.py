@@ -210,6 +210,7 @@ class VideoFeatureDatasetConfig(BaseDataSetConfig):
         self.FPS = args.FPS
         self.batch_size = args.batch_size
         self.split_num = args.split_num
+        self.dataset_name = args.dataset_name
         self.use_rate = 1.0
 
         self.duration = None
@@ -228,8 +229,18 @@ class VideoFeatureDatasetConfig(BaseDataSetConfig):
 
         self.label_filepath = os.path.join(self.root_path,
                                            r"UCF101TrainTestSplits-RecognitionTask/ucfTrainTestlist/classInd.txt")
-
-        self.train_dataset_root_path = os.path.join(self.root_path, "features/RGB")
+        if self.dataset_name == "RGB":
+            self.train_dataset_root_path = os.path.join(self.root_path, r"features/RGB")
+        elif self.dataset_name == "4FPS":
+            self.train_dataset_root_path = os.path.join(self.root_path, r"features/train-4FPS-ResNet152")
+        elif self.dataset_name == "4FPS-Resize":
+            self.train_dataset_root_path = os.path.join(self.root_path, r"features/resize-4FPS-ResNet152")
+        elif self.dataset_name == "2FPS":
+            self.train_dataset_root_path = os.path.join(self.root_path, r"features/train")
+        elif self.dataset_name == "16FPS":
+            self.train_dataset_root_path = os.path.join(self.root_path, r"val/16FPS-i3d")
+        else:
+            raise NotImplementedError("No such dataset name")
 
         # self.train_dataset_root_path = os.path.join(self.root_path, r"features/train")
         # if self.FPS == 4:
