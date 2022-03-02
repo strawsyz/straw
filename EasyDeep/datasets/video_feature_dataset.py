@@ -123,7 +123,7 @@ class VideoFeatureDataset(BaseDataSet, VideoFeatureDatasetConfig):
                 features = features.transpose(1, 0, 2, 3)
                 self.X.append(features)
                 self.Y[idx][labels[class_name]] = 1
-                break
+                # break
         self.X = self.X[:num_samples]
         self.Y = self.Y[:num_samples]
 
