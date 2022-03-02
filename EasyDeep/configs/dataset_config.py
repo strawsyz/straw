@@ -230,8 +230,8 @@ class VideoFeatureDatasetConfig(BaseDataSetConfig):
                                            r"UCF101TrainTestSplits-RecognitionTask/ucfTrainTestlist/classInd.txt")
         # self.train_dataset_root_path = os.path.join(self.root_path, r"features/train")
         if self.FPS == 4:
-            # self.train_dataset_root_path = os.path.join(self.root_path, r"features/train-4FPS-ResNet152")
-            self.train_dataset_root_path = os.path.join(self.root_path, r"features/resize-4FPS-ResNet152")
+            self.train_dataset_root_path = os.path.join(self.root_path, r"features/train-4FPS-ResNet152")
+            # self.train_dataset_root_path = os.path.join(self.root_path, r"features/resize-4FPS-ResNet152")
         elif self.FPS == 2:
             self.train_dataset_root_path = os.path.join(self.root_path, r"features/train")
         elif self.FPS == 16:

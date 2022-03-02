@@ -134,7 +134,7 @@ class Args():
 
 if __name__ == '__main__':
     model_name = "i3d"
-    FPS = 16
+    FPS = 2
     transform = "resize"
 
     args = Args().args
@@ -153,10 +153,12 @@ if __name__ == '__main__':
 
     all_num_frames = []
     # video_sample_path = r"C:\(lab\OtherProjects\pytorch-i3d-master\models\9vOJ_EAXmhY.mkv"
-    # feature_sample_path = r"C:\(lab\datasets\tmp1.npy"
-    # num_frames = extract_sample(video_path=video_sample_path, feature_path=feature_sample_path,
-    #                             model=model, FPS=FPS)
-    extract_feature_dataset(transform)
+    video_sample_path = r"C:\(lab\datasets\UCF101\train\ApplyEyeMakeup\v_ApplyEyeMakeup_g08_c04.avi"
+    feature_sample_path = r"C:\(lab\datasets\tmp1.npy"
+    num_frames = extract_sample(video_path=video_sample_path, feature_path=feature_sample_path,
+                                model=model, FPS=FPS,overwrite=True)
+
+    # extract_feature_dataset(transform)
     # analyze(all_num_frames)
 
     # extract_sample()

@@ -5,6 +5,7 @@ from Args.video_args import get_args
 from base.base_config import BaseExperimentConfig
 from base.base_recorder import EpochRecord
 from base.base_recorder import ExperimentRecord
+from nets.I3D import PretrainedI3DNet
 from utils.other_utils import set_GPU
 from utils.time_utils import get_date
 from utils.time_utils import get_time_4_filename
@@ -432,6 +433,8 @@ class VideoFeatureConfig(DeepExperimentConfig):
             self.net = TranformerNet()
         elif self.net_config.model_name == "FIE2":
             self.net = FIE2Net()
+        elif self.net_config.model_name == "I3D":
+            self.net = PretrainedI3DNet()
         else:
             raise NotImplementedError("No Such  Model")
 
