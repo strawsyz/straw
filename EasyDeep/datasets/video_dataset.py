@@ -87,7 +87,7 @@ class VideoFeatureDataset(BaseDataSet, VideoFeatureDatasetConfig):
 
         for idx, line in enumerate(tqdm(open(self.annotation_filepath, 'r').readlines()[:num_samples], ncols=50)):
             class_name, filename = line.strip().split(r"/")
-            video_filepath = os.path.join(self.dataset_root_path, class_name, filename)
+            video_filepath = os.path.join(self.dataset_root_path, class_name, filename.split(".")[0] + ".avi")
             # self.X.append(feat2clip(np.load(video_filepath), self.clip_length))
 
             videoLoader = FrameCV(video_filepath, FPS=self.FPS, transform=self.transform, start=self.start,
