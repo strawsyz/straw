@@ -75,16 +75,16 @@ class FrameCV():
                 i_frame += 1
 
                 # skip until starting time
-                if self.start is not None:
-                    if i_frame < self.fps_video * self.start:
-                        ret, frame = vidcap.read()
-                        continue
+                # if self.start is not None:
+                #     if i_frame < self.fps_video * self.start:
+                #         ret, frame = vidcap.read()
+                #         continue
 
                 # skip after duration time
-                if self.duration is not None:
-                    if i_frame > self.fps_video * (self.start + self.duration):
-                        ret, frame = vidcap.read()
-                        continue
+                # if self.duration is not None:
+                #     if i_frame > self.fps_video * (self.start + self.duration):
+                #         ret, frame = vidcap.read()
+                #         continue
 
                 if (i_frame % drop_extra_frames < 1):
 
@@ -120,7 +120,7 @@ class FrameCV():
             # check if the expected number of frames were read
             if self.numframe - (i_frame + 1) <= 1:
                 logging.debug("Video read properly")
-                print("Video read properly")
+                # print("Video read properly")
                 good_number_of_frames = True
             else:
                 logging.debug("Video NOT read properly, adjusting fps and read again")
