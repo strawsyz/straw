@@ -125,12 +125,22 @@ class VideoFeatureExperiment(VideoFeatureConfig, DeepExperiment):
         train_loss = 0
         self.net.train()
         # global data
-        for sample, feature, label in tqdm(self.train_loader, ncols=50):
-            sample = self.prepare_data(sample)
-            feature = self.prepare_data(feature)
-            label = self.prepare_data(label)
+        for data in tqdm(self.train_loader, ncols=50):
             self.optimizer.zero_grad()
-            out = self.net(sample, feature)
+
+
+            if self.dataset_config.dataset_name == "RGBResNet":
+                sample, feature, label = data
+                sample = self.prepare_data(sample)
+                label = self.prepare_data(label)
+                feature = self.prepare_data(feature)
+                out = self.net(sample, feature)
+            else:
+                sample, label = data
+                sample = self.prepare_data(sample)
+                label = self.prepare_data(label)
+                out = self.net(sample)
+
             loss = self.loss_function(out, label)
             loss.backward()
             self.optimizer.step()
@@ -162,14 +172,23 @@ class VideoFeatureExperiment(VideoFeatureConfig, DeepExperiment):
         sum = 0
         with torch.no_grad():
             valid_loss = 0
-            for sample, feature, label in self.valid_loader:
-                sample = self.prepare_data(sample)
-                feature = self.prepare_data(feature)
-                label = self.prepare_data(label)
+            for data in self.valid_loader:
                 self.optimizer.zero_grad()
-                predict = self.net(sample, feature)
-                valid_loss += self.loss_function(predict, label)
-                predict_result = torch.argmax(sigmoid(predict), dim=1)
+
+                if self.dataset_config.dataset_name == "RGBResNet":
+                    sample, feature, label = data
+                    sample = self.prepare_data(sample)
+                    label = self.prepare_data(label)
+                    feature = self.prepare_data(feature)
+                    out = self.net(sample, feature)
+                else:
+                    sample, label = data
+                    sample = self.prepare_data(sample)
+                    label = self.prepare_data(label)
+                    out = self.net(sample)
+
+                valid_loss += self.loss_function(out, label)
+                predict_result = torch.argmax(sigmoid(out), dim=1)
                 label_result = torch.argmax(label, dim=1)
                 correct = torch.eq(label_result, predict_result)
                 correct_sum += correct.sum().float().item()

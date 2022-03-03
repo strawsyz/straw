@@ -144,6 +144,7 @@ class VideoFeatureDataset(BaseDataSet, VideoFeatureDatasetConfig):
 
     def __getitem__(self, index):
         if self.dataset_name == "RGBResNet":
+            # return self.X[index], self.F[index], self.Y[index]
             return self.X[index], self.F[index], self.Y[index]
         else:
             return self.X[index], self.Y[index]

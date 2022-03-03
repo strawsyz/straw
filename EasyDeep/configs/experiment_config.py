@@ -421,8 +421,10 @@ class VideoFeatureConfig(DeepExperimentConfig):
     def set_dataset(self):
         from configs.dataset_config import VideoFeatureDatasetConfig
         self.dataset_config = VideoFeatureDatasetConfig()
+        # if self.dataset_config.dataset_name == "RGB":
+        #     from datasets.video_dataset import UCF101DataSet
+        # else:
         from datasets.video_feature_dataset import UCF101DataSet
-        # from datasets.video_dataset import UCF101DataSet
         self.dataset = UCF101DataSet()
 
     def set_net(self):
