@@ -113,7 +113,7 @@ class VideoFeatureDataset(BaseDataSet, VideoFeatureDatasetConfig):
             num_samples = int(num_samples * self.use_rate)
 
             self.Y = np.zeros((num_samples, num_classes))
-
+            self.F = []
             for idx, line in enumerate(tqdm(open(self.annotation_filepath, 'r').readlines()[:num_samples], ncols=50)):
                 class_name, filename = line.strip().split(r"/")
                 filepath = os.path.join(self.dataset_root_path, class_name, filename.split(".")[0] + ".npy")
@@ -122,6 +122,16 @@ class VideoFeatureDataset(BaseDataSet, VideoFeatureDatasetConfig):
                     features = features.transpose(1, 0, 2, 3)
                     features = feat2clip(features, self.clip_length)
                     features = features.transpose(1, 0, 2, 3)
+                elif self.dataset_name == "RGBResNet":
+                    features = np.load(filepath)
+                    features = features.transpose(1, 0, 2, 3)
+                    features = feat2clip(features, self.clip_length)
+                    features = features.transpose(1, 0, 2, 3)
+
+                    filepath = os.path.join(self.feature_root_path, class_name, filename.split(".")[0] + ".npy")
+                    resnet_features = feat2clip(np.load(filepath), self.clip_length)
+                    self.F.append(resnet_features)
+
                 else:
                     features = np.load(filepath)
                     features = feat2clip(features, self.clip_length)
@@ -133,7 +143,10 @@ class VideoFeatureDataset(BaseDataSet, VideoFeatureDatasetConfig):
         self.Y = self.Y[:num_samples]
 
     def __getitem__(self, index):
-        return self.X[index], self.Y[index]
+        if self.dataset_name == "RGBResNet":
+            return self.X[index], self.F[index], self.Y[index]
+        else:
+            return self.X[index], self.Y[index]
 
     def __len__(self):
         return len(self.X)

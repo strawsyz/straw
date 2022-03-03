@@ -233,6 +233,9 @@ class VideoFeatureDatasetConfig(BaseDataSetConfig):
             self.train_dataset_root_path = os.path.join(self.root_path, r"features/RGB")
         elif self.dataset_name == "4FPS":
             self.train_dataset_root_path = os.path.join(self.root_path, r"features/train-4FPS-ResNet152")
+        elif self.dataset_name == "RGBResNet":
+            self.train_dataset_root_path = os.path.join(self.root_path, r"features/RGB")
+            self.feature_root_path = os.path.join(self.root_path, r"features/train")
         elif self.dataset_name == "4FPS-Resize":
             self.train_dataset_root_path = os.path.join(self.root_path, r"features/resize-4FPS-ResNet152")
         elif self.dataset_name == "2FPS":

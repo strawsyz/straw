@@ -125,11 +125,12 @@ class VideoFeatureExperiment(VideoFeatureConfig, DeepExperiment):
         train_loss = 0
         self.net.train()
         # global data
-        for sample, label in tqdm(self.train_loader, ncols=50):
+        for sample, feature, label in tqdm(self.train_loader, ncols=50):
             sample = self.prepare_data(sample)
+            feature = self.prepare_data(feature)
             label = self.prepare_data(label)
             self.optimizer.zero_grad()
-            out = self.net(sample)
+            out = self.net(sample, feature)
             loss = self.loss_function(out, label)
             loss.backward()
             self.optimizer.step()
@@ -161,11 +162,12 @@ class VideoFeatureExperiment(VideoFeatureConfig, DeepExperiment):
         sum = 0
         with torch.no_grad():
             valid_loss = 0
-            for sample, label in self.valid_loader:
+            for sample, feature, label in self.valid_loader:
                 sample = self.prepare_data(sample)
+                feature = self.prepare_data(feature)
                 label = self.prepare_data(label)
                 self.optimizer.zero_grad()
-                predict = self.net(sample)
+                predict = self.net(sample, feature)
                 valid_loss += self.loss_function(predict, label)
                 predict_result = torch.argmax(sigmoid(predict), dim=1)
                 label_result = torch.argmax(label, dim=1)

@@ -24,8 +24,8 @@ class VideoArgs():
         parser.add_argument('--split_num', required=False, type=int, default=3, help='Split Num')
         parser.add_argument('--max_try_times', required=False, type=int, default=8, help='Max Try Times')
         parser.add_argument('--clip_length', required=False, type=int, default=15, help='Number of frames in Clip')
-        parser.add_argument('--model_name', required=False, type=str, default="I3D", help='Model Name')
-        parser.add_argument('--dataset_name', required=False, type=str, default="RGB", help='Dataset Name')
+        parser.add_argument('--model_name', required=False, type=str, default="FIEI3D", help='Model Name')
+        parser.add_argument('--dataset_name', required=False, type=str, default="RGBResNet", help='Dataset Name')
 
         # parser.add_argument("--split_data", required=False, type=int, default=1,
         #                     help='split_data')
@@ -40,7 +40,7 @@ class VideoArgs():
         import platform
         self.args = parser.parse_args()
 
-        self.args.system = print(platform.system())
+        self.args.system = platform.system()
     def get_args(self):
         return self.args
 
