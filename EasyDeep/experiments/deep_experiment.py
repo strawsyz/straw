@@ -37,6 +37,8 @@ class DeepExperiment(DeepExperimentConfig, BaseExperiment):
 
     def prepare_net(self):
         self.net.get_net(self, self.is_use_gpu)
+        if len(self.GPU) >0:
+            self.net.net_structure = torch.nn.DataParallel(self.net.net_structure)
         if self.is_pretrain:
             self.load()
 

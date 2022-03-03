@@ -33,6 +33,7 @@ class DeepExperimentConfig(BaseExperimentConfig):
         self.is_bigger_better = False
         self.num_iter = 50
         self.experiment_record = None
+        self.GPU = None
 
         self.dataset = None
         self.train_loader = None
