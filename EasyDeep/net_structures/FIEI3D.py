@@ -87,7 +87,7 @@ class FIEI3DNet2(nn.Module):
 
     def forward(self, data, features):
         output_fie = self.fie(features)
-        output = self.backbone(data.permute(3, 0, 4, 1, 2))
+        output = self.backbone(data)
         output = output.squeeze(dim=2)
         return output + output_fie
 

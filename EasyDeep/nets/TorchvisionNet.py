@@ -15,11 +15,11 @@ from net_structures.FIEplus import FIEISlowFastNet, create_model
 class SlowFastNet(VideoFeatureNetConfig, BaseNet):
     def __init__(self):
         super(SlowFastNet, self).__init__()
-        self.net_structure = create_model("slowfast_r50")
+        self.net_structure = create_model("slowfast_r50", pretrained=True)
 
 
 class FIESlowFast(VideoFeatureNetConfig, BaseNet):
     def __init__(self):
         super(FIESlowFast, self).__init__()
-        self.net_structure = FIEISlowFastNet(vocab_size=self.vocab_size,embedding_dim=self.embedding_dim,N=self.N, heads=self.heads, num_class=101)
-
+        self.net_structure = FIEISlowFastNet(vocab_size=self.vocab_size, embedding_dim=self.embedding_dim, N=self.N,
+                                             heads=self.heads, num_class=101, pretrained=True)
