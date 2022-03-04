@@ -8,7 +8,7 @@ import torch
 
 from base.base_net import BaseNet
 from configs.net_config import VideoFeatureNetConfig
-from net_structures.FIEI3D import FIEI3DNet
+from net_structures.FIEI3D import FIEI3DNet, FIEI3DNet2
 from pytorch_i3d import InceptionI3d
 
 
@@ -22,6 +22,12 @@ class MyPretrainedI3DNet(VideoFeatureNetConfig, BaseNet):
     def __init__(self):
         super(MyPretrainedI3DNet, self).__init__()
         self.net_structure = FIEI3DNet()
+
+
+class MyPretrainedI3DNet2(VideoFeatureNetConfig, BaseNet):
+    def __init__(self):
+        super(MyPretrainedI3DNet2, self).__init__()
+        self.net_structure = FIEI3DNet2()
 
 
 def get_i3d_model():
