@@ -239,16 +239,20 @@ class Video2SDataset(BaseDataSet, VideoFeatureDatasetConfig):
         from utils.file_utils import get_line_number
         num_samples = get_line_number(self.annotation_filepath)
         num_samples = int(num_samples * self.use_rate)
-
+        # python video_feature_experiment.py  --dataset_name RGBResNet --model_name FIEI3D2 --batch_size 256 --clip_length 15 --GPU 3,5,6,7 --LR 0.0008
         self.Y = np.zeros((num_samples, num_classes))
-        self.feature_root_path = r"C:\(lab\datasets\UCF101\features\RGB"
+
         for idx, line in enumerate(tqdm(open(self.annotation_filepath, 'r').readlines()[:num_samples], ncols=50)):
             class_name, filename = line.strip().split(r"/")
+            slow_filepath = os.path.join(self.feature_root_path, class_name, filename.split(".")[0]+"-slow")
+            fast_filepath = os.path.join(self.feature_root_path, class_name, filename.split(".")[0]+"-fast")
             video_filepath = os.path.join(self.dataset_root_path, class_name, filename.split(".")[0] + ".avi")
             # self.X.append(feat2clip(np.load(video_filepath), self.clip_length))
+            file_utils.make_directory(os.path.join(self.feature_root_path, class_name))
             video_data = self.load_two_stream(video_filepath)
             slow_flow, fast_flow = video_data
-            # np.save(os.path.join(self.feature_root_path, class_name, filename.split(".")[0]), frames)
+            np.save(slow_filepath, slow_flow)
+            np.save(fast_filepath, fast_flow)
             self.Y[idx][labels[class_name]] = 1
             self.fast_flow.append(fast_flow)
             self.slot_flow.append(slow_flow)
