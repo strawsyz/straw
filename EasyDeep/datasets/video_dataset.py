@@ -252,7 +252,6 @@ class Video2SDataset(BaseDataSet, VideoFeatureDatasetConfig):
             self.Y[idx][labels[class_name]] = 1
             self.fast_flow.append(fast_flow)
             self.slot_flow.append(slow_flow)
-            break
 
         self.fast_flow = self.fast_flow[:num_samples]
         self.slot_flow = self.slot_flow[:num_samples]
