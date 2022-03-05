@@ -88,7 +88,7 @@ class FIEI3DNet2(nn.Module):
     def forward(self, data, features):
         output_fie = self.fie(features)
         output = self.backbone(data)
-        output = output.squeeze(dim=2)
+        # output = output.squeeze(dim=2)
         return output + output_fie
 
 # class FIEI3DNet2(nn.Module):
