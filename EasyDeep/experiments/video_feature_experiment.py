@@ -292,7 +292,7 @@ if __name__ == '__main__':
     import numpy as np
     import random
 
-    torch.backends.cudnn.enabled = False
+    # torch.backends.cudnn.enabled = False
     random_state = 0
     torch.manual_seed(random_state)  # cpu
     torch.cuda.manual_seed(random_state)  # gpu

@@ -202,7 +202,7 @@ class VideoFeatureDatasetConfig(BaseDataSetConfig):
         super(VideoFeatureDatasetConfig, self).__init__()
         # self.dataset_path = r""
         self.batch_size = 8
-        self.batch_size_4_test = 320
+        self.batch_size_4_test = 128
         self.split_num = 3
         self.FPS = 4
         args = get_args()
