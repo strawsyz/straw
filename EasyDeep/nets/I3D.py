@@ -39,7 +39,7 @@ def get_i3d_model():
 
     i3d = InceptionI3d(400, in_channels=3)
     # i3d.replace_logits(157)
-    # i3d.load_state_dict(torch.load(model_path))
+    i3d.load_state_dict(torch.load(model_path))
     i3d.replace_logits(101)
 
     # i3d.cuda()

@@ -244,15 +244,15 @@ class Video2SDataset(BaseDataSet, VideoFeatureDatasetConfig):
 
         for idx, line in enumerate(tqdm(open(self.annotation_filepath, 'r').readlines()[:num_samples], ncols=50)):
             class_name, filename = line.strip().split(r"/")
-            slow_filepath = os.path.join(self.feature_root_path, class_name, filename.split(".")[0]+"-slow")
-            fast_filepath = os.path.join(self.feature_root_path, class_name, filename.split(".")[0]+"-fast")
-            video_filepath = os.path.join(self.dataset_root_path, class_name, filename.split(".")[0] + ".avi")
+            slow_filepath = os.path.join(self.feature_root_path, class_name, filename.split(".")[0]+"-slow.npy")
+            fast_filepath = os.path.join(self.feature_root_path, class_name, filename.split(".")[0]+"-fast.npy")
+            # video_filepath = os.path.join(self.dataset_root_path, class_name, filename.split(".")[0] + ".avi")
             # self.X.append(feat2clip(np.load(video_filepath), self.clip_length))
-            file_utils.make_directory(os.path.join(self.feature_root_path, class_name))
-            video_data = self.load_two_stream(video_filepath)
-            slow_flow, fast_flow = video_data
-            np.save(slow_filepath, slow_flow)
-            np.save(fast_filepath, fast_flow)
+            # file_utils.make_directory(os.path.join(self.feature_root_path, class_name))
+            # video_data = self.load_two_stream(video_filepath)
+            # slow_flow, fast_flow = video_data
+            slow_flow = np.load(slow_filepath)
+            fast_flow = np.load(fast_filepath)
             self.Y[idx][labels[class_name]] = 1
             self.fast_flow.append(fast_flow)
             self.slot_flow.append(slow_flow)
