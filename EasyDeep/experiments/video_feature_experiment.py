@@ -140,8 +140,8 @@ class VideoFeatureExperiment(VideoFeatureConfig, DeepExperiment):
             elif self.dataset_config.dataset_name == "Video2SDataset":
                 slow, fast, label = data
                 slow = self.prepare_data(slow)
-                label = self.prepare_data(label)
                 fast = self.prepare_data(fast)
+                label = self.prepare_data(label)
                 out = self.net([slow, fast])
             else:
                 sample, label = data
@@ -211,6 +211,13 @@ class VideoFeatureExperiment(VideoFeatureConfig, DeepExperiment):
                     label = self.prepare_data(label)
                     fast = self.prepare_data(fast)
                     out = self.net([slow, fast])
+                elif self.dataset_config.dataset_name == "SlowFast":
+                    slow, fast, feature, label = data
+                    slow = self.prepare_data(slow)
+                    label = self.prepare_data(label)
+                    feature = self.prepare_data(feature)
+                    fast = self.prepare_data(fast)
+                    out = self.net([slow, fast], feature)
                 else:
                     sample, label = data
                     sample = self.prepare_data(sample)
@@ -285,6 +292,7 @@ if __name__ == '__main__':
     import numpy as np
     import random
 
+    torch.backends.cudnn.enabled = False
     random_state = 0
     torch.manual_seed(random_state)  # cpu
     torch.cuda.manual_seed(random_state)  # gpu
