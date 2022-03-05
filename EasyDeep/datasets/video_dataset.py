@@ -15,7 +15,7 @@ from tqdm import tqdm
 from base.base_dataset import BaseDataSet
 from configs.dataset_config import VideoFeatureDatasetConfig
 from feature_extract.video_loader import FrameCV
-from my_cv.utils import file_util
+from utils import file_utils
 from utils.common_utils import copy_need_attr
 import torchvision
 
@@ -153,7 +153,7 @@ class VideoFeatureDataset(BaseDataSet, VideoFeatureDatasetConfig):
                 continue
             # num_frames = frames.shape[0]
             frames = frames.transpose(3, 0, 1, 2)
-            file_util.make_directory(os.path.join(self.feature_root_path, class_name))
+            file_utils.make_directory(os.path.join(self.feature_root_path, class_name))
             print(type(frames))
             # np.save(os.path.join(self.feature_root_path, class_name, filename.split(".")[0]), frames)
             self.Y[idx][labels[class_name]] = 1
