@@ -242,6 +242,8 @@ class VideoFeatureDatasetConfig(BaseDataSetConfig):
             self.train_dataset_root_path = os.path.join(self.root_path, r"features/train")
         elif self.dataset_name == "16FPS":
             self.train_dataset_root_path = os.path.join(self.root_path, r"val/16FPS-i3d")
+        elif self.dataset_name == "Video2SDataset":
+            self.train_dataset_root_path = os.path.join(self.root_path, r"all/")
         else:
             raise NotImplementedError("No such dataset name")
 

@@ -74,6 +74,40 @@ class UCF101DataSet(VideoFeatureDatasetConfig):
         self.test_model = True
 
 
+class UCF1012SDataSet(VideoFeatureDatasetConfig):
+    def __init__(self):
+        super(UCF1012SDataSet, self).__init__()
+
+    def create_dataset(self):
+        self.train_dataset = Video2SDataset(split="train")
+        self.num_train = len(self.train_dataset)
+        self.test_dataset = Video2SDataset(split="test")
+        self.num_valid = self.num_test = len(self.test_dataset)
+        print("num train : {}, num_test : {}, num valid : {}".format(self.num_train, self.num_test, self.num_valid))
+
+    def load_data(self):
+        pass
+
+    def get_dataloader(self, target):
+        self.create_dataset()
+        if self.test_model:
+            self.train_dataset.test()
+            self.test_dataset.test()
+        else:
+            self.train_dataset.train()
+            self.test_dataset.train()
+        self.train_loader = DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=True)
+        self.valid_loader = DataLoader(self.test_dataset, batch_size=self.batch_size_4_test, shuffle=False)
+        self.test_loader = DataLoader(self.test_dataset, batch_size=self.batch_size_4_test, shuffle=False)
+        copy_need_attr(self, target, ["valid_loader", "train_loader", "test_loader"])
+
+    def train(self):
+        self.test_model = False
+
+    def test(self):
+        self.test_model = True
+
+
 def load_annotations(annotation_filepath):
     labels_dict = {}
     for line in open(annotation_filepath):
@@ -158,8 +192,9 @@ class PackPathway(torch.nn.Module):
         return frame_list
 
 
-class Video2SDataset():
-    def __init__(self):
+class Video2SDataset(BaseDataSet, VideoFeatureDatasetConfig):
+    def __init__(self, split="train"):
+        super(Video2SDataset, self).__init__()
         self.video_paths = []
         self.side_size = 256
         self.mean = [0.45, 0.45, 0.45]
@@ -184,6 +219,44 @@ class Video2SDataset():
                 ]
             ),
         )
+
+        self.split = split
+        self.fast_flow = []
+        self.slot_flow = []
+        # self.Y = []
+
+        if self.split == "train":
+            self.annotation_filepath = self.train_annotation_filepath
+            self.dataset_root_path = self.train_dataset_root_path
+        elif self.split == "test":
+            self.annotation_filepath = self.test_annotation_filepath
+            self.dataset_root_path = self.test_dataset_root_path
+        else:
+            raise NotImplementedError('No Such split')
+
+        labels = load_annotations(self.label_filepath)
+        num_classes = len(labels)
+        from utils.file_utils import get_line_number
+        num_samples = get_line_number(self.annotation_filepath)
+        num_samples = int(num_samples * self.use_rate)
+
+        self.Y = np.zeros((num_samples, num_classes))
+        self.feature_root_path = r"C:\(lab\datasets\UCF101\features\RGB"
+        for idx, line in enumerate(tqdm(open(self.annotation_filepath, 'r').readlines()[:num_samples], ncols=50)):
+            class_name, filename = line.strip().split(r"/")
+            video_filepath = os.path.join(self.dataset_root_path, class_name, filename.split(".")[0] + ".avi")
+            # self.X.append(feat2clip(np.load(video_filepath), self.clip_length))
+            video_data = self.load_two_stream(video_filepath)
+            slow_flow, fast_flow = video_data
+            # np.save(os.path.join(self.feature_root_path, class_name, filename.split(".")[0]), frames)
+            self.Y[idx][labels[class_name]] = 1
+            self.fast_flow.append(fast_flow)
+            self.slot_flow.append(slow_flow)
+            break
+
+        self.fast_flow = self.fast_flow[:num_samples]
+        self.slot_flow = self.slot_flow[:num_samples]
+        self.Y = self.Y[:num_samples]
 
     def load_two_stream(self, video_path):
         # The duration of the input clip is also specific to the model.
@@ -211,19 +284,16 @@ class Video2SDataset():
         return inputs
 
     def __getitem__(self, index):
-        video_path = self.video_paths[index]
-        label = self.labels[index]
-
-        return self.load_two_stream(video_path=video_path), label
+        return self.slot_flow[index], self.fast_flow[index], self.Y[index]
 
     def __len__(self):
-        return len(self.labels)
+        return len(self.slot_flow)
 
 
 # 问题 ：使用的slow fast的帧，但是没有光流抽取的功能
 # 使用提案手法没有办法对没有使用帧特征的。
 # 将提案手法作为另外一个branch，用另外一个branch来抽取帧之间的特征
-# 在最后的部分联合其阿里
+# 在最后的部分联合起来
 
 
 

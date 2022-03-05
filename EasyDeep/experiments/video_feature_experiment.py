@@ -7,6 +7,7 @@ import time
 from collections import deque
 import torch
 from tqdm import tqdm
+import torch.nn.functional as F
 
 from configs.experiment_config import VideoFeatureConfig
 from experiments import DeepExperiment
@@ -123,11 +124,12 @@ class VideoFeatureExperiment(VideoFeatureConfig, DeepExperiment):
 
     def train_one_epoch(self, epoch) -> float:
         train_loss = 0
+        num_steps_per_update = 4  # accum gradient
+
         self.net.train()
         # global data
         for data in tqdm(self.train_loader, ncols=50):
             self.optimizer.zero_grad()
-
 
             if self.dataset_config.dataset_name == "RGBResNet":
                 sample, feature, label = data
@@ -135,6 +137,12 @@ class VideoFeatureExperiment(VideoFeatureConfig, DeepExperiment):
                 label = self.prepare_data(label)
                 feature = self.prepare_data(feature)
                 out = self.net(sample, feature)
+            elif self.dataset_config.dataset_name == "Video2SDataset":
+                slow, fast, label = data
+                slow = self.prepare_data(slow)
+                label = self.prepare_data(label)
+                fast = self.prepare_data(fast)
+                out = self.net([slow, fast])
             else:
                 sample, label = data
                 sample = self.prepare_data(sample)
@@ -142,6 +150,22 @@ class VideoFeatureExperiment(VideoFeatureConfig, DeepExperiment):
                 out = self.net(sample)
 
             loss = self.loss_function(out, label)
+            # t = sample.size(2)
+            # # upsample to input size
+            # per_frame_logits = F.upsample(out, t, mode='linear')
+            #
+            # # compute localization loss
+            # loc_loss = F.binary_cross_entropy_with_logits(per_frame_logits, label)
+            # # tot_loc_loss += loc_loss.data[0]
+            #
+            # # compute classification loss (with max-pooling along time B x C x T)
+            # cls_loss = F.binary_cross_entropy_with_logits(torch.max(per_frame_logits, dim=2)[0],
+            #                                               torch.max(label, dim=2)[0])
+            # # tot_cls_loss += cls_loss.data[0]
+            #
+            # loss = (0.5 * loc_loss + 0.5 * cls_loss) / num_steps_per_update
+            # tot_loss += loss.data[0]
+
             loss.backward()
             self.optimizer.step()
             train_loss += loss.data
@@ -181,6 +205,12 @@ class VideoFeatureExperiment(VideoFeatureConfig, DeepExperiment):
                     label = self.prepare_data(label)
                     feature = self.prepare_data(feature)
                     out = self.net(sample, feature)
+                elif self.dataset_config.dataset_name == "Video2SDataset":
+                    slow, fast, label = data
+                    slow = self.prepare_data(slow)
+                    label = self.prepare_data(label)
+                    fast = self.prepare_data(fast)
+                    out = self.net([slow, fast])
                 else:
                     sample, label = data
                     sample = self.prepare_data(sample)

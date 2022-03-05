@@ -380,6 +380,7 @@ class MultiLabelConfig(DeepExperimentConfig):
         self.net = MultiLabelNet()
 
 
+
 class VideoFeatureConfig(DeepExperimentConfig):
     name = "video_feature"
     tag = None
@@ -423,11 +424,12 @@ class VideoFeatureConfig(DeepExperimentConfig):
     def set_dataset(self):
         from configs.dataset_config import VideoFeatureDatasetConfig
         self.dataset_config = VideoFeatureDatasetConfig()
-        # if self.dataset_config.dataset_name == "RGB":
-        #     from datasets.video_dataset import UCF101DataSet
-        # else:
-        from datasets.video_feature_dataset import UCF101DataSet
-        self.dataset = UCF101DataSet()
+        if self.dataset_config.dataset_name == "Video2SDataset":
+            from datasets.video_dataset import UCF1012SDataSet
+            self.dataset = UCF1012SDataSet()
+        else:
+            from datasets.video_feature_dataset import UCF101DataSet
+            self.dataset = UCF101DataSet()
 
     def set_net(self):
         from nets.Transformer import TranformerNet
