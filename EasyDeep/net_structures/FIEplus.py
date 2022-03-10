@@ -21,7 +21,7 @@ class FIEISlowFastNet(nn.Module):
 
     def forward(self, data, features):
         output_fie = self.fie(features)
-        output = self.backbone(data.permute(3, 0, 4, 1, 2))
+        output = self.backbone(data)
         # output = self.softmax(output)
         # output = output.squeeze(dim=2)
         return output + output_fie
