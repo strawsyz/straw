@@ -175,9 +175,9 @@ class VideoFeatureDataset(BaseDataSet, VideoFeatureDatasetConfig):
         if self.dataset_name == "RGBResNet":
             return self.X[index], self.F[index], self.Y[index]
         elif self.dataset_name == "SlowFast":
-            return self.slow_flow[index], self.fast_flow[index], self.X[index], self.Y[index]
-        elif self.dataset_name == "SlowFastResNet":
             return self.slow_flow[index], self.fast_flow[index], self.Y[index]
+        elif self.dataset_name == "SlowFastResNet":
+            return self.slow_flow[index], self.fast_flow[index], self.X[index], self.Y[index]
         else:
             return self.X[index], self.Y[index]
 
