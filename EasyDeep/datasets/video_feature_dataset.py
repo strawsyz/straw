@@ -160,9 +160,6 @@ class VideoFeatureDataset(BaseDataSet, VideoFeatureDatasetConfig):
                     self.Y[idx][labels[class_name]] = 1
                     self.fast_flow.append(fast_flow)
                     self.slow_flow.append(slow_flow)
-                    filepath = os.path.join(self.feature_root_path, class_name, filename.split(".")[0] + ".npy")
-                    resnet_features = feat2clip(np.load(filepath), self.clip_length)
-                    self.F.append(resnet_features)
 
                 else:
                     features = np.load(filepath)
