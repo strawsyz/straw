@@ -110,9 +110,9 @@ class VideoFeatureNetConfig(BaseNetConfig):
         # set According to the Args
         args = get_args()
         self.lr = args.LR
-        self.n_layer = args.n_layers
+        # self.n_layer = args.n_layers
         self.heads = args.heads
         self.embeddings_dim = args.embeddings_dim
-        self.N = args.N
+        self.N = args.n_layers
         self.vocab_size = args.vocab_size
         self.model_name = args.model_name
