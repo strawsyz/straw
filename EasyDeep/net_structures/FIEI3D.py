@@ -27,7 +27,7 @@ class SimpleEncoderNoPETrue(nn.Module):
         return self.norm(x), Attn
 
 
-def get_i3d_model():
+def get_i3d_model(pretrained=True):
     import platform
     if platform.system() == "Linux":
         model_path = r"/workspace/datasets/rgb_imagenet.pt"
@@ -36,7 +36,8 @@ def get_i3d_model():
 
     i3d = InceptionI3d(400, in_channels=3)
     # i3d.replace_logits(157)
-    i3d.load_state_dict(torch.load(model_path))
+    if pretrained:
+        i3d.load_state_dict(torch.load(model_path))
     i3d.replace_logits(101)
 
     # i3d.cuda()

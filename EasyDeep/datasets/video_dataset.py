@@ -223,7 +223,6 @@ class Video2SDataset(BaseDataSet, VideoFeatureDatasetConfig):
         self.split = split
         self.fast_flow = []
         self.slot_flow = []
-        # self.Y = []
 
         if self.split == "train":
             self.annotation_filepath = self.train_annotation_filepath
@@ -265,9 +264,6 @@ class Video2SDataset(BaseDataSet, VideoFeatureDatasetConfig):
         # The duration of the input clip is also specific to the model.
         clip_duration = (self.num_frames * self.sampling_rate) / self.frames_per_second
 
-        # Load the example video
-        # video_path = r"C:\(lab\datasets\UCF101\all\ApplyLipstick\v_ApplyLipstick_g01_c02.avi"
-
         # Select the duration of the clip to load by specifying the start and end duration
         # The start_sec should correspond to where the action occurs in the video
         start_sec = 0
@@ -282,8 +278,6 @@ class Video2SDataset(BaseDataSet, VideoFeatureDatasetConfig):
         # Move the inputs to the desired device
         inputs = video_data["video"]
 
-        # inputs = [i.to(device)[None, ...] for i in inputs]
-        # print(inputs.shape)
         return inputs
 
     def __getitem__(self, index):

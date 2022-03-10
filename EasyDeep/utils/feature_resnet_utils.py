@@ -144,8 +144,8 @@ class FrameCV():
         return self.frames[index]
 
 
-def extract_features_ResNet(video_path, feature_path, model, start=None, duration=None, overwrite=False, FPS=2,
-                            transform="crop"):
+def extract_features(video_path, feature_path, model, start=None, duration=None, overwrite=False, FPS=2,
+                     transform="crop"):
     print("extract video", video_path, "from", start, duration)
     # feature_path = video_path.replace(
     #     ".mkv", f"_{self.feature}_{self.back_end}.npy")
@@ -272,16 +272,21 @@ if __name__ == "__main__":
     #
     # model = model.eval().to(device)
 
-    video_path = r"C:\(lab\datasets\UCF101\train\ApplyEyeMakeup\v_ApplyEyeMakeup_g08_c01.avi"
-    output_path = r"C:\(lab\datasets\UCF101\timesformer\1.npy"
-    output_path = r"C:\(lab\datasets\UCF101\i3d\1.npy"
-    # feature_path = r"C:\(lab\datasets\UCF101\features\val"
+    # video_path = r"C:\(lab\datasets\UCF101\train\ApplyEyeMakeup\v_ApplyEyeMakeup_g08_c01.avi"
+    # output_path = r"C:\(lab\datasets\UCF101\timesformer\1.npy"
+    # output_path = r"C:\(lab\datasets\UCF101\i3d\1.npy"
+    #
+    # feature_path = r"C:\(lab\datasets\UCF101\features\resize-resnet"
+    # video_path = r"C:\(lab\datasets\UCF101\val"
+
+    video_path =r"C:\(lab\datasets\UCF101\train\ApplyEyeMakeup\v_ApplyEyeMakeup_g08_c04.avi"
+    output_path = r"1.npy"
 
     model = get_i3d_model()
-    num_frames = extract_features_ResNet(video_path=video_path, feature_path=output_path, model=model)
-    print(num_frames)
-
-    # all_num_frames = []
+    num_frames = extract_features(video_path=video_path, feature_path=output_path, model=model)
+    # print(num_frames)
+    # transform = "resize"
+    # # all_num_frames = []
     # for label in os.listdir(video_path):
     #     for filename in os.listdir(os.path.join(video_path, label)):
     #         video_sample_path = os.path.join(video_path, label, filename)
@@ -290,8 +295,8 @@ if __name__ == "__main__":
     #         # make_directory(feature_path)
     #         print(f"video path : {video_sample_path}")
     #         print(f"feature path : {feature_sample_path}")
-    #         num_frames = extract_features_ResNet(video_path=video_sample_path, feature_path=feature_sample_path,
-    #                                              model=model)
-    #         # all_num_frames.append(num_frames)
+    #         num_frames = extract_features(video_path=video_sample_path, feature_path=feature_sample_path,
+    #                                       model=model, transform=transform)
+            # all_num_frames.append(num_frames)
     #
     # analyze(all_num_frames)

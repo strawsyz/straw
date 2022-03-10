@@ -8,7 +8,7 @@ import torch
 
 from base.base_net import BaseNet
 from configs.net_config import VideoFeatureNetConfig
-from net_structures.FIEI3D import FIEI3DNet, FIEI3DNet2
+from net_structures.FIEI3D import FIEI3DNet, FIEI3DNet2, get_i3d_model
 from pytorch_i3d import InceptionI3d
 
 
@@ -30,20 +30,6 @@ class MyPretrainedI3DNet2(VideoFeatureNetConfig, BaseNet):
         self.net_structure = FIEI3DNet2()
 
 
-def get_i3d_model():
-    import platform
-    if platform.system() == "Linux":
-        model_path = r"/workspace/datasets/rgb_imagenet.pt"
-    else:
-        model_path = r"C:\(lab\OtherProjects\pytorch-i3d-master\models\rgb_imagenet.pt"
-
-    i3d = InceptionI3d(400, in_channels=3)
-    # i3d.replace_logits(157)
-    i3d.load_state_dict(torch.load(model_path))
-    i3d.replace_logits(101)
-
-    # i3d.cuda()
-    return i3d
 
 if __name__ == '__main__':
     data = torch.ones((15, 3, 13, 224, 224))

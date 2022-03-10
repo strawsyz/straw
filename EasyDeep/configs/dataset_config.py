@@ -245,6 +245,12 @@ class VideoFeatureDatasetConfig(BaseDataSetConfig):
         elif self.dataset_name == "Video2SDataset":
             self.train_dataset_root_path = os.path.join(self.root_path, r"all/")
             self.feature_root_path = os.path.join(self.root_path, r"features/FS")
+        elif self.dataset_name == "SlowFastResNet":
+            self.train_dataset_root_path = os.path.join(self.root_path, r"all/")
+            self.feature_root_path = os.path.join(self.root_path, r"features/FS")
+        elif self.dataset_name == "SlowFast":
+            self.train_dataset_root_path = os.path.join(self.root_path, r"all/")
+            self.feature_root_path = os.path.join(self.root_path, r"features/FS")
         else:
             raise NotImplementedError("No such dataset name")
 

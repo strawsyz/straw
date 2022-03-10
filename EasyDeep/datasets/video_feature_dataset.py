@@ -2,6 +2,7 @@ import logging
 import os
 
 import numpy as np
+from pytorchvideo.data.encoded_video import EncodedVideo
 from torch.utils.data import Dataset, DataLoader
 from tqdm import tqdm
 
@@ -114,6 +115,9 @@ class VideoFeatureDataset(BaseDataSet, VideoFeatureDatasetConfig):
 
             self.Y = np.zeros((num_samples, num_classes))
             self.F = []
+            self.slow_flow = []
+            self.fast_flow = []
+            features = None
             for idx, line in enumerate(tqdm(open(self.annotation_filepath, 'r').readlines()[:num_samples], ncols=50)):
                 class_name, filename = line.strip().split(r"/")
                 filepath = os.path.join(self.dataset_root_path, class_name, filename.split(".")[0] + ".npy")
@@ -132,25 +136,104 @@ class VideoFeatureDataset(BaseDataSet, VideoFeatureDatasetConfig):
                     resnet_features = feat2clip(np.load(filepath), self.clip_length)
                     self.F.append(resnet_features)
 
-                else:
+                elif self.dataset_name == "SlowFast":
+                    slow_filepath = os.path.join(self.feature_root_path, class_name,
+                                                 filename.split(".")[0] + "-slow.npy")
+                    fast_filepath = os.path.join(self.feature_root_path, class_name,
+                                                 filename.split(".")[0] + "-fast.npy")
+                    slow_flow = np.load(slow_filepath)
+                    fast_flow = np.load(fast_filepath)
+                    self.Y[idx][labels[class_name]] = 1
+                    self.fast_flow.append(fast_flow)
+                    self.slow_flow.append(slow_flow)
+
+                elif self.dataset_name == "SlowFastResNet":
                     features = np.load(filepath)
                     features = feat2clip(features, self.clip_length)
 
-                self.X.append(features)
-                self.Y[idx][labels[class_name]] = 1
+                    slow_filepath = os.path.join(self.feature_root_path, class_name,
+                                                 filename.split(".")[0] + "-slow.npy")
+                    fast_filepath = os.path.join(self.feature_root_path, class_name,
+                                                 filename.split(".")[0] + "-fast.npy")
+                    slow_flow = np.load(slow_filepath)
+                    fast_flow = np.load(fast_filepath)
+                    self.Y[idx][labels[class_name]] = 1
+                    self.fast_flow.append(fast_flow)
+                    self.slow_flow.append(slow_flow)
+                    filepath = os.path.join(self.feature_root_path, class_name, filename.split(".")[0] + ".npy")
+                    resnet_features = feat2clip(np.load(filepath), self.clip_length)
+                    self.F.append(resnet_features)
+
+                else:
+                    features = np.load(filepath)
+                    features = feat2clip(features, self.clip_length)
+                if features is not None:
+                    self.X.append(features)
+                    self.Y[idx][labels[class_name]] = 1
 
         self.X = self.X[:num_samples]
         self.Y = self.Y[:num_samples]
 
     def __getitem__(self, index):
         if self.dataset_name == "RGBResNet":
-            # return self.X[index], self.F[index], self.Y[index]
             return self.X[index], self.F[index], self.Y[index]
+        elif self.dataset_name == "SlowFast":
+            return self.slow_flow[index], self.fast_flow[index], self.X[index], self.Y[index]
+        elif self.dataset_name == "SlowFastResNet":
+            return self.slow_flow[index], self.fast_flow[index], self.Y[index]
         else:
             return self.X[index], self.Y[index]
 
     def __len__(self):
-        return len(self.X)
+        if self.dataset_name == "SlowFast":
+            return len(self.slow_flow)
+        else:
+            return len(self.X)
+
+#
+# class Video2SDataset(BaseDataSet, VideoFeatureDatasetConfig):
+#     def __init__(self, split="train"):
+#         super(Video2SDataset, self).__init__()
+#         self.split = split
+#         self.fast_flow = []
+#         self.slot_flow = []
+#         self.X = []
+#
+#         if self.split == "train":
+#             self.annotation_filepath = self.train_annotation_filepath
+#             self.dataset_root_path = self.train_dataset_root_path
+#         elif self.split == "test":
+#             self.annotation_filepath = self.test_annotation_filepath
+#             self.dataset_root_path = self.test_dataset_root_path
+#         else:
+#             raise NotImplementedError('No Such split')
+#
+#         labels = load_annotations(self.label_filepath)
+#         num_classes = len(labels)
+#         from utils.file_utils import get_line_number
+#         num_samples = get_line_number(self.annotation_filepath)
+#         num_samples = int(num_samples * self.use_rate)
+#         self.Y = np.zeros((num_samples, num_classes))
+#
+#         for idx, line in enumerate(tqdm(open(self.annotation_filepath, 'r').readlines()[:num_samples], ncols=50)):
+#             class_name, filename = line.strip().split(r"/")
+#             slow_filepath = os.path.join(self.feature_root_path, class_name, filename.split(".")[0] + "-slow.npy")
+#             fast_filepath = os.path.join(self.feature_root_path, class_name, filename.split(".")[0] + "-fast.npy")
+#             slow_flow = np.load(slow_filepath)
+#             fast_flow = np.load(fast_filepath)
+#             self.Y[idx][labels[class_name]] = 1
+#             self.fast_flow.append(fast_flow)
+#             self.slot_flow.append(slow_flow)
+#
+#         self.fast_flow = self.fast_flow[:num_samples]
+#         self.slot_flow = self.slot_flow[:num_samples]
+#         self.Y = self.Y[:num_samples]
+#
+#     def __getitem__(self, index):
+#         return self.slot_flow[index], self.fast_flow[index], self.Y[index]
+#
+#     def __len__(self):
+#         return len(self.slot_flow)
 
 
 class K400DataSet(VideoFeatureDatasetConfig):
