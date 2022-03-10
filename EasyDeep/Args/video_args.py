@@ -15,6 +15,7 @@ class VideoArgs():
         parser = ArgumentParser(description='transformer for soccernet', formatter_class=ArgumentDefaultsHelpFormatter)
 
         parser.add_argument('--GPU', required=False, type=str, default=GPU, help='ID of the GPU to use')
+        parser.add_argument('--vocab_size', required=False, type=int, default=2048, help='Vocab Size')
         parser.add_argument('--embeddings_dim', required=False, type=int, default=512, help='Embedding Size')
         parser.add_argument('--heads', required=False, type=int, default=1, help='Heads')
         parser.add_argument('--n_layers', required=False, type=int, default=1, help='Num of Layers')

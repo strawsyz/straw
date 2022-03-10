@@ -21,13 +21,15 @@ class PretrainedI3DNet(VideoFeatureNetConfig, BaseNet):
 class MyPretrainedI3DNet(VideoFeatureNetConfig, BaseNet):
     def __init__(self):
         super(MyPretrainedI3DNet, self).__init__()
-        self.net_structure = FIEI3DNet()
+        self.net_structure = FIEI3DNet(vocab_size=self.vocab_size, embedding_dim=self.embeddings_dim, N=self.N,
+                                             heads=self.heads, pretrained=True)
 
 
 class MyPretrainedI3DNet2(VideoFeatureNetConfig, BaseNet):
     def __init__(self):
         super(MyPretrainedI3DNet2, self).__init__()
-        self.net_structure = FIEI3DNet2()
+        self.net_structure = FIEI3DNet2(vocab_size=self.vocab_size, embedding_dim=self.embeddings_dim, N=self.N,
+                                             heads=self.heads, pretrained=True)
 
 
 

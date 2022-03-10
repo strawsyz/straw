@@ -46,7 +46,7 @@ def get_i3d_model(pretrained=True):
 
 class FIEI3DNet(nn.Module):
 
-    def __init__(self, vocab_size=2048, embedding_dim=256, N=1, heads=1, max_seq_len=200):
+    def __init__(self, vocab_size=2048, embedding_dim=256, N=1, heads=1, max_seq_len=200, pretrained=True):
         super().__init__()
         # if vocab_size != embedding_dim:
         self.linear1 = nn.Linear(vocab_size, embedding_dim)
@@ -58,7 +58,7 @@ class FIEI3DNet(nn.Module):
             if p.dim() > 1:
                 nn.init.xavier_uniform_(p)
 
-        self.backbone = get_i3d_model()
+        self.backbone = get_i3d_model(pretrained=pretrained)
 
     def forward(self, data, features):
         batch_size, num_frame, num_feature = features.shape
@@ -80,11 +80,12 @@ class FIEI3DNet(nn.Module):
 
 class FIEI3DNet2(nn.Module):
 
-    def __init__(self, vocab_size=2048, embedding_dim=256, N=1, heads=1, max_seq_len=200, num_class=101):
+    def __init__(self, vocab_size=2048, embedding_dim=256, N=1, heads=1, max_seq_len=200, num_class=101,
+                 pretrained=True):
         super().__init__()
 
         self.fie = FIE2(vocab_size, embedding_dim, N, heads, num_class, max_seq_len=200)
-        self.backbone = get_i3d_model()
+        self.backbone = get_i3d_model(pretrained=pretrained)
 
     def forward(self, data, features):
         output_fie = self.fie(features)
