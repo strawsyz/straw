@@ -64,5 +64,29 @@ def get_i3d_model(model_path=r"C:\(lab\OtherProjects\pytorch-i3d-master\models\r
 
 
 if __name__ == '__main__':
-    model = get_extractor("i3d")
-    print(model)
+    # import torchvision.models as models
+    #
+    # from resnet import resnet152 as caffe_resnet
+
+    # import resnet
+    # 省略掉读取图片和预处理的步骤，下面的img就是已经经过预处理之后的图片
+
+    # model = caffe_resnet.resnet152(pretrained=True)
+    # del model.fc
+    # model.fc = lambda x: x
+    # model = model.cuda()
+    # print(model)
+
+    import torchvision
+
+    model = torchvision.models.resnet18(pretrained=True)
+
+    del model.fc
+    model.fc = lambda x: x
+    model = model.cuda()
+    img = torch.ones(3, 10, 3, 224, 224).cuda()
+    img = img.reshape((-1, 3, 224, 224))
+    feat = model(img)
+    feat = feat.reshape((3, 10, -1))
+    print(feat.shape)
+    # feat = model(img)

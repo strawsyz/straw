@@ -8,7 +8,6 @@
 from torch import nn
 
 from net_structures.old_models import FIE2
-# from nets.TorchvisionNet import create_model
 import torch
 
 class FIEISlowFastNet(nn.Module):
@@ -22,8 +21,6 @@ class FIEISlowFastNet(nn.Module):
     def forward(self, data, features):
         output_fie = self.fie(features)
         output = self.backbone(data)
-        # output = self.softmax(output)
-        # output = output.squeeze(dim=2)
         return output + output_fie
 
 

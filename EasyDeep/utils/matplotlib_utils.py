@@ -1,12 +1,15 @@
 import matplotlib.pyplot as plt
 
 
-def lineplot(y_list: list, x_list: list = None, labels=None, title="broken line graph", style_list=None, axis='on'):
+def lineplot(y_list: list, x_list: list = None, labels=None, title="broken line graph", style_list=None, axis='on',
+             figsize=None):
     if x_list is None:
         x_list = [[x for x in range(len(y_list[0]))] for _ in range(len(y_list))]
     assert len(x_list) == len(y_list)
-
-    plt.figure()
+    if figsize is None:
+        plt.figure()
+    else:
+        plt.figure(figsize=figsize)
     if labels is None:
         labels = [x for x in range(len(x_list))]
     for i in range(len(x_list)):
@@ -15,7 +18,8 @@ def lineplot(y_list: list, x_list: list = None, labels=None, title="broken line 
         else:
             plt.plot(x_list[i], y_list[i], style_list[i], label=labels[i])
     plt.legend()
-    plt.title(title)
+    if title is not None:
+        plt.title(title)
     plt.axis(axis)
 
 
