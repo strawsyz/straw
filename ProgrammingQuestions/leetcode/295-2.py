@@ -1,4 +1,4 @@
-# 使用两个堆排序
+# 思路：使用一个大顶堆和一个小顶堆来保存数组
 
 # 参考官方的解法
 class MedianFinder(object):
@@ -9,21 +9,19 @@ class MedianFinder(object):
 
     def addNum(self, x):
         big, small = self.heaps
-        if self.odd:
-            # todo 这边还有待理解
-            # 如果本来有单数个数字
+        if self.odd:  # 来本是奇数状态，添加数字之后变成偶数
+            # 将两个堆的最大值和最小值提取出来，进行平均
             heapq.heappush(big, max(x, self.med))
             heapq.heappush(small, -min(x, self.med))
             self.med = (big[0] - small[0]) / 2.0
         else:
-            # 如果本来有偶数个数字
             if x > self.med:
                 # 如果大于原有的中位数，就插到大顶堆
                 self.med = heapq.heappushpop(big, x)
             else:
                 # 如果小于原有的中位数，就插到小顶堆
                 self.med = -heapq.heappushpop(small, -x)
-        # 改成单数或是偶数
+        # 修改奇偶数状态
         self.odd ^= True
 
     def findMedian(self):
