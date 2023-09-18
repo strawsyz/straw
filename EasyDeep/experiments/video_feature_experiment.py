@@ -91,7 +91,6 @@ class VideoFeatureExperiment(VideoFeatureConfig, DeepExperiment):
         self.experiment_record.save(self.history_save_path)
         self.logger.info("=" * 10 + " saved experiment history at {}".format(self.history_save_path) + "=" * 10)
 
-
     def train(self):
         self.prepare_dataset()
         self.prepare_net()
@@ -299,7 +298,6 @@ class VideoFeatureExperiment(VideoFeatureConfig, DeepExperiment):
             return data
 
 
-
 if __name__ == '__main__':
     import sys
     import numpy as np
@@ -321,5 +319,14 @@ if __name__ == '__main__':
     # export PYTHONPATH="${PYTHONPATH}:/workspace/straw/EasyDeep/"
     # os.environ["CUDA_VISIBLE_DEVICES"] = "0"
     experiment = VideoFeatureExperiment()
+    epoch = 1
+    experiment.valid_one_epoch(epoch)
+
+    experiment.pretrain_path = pretrain_path.strip()
+    experiment.is_pretrain = True
+    result_path = experiment.test(save_predict_result=True)
+    return result_path
+
     experiment.train()
     print(experiment.get_best_accuracy())
+    # Results/video_feature-03-23-2yW4Ac/history/deep_03-23_13-19-08.pth
